@@ -2,7 +2,7 @@
 
 *Designed & built by [**Ojas Mali**](https://github.com/ojxsmali)*
 
-**Live demo → [fintrack-lyart-eta.vercel.app](https://fintrack-lyart-eta.vercel.app)** — open the prototype, or build your own; no sign-up needed.
+**Live demo → [fintrack-ojasmali.vercel.app](https://fintrack-ojasmali.vercel.app)** — open the prototype, or build your own; no sign-up needed.
 
 **Where your money goes, what's changing, and what deserves attention.**
 
