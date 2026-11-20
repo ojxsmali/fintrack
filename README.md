@@ -2,6 +2,8 @@
 
 *Designed & built by [**Ojas Mali**](https://github.com/ojxsmali)*
 
+**Live demo → [fintrack-lyart-eta.vercel.app](https://fintrack-lyart-eta.vercel.app)** — open the prototype, or build your own; no sign-up needed.
+
 **Where your money goes, what's changing, and what deserves attention.**
 
 FinTrack is a personal finance web app that turns raw transactions into a calm monthly picture: your balance, what came in, what went out, how you're pacing against last month, which budgets need attention, and short insights. Each insight shows the calculation it comes from.
