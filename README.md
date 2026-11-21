@@ -14,7 +14,7 @@ FinTrack is a personal finance web app that turns raw transactions into a calm m
 |---|---|
 | ![Analytics: income vs spending, savings rate, highlights](docs/screenshots/analytics-desktop.png) | ![Budgets: per-category limits with on-track, close and over states](docs/screenshots/budgets-desktop.png) |
 | **Transactions** | **Welcome** |
-| ![Transactions: search, filters, period picker, CSV export](docs/screenshots/transactions-desktop.png) | ![Welcome page: open the prototype or build your own](docs/screenshots/welcome-desktop.png) |
+| ![Transactions: search, filters, period picker, CSV export](docs/screenshots/transactions-desktop.png) | ![Welcome page: a live slice of the overview next to the headline, then two ways in](docs/screenshots/welcome-desktop.png) |
 
 <p align="center">
   <img src="docs/screenshots/overview-mobile.png" alt="FinTrack overview on a phone" width="260" />
@@ -37,6 +37,10 @@ FinTrack is a personal finance web app that turns raw transactions into a calm m
 | **Settings** | Display name, currency (every current ISO currency, formatted with its own symbol, digit grouping and decimal places), accounts and starting balances, budget-warning preference, CSV export, loading or removing sample data, deleting all transactions, sign out. |
 | **Auth** | Email + password sign-up and sign-in through Supabase Auth, persistent sessions and protected routes. Cached data is cleared on sign-out. |
 | **Two ways in, no sign-up** | The welcome page offers **See the prototype** (a workspace pre-filled with labelled sample data) and **Build your own FinTrack** (a workspace that starts from zero for tracking your own money). Both are stored only in that browser, kept separate, and can be erased from Settings. Real accounts are optional. |
+
+### Design and motion
+
+Warm paper, dark ink and one petrol accent; Geist for the interface and every number (tabular figures), Instrument Serif for headlines. The welcome page opens with a working slice of the overview — this month's income, spending, savings, spending pace and top categories — computed from the same sample data the prototype loads, so every number on the landing page matches the app. Motion is small and purposeful: word-by-word headline, figures that count up once, a pace line that draws itself, scroll reveals, a page settle on navigation and chart series that draw in. All of it switches off under `prefers-reduced-motion`. Tokens, type scale and motion rules are documented in [DESIGN.md](DESIGN.md).
 
 **Deliberately left out of v1:** dark mode, recurring transactions, goals, multiple currencies with conversion, and bank sync (see *Future improvements*). Insights are deterministic calculations, so they are called **Insights**, not "AI Insights".
 
