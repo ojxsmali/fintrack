@@ -1,7 +1,8 @@
-import { lazy, Suspense, type ReactNode } from 'react'
+import { lazy, Suspense, useEffect, type ReactNode } from 'react'
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { AuthProvider, useAuth } from './services/auth'
+import { AuthProvider } from './services/auth'
+import { useAuth } from './services/authContext'
 import { ToastProvider } from './components/ui/Toast'
 import { TransactionEditorProvider } from './components/transactions/TransactionEditor'
 import { AppShell } from './components/layout/AppShell'
@@ -27,6 +28,26 @@ const queryClient = new QueryClient({
     },
   },
 })
+
+const TITLES: Record<string, string> = {
+  '/': 'FinTrack — personal finance, made legible',
+  '/login': 'Sign in · FinTrack',
+  '/signup': 'Create account · FinTrack',
+  '/dashboard': 'Overview · FinTrack',
+  '/transactions': 'Transactions · FinTrack',
+  '/budgets': 'Budgets · FinTrack',
+  '/analytics': 'Analytics · FinTrack',
+  '/settings': 'Settings · FinTrack',
+}
+
+/** Gives every route its own browser-tab title (history, bookmarks, screen readers). */
+function DocumentTitle() {
+  const { pathname } = useLocation()
+  useEffect(() => {
+    document.title = TITLES[pathname] ?? 'FinTrack'
+  }, [pathname])
+  return null
+}
 
 function RequireAuth({ children }: { children: ReactNode }) {
   const { status } = useAuth()
@@ -56,6 +77,7 @@ export default function App() {
       <BrowserRouter>
         <ToastProvider>
           <AuthProvider>
+            <DocumentTitle />
             <ErrorBoundary>
             <Routes>
               <Route path="/" element={<WelcomePage />} />
@@ -72,11 +94,11 @@ export default function App() {
               >
                 {(
                   [
-                    ['/dashboard', <DashboardPage />],
-                    ['/transactions', <TransactionsPage />],
-                    ['/budgets', <BudgetsPage />],
-                    ['/analytics', <AnalyticsPage />],
-                    ['/settings', <SettingsPage />],
+                    ['/dashboard', <DashboardPage key="dashboard" />],
+                    ['/transactions', <TransactionsPage key="transactions" />],
+                    ['/budgets', <BudgetsPage key="budgets" />],
+                    ['/analytics', <AnalyticsPage key="analytics" />],
+                    ['/settings', <SettingsPage key="settings" />],
                   ] as const
                 ).map(([path, el]) => (
                   <Route key={path} path={path} element={<Suspense fallback={<PageFallback />}>{el}</Suspense>} />

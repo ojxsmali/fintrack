@@ -8,7 +8,21 @@
 
 FinTrack is a personal finance web app that turns raw transactions into a calm monthly picture: your balance, what came in, what went out, how you're pacing against last month, which budgets need attention, and short insights. Each insight shows the calculation it comes from.
 
-> Screenshots: _placeholder. Add `docs/overview.png`, `docs/transactions.png` and `docs/mobile.png` after deploying._
+![FinTrack overview — balance, this month at a glance, spending pace and insights](docs/screenshots/overview-desktop.png)
+
+| Analytics | Budgets |
+|---|---|
+| ![Analytics: income vs spending, savings rate, highlights](docs/screenshots/analytics-desktop.png) | ![Budgets: per-category limits with on-track, close and over states](docs/screenshots/budgets-desktop.png) |
+| **Transactions** | **Welcome** |
+| ![Transactions: search, filters, period picker, CSV export](docs/screenshots/transactions-desktop.png) | ![Welcome page: open the prototype or build your own](docs/screenshots/welcome-desktop.png) |
+
+<p align="center">
+  <img src="docs/screenshots/overview-mobile.png" alt="FinTrack overview on a phone" width="260" />
+  &nbsp;&nbsp;
+  <img src="docs/screenshots/transactions-mobile.png" alt="FinTrack transactions on a phone" width="260" />
+</p>
+
+*Screenshots show the prototype workspace (a year of clearly labelled sample data).*
 
 ---
 
@@ -191,7 +205,7 @@ Local auth has email confirmation turned off (`supabase/config.toml`), so sign-u
 4. In Supabase → **Authentication → URL Configuration**, set the Site URL to your Vercel URL and add `https://<your-app>.vercel.app/**` to Redirect URLs.
 5. Every `git push` to `main` redeploys automatically.
 
-`vercel.json` already includes the SPA rewrite (deep links work) and basic security headers. Netlify also works (`public/_redirects` is included).
+`vercel.json` already includes the SPA rewrite (deep links work), security headers and long-lived caching for hashed assets. `index.html` carries the page description, canonical URL, Open Graph / Twitter card (`public/og-image.png`), icons and a web-app manifest. Netlify also works (`public/_redirects` is included).
 
 **Free-tier note:** Supabase pauses free projects after about a week with no activity. If that happens, real sign-in stops until you click **Restore project** in the Supabase dashboard — but the guest demo keeps working, because it needs no backend.
 
@@ -228,7 +242,7 @@ Linear and Stripe (table density, restrained colour), Mercury (calm, editorial m
 - One currency per workspace or account. All 150+ current ISO currencies are available, but there is no exchange-rate conversion and no mixing currencies within one account.
 - No transfers between accounts. Moving money between your own accounts would currently count as both income and spending.
 - Analytics loads the selected window's transactions and aggregates them in the browser. This is fine for personal volumes. Large histories should move to SQL aggregates through the existing `monthly_summaries` view or RPCs.
-- Lint reports React-Compiler-style warnings (no errors) about `new Date()` during render and setState in effects.
+- **The public demo runs in guest mode.** It is deployed without Supabase credentials, so visitors use the browser-only prototype or their own browser workspace and account sign-up is hidden. Connecting Supabase (see *Deployment*) switches accounts on with no code change.
 
 ## Future improvements
 

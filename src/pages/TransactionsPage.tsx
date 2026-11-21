@@ -8,7 +8,7 @@ import { PeriodPicker, type PeriodValue } from '../components/ui/PeriodPicker'
 import { EmptyState, ErrorState, Skeleton } from '../components/ui/States'
 import { TxAmount } from '../components/ui/Money'
 import { TransactionList } from '../components/transactions/TransactionList'
-import { useTransactionEditor } from '../components/transactions/TransactionEditor'
+import { useTransactionEditor } from '../components/transactions/editorContext'
 import { useAccounts, useCategories, useTransactionCount, useTransactionPage } from '../hooks/useFinance'
 import { useExportCsv } from '../hooks/useExportCsv'
 import { resolvePeriod } from '../lib/periods'
@@ -36,19 +36,24 @@ export function TransactionsPage() {
   const [search, setSearch] = useState('')
   const [type, setType] = useState<TxType | 'all'>('all')
   const [categoryId, setCategoryId] = useState<string>('all')
-  const [period, setPeriod] = useState<PeriodValue>({ preset: 'all', custom: monthRange(new Date()) })
+  const [today] = useState(() => new Date())
+  const [period, setPeriod] = useState<PeriodValue>(() => ({ preset: 'all', custom: monthRange(today) }))
   const [sort, setSort] = useState<SortKey>('date_desc')
-  const [page, setPage] = useState(1)
   const q = useDebounced(search)
 
   const range = useMemo(() => {
     if (period.preset === 'all') return undefined
     if (period.preset === 'custom' && period.custom.from > period.custom.to) return undefined
-    return resolvePeriod(period.preset, new Date(), period.custom)
-  }, [period])
+    return resolvePeriod(period.preset, today, period.custom)
+  }, [period, today])
+
+  // Back to page 1 whenever the filters change (derived during render, no effect needed).
+  const filterKey = [q, type, categoryId, range?.from, range?.to, sort].join('|')
+  const [paging, setPaging] = useState({ key: filterKey, page: 1 })
+  const page = paging.key === filterKey ? paging.page : 1
+  const setPage = (update: (p: number) => number) => setPaging({ key: filterKey, page: update(page) })
 
   const query: TransactionQuery = { search: q, type, categoryId, range, sort, page, pageSize: PAGE_SIZE }
-  useEffect(() => setPage(1), [q, type, categoryId, range?.from, range?.to, sort])
 
   const { data, isLoading, error, refetch, isFetching } = useTransactionPage(query)
   const filtersActive = !!q || type !== 'all' || categoryId !== 'all' || period.preset !== 'all'

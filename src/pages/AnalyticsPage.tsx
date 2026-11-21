@@ -31,12 +31,13 @@ import type { Transaction } from '../types/finance'
 export function AnalyticsPage() {
   const currency = useCurrency()
   const money = (n: number) => formatCurrency(n, currency)
-  const [period, setPeriod] = useState<PeriodValue>({ preset: 'last_6_months', custom: monthRange(new Date()) })
+  const [today] = useState(() => new Date())
+  const [period, setPeriod] = useState<PeriodValue>(() => ({ preset: 'last_6_months', custom: monthRange(today) }))
   const range = useMemo(() => {
     const p = period.preset === 'all' ? 'last_6_months' : period.preset
     if (p === 'custom' && period.custom.from > period.custom.to) return resolvePeriod('this_month')
-    return resolvePeriod(p, new Date(), period.custom)
-  }, [period])
+    return resolvePeriod(p, today, period.custom)
+  }, [period, today])
   const prev = useMemo(() => previousPeriod(range), [range])
   // One fetch: the previous window, this window, and anything dated after it
   // (needed to walk the balance back from today's figure).

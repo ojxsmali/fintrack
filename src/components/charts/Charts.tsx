@@ -1,5 +1,6 @@
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { CHART, ChartFrame, TooltipCard } from './ChartFrame'
+import { ChartFrame, TooltipCard } from './ChartFrame'
+import { CHART } from './chartColors'
 import { formatCurrency, formatPercent } from '../../lib/format'
 import { fmt } from '../../lib/dates'
 import type { BalancePoint, MonthPoint, PacePoint } from '../../lib/finance'

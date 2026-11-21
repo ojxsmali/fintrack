@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { useAuth } from '../services/auth'
+import { useAuth } from '../services/authContext'
 import { useAccounts, useCategories } from './useFinance'
-import { useToast } from '../components/ui/Toast'
+import { useToast } from '../components/ui/toastContext'
 import { friendlyError } from '../services/repository'
 import { today } from '../lib/dates'
 

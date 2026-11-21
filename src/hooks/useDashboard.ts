@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { addMonths, daysInMonth, endOfMonth, fmt, monthRange, toISODate } from '../lib/dates'
 import {
   budgetStatuses,
@@ -20,13 +20,14 @@ import { useBalances, useBudgets, useCategories, useCurrency, useProfile, useTra
  * Everything the overview needs, derived from one 4-month transaction window
  * (this month, last month, and two before for the savings comparison).
  */
-export function useDashboard(now = new Date()) {
+export function useDashboard(nowOverride?: Date) {
+  const [now] = useState(() => nowOverride ?? new Date())
   const currency = useCurrency()
   const profile = useProfile()
   const balances = useBalances()
   const categories = useCategories()
   const budgets = useBudgets()
-  const txWindow = useMemo(() => ({ from: toISODate(addMonths(now, -3)), to: toISODate(endOfMonth(now)) }), [now.getFullYear(), now.getMonth()]) // eslint-disable-line react-hooks/exhaustive-deps
+  const txWindow = useMemo(() => ({ from: toISODate(addMonths(now, -3)), to: toISODate(endOfMonth(now)) }), [now])
   const txs = useTransactionsInRange(txWindow)
 
   const isLoading = profile.isLoading || balances.isLoading || categories.isLoading || budgets.isLoading || txs.isLoading

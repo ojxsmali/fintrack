@@ -2,8 +2,8 @@ import { Component, type ReactNode } from 'react'
 import { Button } from '../ui/Button'
 
 /** Catches render errors in a page so one broken view never blanks the app. */
-export class ErrorBoundary extends Component<{ children: ReactNode; resetKey?: string }, { failed: boolean }> {
-  state = { failed: false }
+export class ErrorBoundary extends Component<{ children: ReactNode; resetKey?: string }, { failed: boolean; resetKey?: string }> {
+  state: { failed: boolean; resetKey?: string } = { failed: false }
 
   static getDerivedStateFromError() {
     return { failed: true }
@@ -13,8 +13,10 @@ export class ErrorBoundary extends Component<{ children: ReactNode; resetKey?: s
     console.error('[FinTrack] page crashed', error)
   }
 
-  componentDidUpdate(prev: { resetKey?: string }) {
-    if (prev.resetKey !== this.props.resetKey && this.state.failed) this.setState({ failed: false })
+  // Navigating to another route (new resetKey) clears a crashed page.
+  static getDerivedStateFromProps(props: { resetKey?: string }, state: { failed: boolean; resetKey?: string }) {
+    if (props.resetKey !== state.resetKey) return { failed: false, resetKey: props.resetKey }
+    return null
   }
 
   render() {

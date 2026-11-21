@@ -6,7 +6,7 @@ import { Button } from '../components/ui/Button'
 import { Field, Input } from '../components/ui/Field'
 import { CurrencySelect } from '../components/ui/CurrencySelect'
 import { AuthorCredit } from '../components/layout/AuthorCredit'
-import { useAuth, type Workspace } from '../services/auth'
+import { useAuth, type Workspace } from '../services/authContext'
 
 const FEATURES = [
   ['A calm monthly overview', 'Balance, income, spending and savings, with how this month compares to the last.'],
@@ -58,7 +58,7 @@ export function WelcomePage() {
             <p className="text-xs font-medium uppercase tracking-[0.08em] text-ink-3">Option 1</p>
             <h2 className="mt-2 text-xl font-semibold tracking-[-0.02em]">See the prototype</h2>
             <p className="mt-2 text-sm text-ink-2">
-              Explore every screen with six months of realistic sample data — dashboard, budgets, analytics and insights. Nothing to set up.
+              Explore every screen with a year of realistic sample data — dashboard, budgets, analytics and insights. Nothing to set up.
             </p>
             <div className="mt-auto pt-6">
               <Button size="lg" variant="secondary" className="w-full sm:w-auto" loading={pending === 'sample'} onClick={() => open('sample')}>
@@ -108,6 +108,30 @@ export function WelcomePage() {
             .
           </p>
         )}
+
+        <figure className="mt-14">
+          <div className="overflow-hidden rounded-lg border border-line bg-surface shadow-[0_24px_60px_-24px_rgba(26,26,24,0.28)]">
+            <div className="flex items-center gap-1.5 border-b border-line bg-sunken px-3 py-2" aria-hidden="true">
+              <span className="h-2.5 w-2.5 rounded-full bg-line" />
+              <span className="h-2.5 w-2.5 rounded-full bg-line" />
+              <span className="h-2.5 w-2.5 rounded-full bg-line" />
+            </div>
+            <img
+              src="/preview/overview-1600.webp"
+              srcSet="/preview/overview-960.webp 960w, /preview/overview-1600.webp 1600w"
+              sizes="(min-width: 1120px) 1056px, 100vw"
+              width={1600}
+              height={1000}
+              loading="lazy"
+              decoding="async"
+              className="block h-auto w-full"
+              alt="The FinTrack overview: total balance, this month's income, spending and savings, a spending-pace chart against last month, and insights worth your attention."
+            />
+          </div>
+          <figcaption className="mt-3 text-sm text-ink-3">
+            The prototype’s overview — balance, this month at a glance, spending pace and the insights worth a look.
+          </figcaption>
+        </figure>
 
         <ul className="mt-16 grid gap-6 border-t border-line pt-8 sm:grid-cols-3">
           {FEATURES.map(([t, d]) => (

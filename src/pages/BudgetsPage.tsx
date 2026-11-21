@@ -5,7 +5,7 @@ import { Button, IconButton } from '../components/ui/Button'
 import { Dialog } from '../components/ui/Dialog'
 import { Field, Input, Select } from '../components/ui/Field'
 import { EmptyState, ErrorState, Skeleton } from '../components/ui/States'
-import { useToast } from '../components/ui/Toast'
+import { useToast } from '../components/ui/toastContext'
 import { BudgetProgress } from '../components/budgets/BudgetProgress'
 import { useBudgets, useCategories, useCurrency, useDeleteBudget, useSaveBudget, useTransactionsInRange } from '../hooks/useFinance'
 import { budgetStatuses, overallBudgetUsage, spendingByCategory, type BudgetStatus } from '../lib/finance'
@@ -19,7 +19,8 @@ export function BudgetsPage() {
   const currency = useCurrency()
   const money = (n: number) => formatCurrency(n, currency)
   const [offset, setOffset] = useState(0)
-  const month = useMemo(() => addMonths(new Date(), offset), [offset])
+  const [today] = useState(() => new Date())
+  const month = useMemo(() => addMonths(today, offset), [today, offset])
   const range = useMemo(() => monthRange(month), [month])
   const budgets = useBudgets()
   const categories = useCategories()

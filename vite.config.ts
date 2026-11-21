@@ -1,4 +1,4 @@
-/// <reference types="vitest/config" />
+﻿/// <reference types="vitest/config" />
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'vite'
@@ -24,5 +24,7 @@ export default defineConfig({
     // Tests never touch a real project, even if .env.local holds Supabase keys.
     env: { VITE_SUPABASE_URL: '', VITE_SUPABASE_ANON_KEY: '' },
     css: false,
+    // The two end-to-end app-flow tests render whole pages; a cold first run on a busy machine needs headroom.
+    testTimeout: 20000,
   },
 })

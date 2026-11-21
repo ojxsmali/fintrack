@@ -1,11 +1,12 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react'
+import { EditorContext, type EditorApi } from './editorContext'
 import { Pencil, Trash2 } from 'lucide-react'
 import { Dialog } from '../ui/Dialog'
 import { Button } from '../ui/Button'
 import { Field, Input, Select, Textarea } from '../ui/Field'
 import { Segmented } from '../ui/Segmented'
 import { TxAmount } from '../ui/Money'
-import { useToast } from '../ui/Toast'
+import { useToast } from '../ui/toastContext'
 import { useAccounts, useCategories, useCurrency, useDeleteTransaction, useSaveTransaction } from '../../hooks/useFinance'
 import { validateTransaction, type FieldErrors, type TransactionDraft } from '../../lib/validation'
 import { currencySymbol } from '../../lib/format'
@@ -14,19 +15,6 @@ import { friendlyError } from '../../services/repository'
 import type { Transaction, TxType } from '../../types/finance'
 
 type Mode = { kind: 'closed' } | { kind: 'create'; type?: TxType } | { kind: 'view'; tx: Transaction } | { kind: 'edit'; tx: Transaction }
-
-interface EditorApi {
-  create(type?: TxType): void
-  open(tx: Transaction): void
-}
-
-const EditorContext = createContext<EditorApi | null>(null)
-
-export function useTransactionEditor(): EditorApi {
-  const ctx = useContext(EditorContext)
-  if (!ctx) throw new Error('useTransactionEditor must be used inside <TransactionEditorProvider>')
-  return ctx
-}
 
 export function TransactionEditorProvider({ children }: { children: ReactNode }) {
   const [mode, setMode] = useState<Mode>({ kind: 'closed' })
@@ -193,9 +181,8 @@ function TransactionForm({
   const [errors, setErrors] = useState<FieldErrors<keyof TransactionDraft>>({})
   const [formError, setFormError] = useState<string | null>(null)
 
-  useEffect(() => {
-    if (!draft.account_id && accounts[0]) setDraft((d) => ({ ...d, account_id: accounts[0].id }))
-  }, [accounts, draft.account_id])
+  // Default to the first account without an extra render.
+  const accountId = draft.account_id || accounts[0]?.id || ''
 
   useEffect(() => {
     amountRef.current?.focus()
@@ -216,7 +203,7 @@ function TransactionForm({
   const submit = async (e: FormEvent) => {
     e.preventDefault()
     setFormError(null)
-    const res = validateTransaction(draft, { categories, accountIds: accounts.map((a) => a.id) })
+    const res = validateTransaction({ ...draft, account_id: accountId }, { categories, accountIds: accounts.map((a) => a.id) })
     if (!res.ok) {
       setErrors(res.errors)
       return
@@ -289,7 +276,7 @@ function TransactionForm({
       </div>
       <Field label="Account" error={errors.account_id}>
         {(p) => (
-          <Select {...p} value={draft.account_id} onChange={(e) => set('account_id', e.target.value)}>
+          <Select {...p} value={accountId} onChange={(e) => set('account_id', e.target.value)}>
             {accounts.map((a) => (
               <option key={a.id} value={a.id}>
                 {a.name}

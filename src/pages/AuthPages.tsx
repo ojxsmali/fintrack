@@ -5,7 +5,7 @@ import { Button } from '../components/ui/Button'
 import { Field, Input, PasswordInput } from '../components/ui/Field'
 import { CurrencySelect } from '../components/ui/CurrencySelect'
 import { AuthorCredit } from '../components/layout/AuthorCredit'
-import { useAuth } from '../services/auth'
+import { useAuth } from '../services/authContext'
 import { validateEmail, validatePassword } from '../lib/validation'
 
 function AuthLayout({ children }: { children: ReactNode }) {

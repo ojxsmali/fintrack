@@ -5,10 +5,10 @@ import { Button } from '../components/ui/Button'
 import { Dialog } from '../components/ui/Dialog'
 import { Field, Input, Select, Toggle } from '../components/ui/Field'
 import { Skeleton } from '../components/ui/States'
-import { useToast } from '../components/ui/Toast'
+import { useToast } from '../components/ui/toastContext'
 import { useAccounts, useBalances, useHasSampleData, useProfile, useSampleData, useSaveAccount, useUpdateProfile } from '../hooks/useFinance'
 import { useExportCsv } from '../hooks/useExportCsv'
-import { useAuth } from '../services/auth'
+import { useAuth } from '../services/authContext'
 import { friendlyError } from '../services/repository'
 import { useQueryClient } from '@tanstack/react-query'
 import { currencySymbol, formatCurrency } from '../lib/format'
@@ -37,16 +37,14 @@ export function SettingsPage() {
   const toast = useToast()
   const location = useLocation()
   const qc = useQueryClient()
-  const [name, setName] = useState('')
+  const [nameDraft, setName] = useState<string | null>(null)
   const [confirm, setConfirm] = useState<'wipe' | 'reset' | null>(null)
   const [busy, setBusy] = useState(false)
   const sample = useSampleData()
   const hasSample = useHasSampleData()
   const exportCsv = useExportCsv()
 
-  useEffect(() => {
-    if (profile.data) setName(profile.data.display_name)
-  }, [profile.data])
+  const name = nameDraft ?? profile.data?.display_name ?? ''
 
   useEffect(() => {
     if (location.hash) document.getElementById(location.hash.slice(1))?.scrollIntoView({ block: 'start' })
@@ -140,7 +138,7 @@ export function SettingsPage() {
           </Row>
           <Row
             title="Sample data"
-            body={hasSample.data ? 'Sample transactions are loaded and labelled “sample”. Remove them before tracking for real.' : 'Load six months of illustrative transactions to explore the product. Clearly labelled, removable in one click.'}
+            body={hasSample.data ? 'Sample transactions are loaded and labelled “sample”. Remove them before tracking for real.' : 'Load a year of illustrative transactions to explore the product. Clearly labelled, removable in one click.'}
           >
             {hasSample.data ? (
               <Button

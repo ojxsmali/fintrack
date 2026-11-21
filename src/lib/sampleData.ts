@@ -79,7 +79,8 @@ export function buildSampleData(categories: Category[], accountId: string, now =
     })
   }
 
-  for (let m = -6; m <= 0; m++) {
+  // A full year plus the current month, so every default period (incl. "last 6 months" vs the 6 before) can compare.
+  for (let m = -12; m <= 0; m++) {
     const month = addMonths(now, m)
     const y = month.getFullYear()
     const mo = month.getMonth()

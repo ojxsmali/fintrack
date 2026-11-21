@@ -3,7 +3,7 @@
  * invalidated after every write so the dashboard reflects changes without a reload.
  */
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useAuth } from '../services/auth'
+import { useAuth } from '../services/authContext'
 import type { BudgetInput, DateRange, Profile, Transaction, TransactionInput, TransactionQuery, Account } from '../types/finance'
 
 export const keys = {

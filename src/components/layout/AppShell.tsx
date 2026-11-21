@@ -4,8 +4,8 @@ import { useEffect, useRef, type ReactNode } from 'react'
 import { Wordmark, LogoMark } from '../ui/Logo'
 import { ErrorBoundary } from './ErrorBoundary'
 import { Button, IconButton } from '../ui/Button'
-import { useTransactionEditor } from '../transactions/TransactionEditor'
-import { useAuth } from '../../services/auth'
+import { useTransactionEditor } from '../transactions/editorContext'
+import { useAuth } from '../../services/authContext'
 import { AuthorCredit } from './AuthorCredit'
 
 const NAV = [

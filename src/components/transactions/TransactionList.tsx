@@ -1,7 +1,7 @@
 import type { Category, Transaction } from '../../types/finance'
 import { fmt, relativeDayLabel } from '../../lib/dates'
 import { TxAmount } from '../ui/Money'
-import { useTransactionEditor } from './TransactionEditor'
+import { useTransactionEditor } from './editorContext'
 
 /** Neutral monogram — identifies the merchant without colourful icon noise. */
 function Monogram({ name, income }: { name: string; income: boolean }) {

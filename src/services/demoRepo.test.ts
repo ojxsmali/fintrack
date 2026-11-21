@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { createDemoRepo, freshDemoState, type DemoStorage } from './demoRepo'
 import { AppError } from './repository'
-import { authMessage } from './auth'
+import { authMessage } from './authContext'
 import type { FinanceRepo } from './repository'
 
 function memoryStorage(): DemoStorage {
@@ -79,6 +79,10 @@ describe('sample data', () => {
     await repo.createTransaction({ type: 'expense', amount: 99, category_id: food, account_id: account, merchant: 'Mine', description: '', notes: '', occurred_on: '2026-11-01' })
     const plan = buildSampleData(await repo.listCategories(), account, new Date(2026, 10, 20))
     expect(plan.transactions.every((t) => t.is_sample && t.amount > 0 && t.occurred_on <= '2026-11-20')).toBe(true)
+    // A full year back, so "last 6 months" can always be compared with the 6 months before it.
+    const months = new Set(plan.transactions.map((t) => t.occurred_on.slice(0, 7)))
+    expect(months.size).toBe(13)
+    expect([...months].sort()[0]).toBe('2025-11')
     await repo.insertSampleData(plan.transactions, plan.budgets)
     expect(await repo.hasSampleData()).toBe(true)
     await repo.removeSampleData()

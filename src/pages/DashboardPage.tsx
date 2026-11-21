@@ -7,15 +7,15 @@ import { formatCurrency, formatPercent } from '../lib/format'
 import { Skeleton, EmptyState, ErrorState } from '../components/ui/States'
 import { Button } from '../components/ui/Button'
 import { Panel } from '../components/ui/Panel'
-import { useToast } from '../components/ui/Toast'
+import { useToast } from '../components/ui/toastContext'
 import { SpendingPaceChart } from '../components/charts/Charts'
 import { CategoryBars } from '../components/charts/CategoryBars'
 import { BudgetProgress } from '../components/budgets/BudgetProgress'
 import { TransactionList } from '../components/transactions/TransactionList'
-import { useTransactionEditor } from '../components/transactions/TransactionEditor'
+import { useTransactionEditor } from '../components/transactions/editorContext'
 import { InsightList } from '../components/dashboard/InsightList'
 import { friendlyError } from '../services/repository'
-import { useAuth } from '../services/auth'
+import { useAuth } from '../services/authContext'
 
 function greeting(d = new Date()) {
   const h = d.getHours()
