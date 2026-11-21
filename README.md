@@ -40,7 +40,7 @@ FinTrack is a personal finance web app that turns raw transactions into a calm m
 
 ### Design and motion
 
-Warm paper, dark ink and one petrol accent; Geist for the interface and every number (tabular figures), Instrument Serif for headlines. The welcome page opens with a working slice of the overview — this month's income, spending, savings, spending pace and top categories — computed from the same sample data the prototype loads, so every number on the landing page matches the app. Motion is small and purposeful: word-by-word headline, figures that count up once, a pace line that draws itself, scroll reveals, a page settle on navigation and chart series that draw in. All of it switches off under `prefers-reduced-motion`. Tokens, type scale and motion rules are documented in [DESIGN.md](DESIGN.md).
+**Night ledger.** Deep green-black, bone-white ink and one electric lime accent; Bricolage Grotesque for headlines and big figures, Onest for the interface (tabular figures), JetBrains Mono for keys. The welcome page opens with fanned cards built from the prototype's own sample data — saved this month, spending pace against last month, where it went — which you can grab and pull; let go and they spring back. Buttons squash and ripple on press, nav pills slide on a spring, panels follow the cursor with a soft spotlight, the product screenshot rises from a tilt as you scroll, and charts draw in. All of it switches off under `prefers-reduced-motion`. Tokens, type and every interaction are documented in [DESIGN.md](DESIGN.md).
 
 **Deliberately left out of v1:** dark mode, recurring transactions, goals, multiple currencies with conversion, and bank sync (see *Future improvements*). Insights are deterministic calculations, so they are called **Insights**, not "AI Insights".
 
@@ -57,7 +57,7 @@ Warm paper, dark ink and one petrol accent; Geist for the interface and every nu
 | Charts | Recharts | Line and bar charts with custom tooltips. Category bars and sparklines are plain HTML, which is lighter and more accessible. |
 | Backend | Supabase (Postgres + Auth + Row Level Security) | Real auth and a relational schema, with security enforced in the database. |
 | Icons | Lucide | Used sparingly, mostly in navigation. |
-| Fonts | Geist (UI and numbers), Instrument Serif (greeting and auth headline only) | Self-hosted through Fontsource, so there are no third-party font requests. |
+| Fonts | Bricolage Grotesque (display), Onest (UI and numbers), JetBrains Mono (keys) | Self-hosted through Fontsource, so there are no third-party font requests |
 | Tests | Vitest + Testing Library; PGlite for database checks | |
 
 Framer Motion was not added. The only motion is short CSS transitions (120–180 ms), which are disabled under `prefers-reduced-motion`.
@@ -228,8 +228,8 @@ Not covered by automated tests: the live `supabaseRepo` network path and the Sup
 
 ## Design decisions
 
-- **Direction.** Warm paper background, ink text, one petrol accent, and muted semantic colours (moss for positive values, ochre for caution, clay for over-budget). Spending is shown in ink rather than red, because spending money is normal and not an error. Structure comes mainly from type, spacing and hairlines, and only some sections sit in bordered panels.
-- **Type.** Geist for its neutral, technical tone and true tabular figures (verified: digits render at equal width). Instrument Serif appears only in the greeting and the auth headline, which gives warmth without becoming decoration.
+- **Direction.** A dark "night ledger": green-black background, bone-white text, one electric lime accent spent on actions and this month's data, mint for positive values, amber for caution, coral for over-budget. Money is never shown in saturated red/green.
+- **Type.** Bricolage Grotesque gives headlines and headline figures character; Onest keeps the interface neutral with true tabular figures, so columns of money align.
 - **Charts.** A cumulative line for "am I on pace?", because daily bars are spiky and hide the trajectory. Horizontal bars for categories, because labels sit next to exact values on a common baseline, which reads better than a donut, especially at 320 px. The two-series colours were checked with a colour-vision-deficiency validator (blue/amber, ΔE ≥ 20 under protanopia and tritanopia). Last month is a dashed neutral line, and every chart has a legend, a written summary and a table view.
 - **Navigation.** Labelled sidebar on desktop, icon rail on tablet, bottom tab bar on phones. Research (NN/g) favours visible navigation over hidden menus. On phones, "Add" lives in the top bar so it doesn't compete with the tabs.
 - **No dark mode in v1.** People check finances in short, mostly daytime sessions. A proper dark theme needs its own validated chart colours and states rather than inverted colours. The tokens are set up so it can be added later.

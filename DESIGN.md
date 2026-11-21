@@ -1,54 +1,44 @@
-# FinTrack design system
+# FinTrack design system — "Night ledger"
 
-FinTrack should feel like a well-kept ledger: warm paper, dark ink, one petrol accent, and numbers that line up. Colour goes to data and state, not decoration.
+Deep green-black, bone-white ink and one electric lime accent. Lime is spent on what you act on and on this month's data; everything else stays quiet. Interfaces should feel physical: things you press squash, things you drag spring back.
 
 ## Colour (tokens in `src/index.css`)
 
 | Role | Token | Value |
 |---|---|---|
-| App background | `paper` | `#f6f4ef` |
-| Raised surface (panels, drawers) | `surface` | `#fdfcf9` |
-| Wells, skeletons, hover | `sunken` | `#efece5` |
-| Hairlines | `line` / `line-strong` | `#e3dfd6` / `#cfcac0` |
-| Text | `ink` → `ink-4` | `#1a1a18` (16.2:1) → `#9a978f` |
-| Accent (petrol) | `accent` | `#1f5260` |
-| Money in / saved | `positive` (moss) | `#2e6a4c` |
-| Overspent | `negative` (clay) | `#a3472f` |
-| Near a limit | `caution` | `#8c6412` |
-
-Money is never shown in saturated red or green. Spending is ink: it is normal, not an error.
+| App background | `paper` | `#0B0D0C` |
+| Panels, drawers | `surface` | `#131715` |
+| Wells, hover | `sunken` | `#1B201D` |
+| Hairlines | `line` / `line-strong` | `#242A27` / `#343C38` |
+| Text | `ink` → `ink-4` | `#F1F4EF` (17.6:1) → `#5D6761` |
+| Accent | `accent` (electric lime) | `#C6F45E`, text on it `#0B0D0C` |
+| Saved / income | `positive` (mint) | `#5FE0A5` |
+| Overspent | `negative` (coral) | `#FF7F66` |
+| Near a limit | `caution` | `#F4C25A` |
+| Charts | current / previous / income / spending | lime / dashed grey / sky `#7CC6FF` / apricot `#FFA26B` |
 
 ## Type
 
-- **Geist Variable** for UI and every number (`.num` turns on tabular figures).
-- **Instrument Serif** only for page-level headlines (welcome hero, section titles, the dashboard greeting).
-- Scale: 11 / 12 / 13 / 15 / 17 / 22 / 28 / 38 / 48 px. Body is 15 px.
+- **Bricolage Grotesque** — display: headlines, page titles, headline figures.
+- **Onest** — interface text, tabular figures via `.num`.
+- **JetBrains Mono** — keys and code-like labels.
 
-## Shape and depth
+## Interaction (`src/components/motion/`, `motion` library)
 
-- Radius 4 / 6 / 8 / 12 px. Cards use 8 px; the welcome hero card uses 12 px.
-- Only overlays float (`--shadow-overlay`). Cards get a hairline and, on hover, a warmer hairline and a soft shadow (`.ft-card`).
+| Pattern | Where |
+|---|---|
+| Drag-and-release cards that spring back (`PullCard`) | landing hero cards, dashboard stat tiles |
+| Magnetic buttons (`Magnetic`) | landing CTAs |
+| Pointer tilt (`TiltCard`) | dashboard balance card, feature bento |
+| Cursor spotlight (`.ft-card` + `spotlight`) | every panel |
+| Press squash + ink ripple | every button |
+| Sliding nav pill / tab blob (`layoutId`) | sidebar, phone tab bar |
+| Scroll-linked product reveal (tilt → flat, scale up) | landing |
+| Word rise + lime marker sweep | landing headline |
+| Blur-rise reveals, page settle, section stagger, chart draw-in, count-ups | everywhere |
 
-## Motion (`src/components/motion/`, CSS in `src/index.css`)
-
-One curve (`cubic-bezier(0.22, 1, 0.36, 1)`), no bounce, no loops except the hero's slow ambient light.
-
-| Pattern | Where | Notes |
-|---|---|---|
-| Word-by-word headline rise | Welcome hero | Full sentence kept for screen readers (`SplitWords`) |
-| Count-up figures | Welcome preview card, dashboard balance strip | Runs once when the figure is first visible (`CountUp`) |
-| Sparkline draw + bar grow | Welcome preview card | Same sample data as the prototype |
-| Scroll reveal | Welcome sections | `Reveal`, IntersectionObserver, 14 px rise |
-| Tilted preview flattening on scroll | Welcome product screenshot | `--tilt` from scroll position |
-| Page settle | Every route change | `.ft-page`, 420 ms |
-| Section stagger | Dashboard | `.ft-stagger`, 60 ms steps |
-| Series draw-in | All Recharts charts | 900 ms, once |
-| Active-nav indicator | Sidebar and phone tab bar | Accent bar scales in |
-
-`prefers-reduced-motion: reduce` turns all of it off: content renders in its final state at once.
+`<MotionConfig reducedMotion="user">` and CSS media queries turn all of it off for reduced motion.
 
 ## Layout
 
-- Phone (< 768): top bar + bottom tab bar. Tablet (768–1023): icon rail. Desktop (≥ 1024): labelled sidebar.
-- Content max width 1180 px in the app, 1200 px on the welcome page.
-- Every page is checked at 1440, 1280, 768, 390 and 375 px with no horizontal overflow.
+Phone (< 768): top bar + floating pill tab bar. Tablet (768–1023): icon rail. Desktop (≥ 1024): labelled sidebar. Checked at 1440, 1280, 768, 390, 375 and 320 px with no horizontal overflow.
