@@ -115,7 +115,9 @@ export function AppShell() {
         <main id="main" ref={mainRef} tabIndex={-1} className="flex-1 outline-none">
           <div className="mx-auto w-full max-w-[1180px] px-4 pb-28 pt-6 sm:px-6 md:pb-16 md:pt-8 lg:px-10 lg:pt-10">
             <ErrorBoundary resetKey={location.pathname}>
-              <Outlet />
+              <div key={location.pathname} className="ft-page">
+                <Outlet />
+              </div>
             </ErrorBoundary>
           </div>
         </main>
@@ -129,11 +131,12 @@ export function AppShell() {
               <NavLink
                 to={to}
                 className={({ isActive }) =>
-                  `flex h-14 flex-col items-center justify-center gap-0.5 text-[10.5px] font-medium transition-colors ${isActive ? 'text-ink' : 'text-ink-3'}`
+                  `relative flex h-14 flex-col items-center justify-center gap-0.5 text-[10.5px] font-medium transition-colors ${isActive ? 'text-ink' : 'text-ink-3'}`
                 }
               >
                 {({ isActive }) => (
                   <>
+                    <span aria-hidden className={`absolute top-0 h-0.5 w-8 rounded-b-full bg-accent transition-opacity duration-300 ${isActive ? 'opacity-100' : 'opacity-0'}`} />
                     <Icon size={20} strokeWidth={isActive ? 2.1 : 1.7} aria-hidden />
                     <span>{label === 'Transactions' ? 'Activity' : label}</span>
                   </>
@@ -160,7 +163,11 @@ function SideLink({ to, label, icon: Icon }: { to: string; label: string; icon: 
     >
       {({ isActive }) => (
         <>
-          <Icon size={18} strokeWidth={isActive ? 2.1 : 1.7} aria-hidden />
+          <span
+            aria-hidden
+            className={`absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-accent transition-[opacity,transform] duration-300 ease-[var(--ease-out)] max-lg:hidden ${isActive ? 'scale-y-100 opacity-100' : 'scale-y-0 opacity-0'}`}
+          />
+          <Icon size={18} strokeWidth={isActive ? 2.1 : 1.7} aria-hidden className="transition-transform duration-200 group-hover:scale-105" />
           <span className="sr-only lg:not-sr-only">{label}</span>
         </>
       )}

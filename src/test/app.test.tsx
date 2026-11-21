@@ -51,7 +51,7 @@ describe('app flow (no backend)', () => {
     const user = userEvent.setup()
     window.history.pushState({}, '', '/')
     render(<App />)
-    await user.click(await screen.findByRole('button', { name: 'Open the prototype' }))
+    await user.click((await screen.findAllByRole('button', { name: 'Open the prototype' }))[0])
     expect(await screen.findByText('Total balance')).toBeInTheDocument()
     expect(screen.getByRole('note')).toHaveTextContent(/Prototype/)
     const sample = JSON.parse(localStorage.getItem('fintrack.demo.v1')!)

@@ -14,6 +14,7 @@ import { BudgetProgress } from '../components/budgets/BudgetProgress'
 import { TransactionList } from '../components/transactions/TransactionList'
 import { useTransactionEditor } from '../components/transactions/editorContext'
 import { InsightList } from '../components/dashboard/InsightList'
+import { CountUp } from '../components/motion/Motion'
 import { friendlyError } from '../services/repository'
 import { useAuth } from '../services/authContext'
 
@@ -40,7 +41,7 @@ export function DashboardPage() {
         : `You’ve spent ${money(data.spentToDate)} so far in ${data.monthName} — ${formatPercent(Math.abs(data.pace))} ${data.pace <= 0 ? 'less' : 'more'} than at this point in ${data.prevMonthName}.`
 
   return (
-    <div className="flex flex-col gap-10">
+    <div className="ft-stagger flex flex-col gap-10">
       <header>
         <h1 className="font-display text-[2.15rem] leading-[1.1] tracking-[-0.01em] text-ink sm:text-4xl">
           {greeting()}
@@ -152,10 +153,10 @@ function BalanceStrip({
   accounts: number
 }) {
   return (
-    <section aria-label="Balance overview" className="grid grid-cols-2 gap-x-6 gap-y-6 border-y border-line py-6 md:grid-cols-[1.5fr_1fr_1fr_1fr] md:gap-0 md:divide-x md:divide-line">
-      <div className="col-span-2 md:col-span-1 md:pr-8">
+    <section aria-label="Balance overview" className="grid grid-cols-2 gap-x-6 gap-y-6 border-y border-line py-6 md:grid-cols-3 lg:grid-cols-[minmax(0,1.5fr)_repeat(3,minmax(0,1fr))] lg:gap-0 lg:divide-x lg:divide-line">
+      <div className="col-span-2 min-w-0 md:col-span-3 lg:col-span-1 lg:pr-8">
         <p className="text-sm text-ink-3">Total balance</p>
-        <p className={`num mt-1 text-4xl font-medium tracking-[-0.035em] ${balance < 0 ? 'text-negative' : 'text-ink'}`}>{money(balance)}</p>
+        <p className={`num mt-1 text-4xl font-medium tracking-[-0.035em] ${balance < 0 ? 'text-negative' : 'text-ink'}`}><CountUp value={balance} format={(n) => money(n)} /></p>
         <p className="mt-1 text-xs text-ink-3">
           Across {accounts} {accounts === 1 ? 'account' : 'accounts'} ·{' '}
           <Link to="/settings#accounts" className="underline-offset-2 hover:underline">
@@ -163,11 +164,12 @@ function BalanceStrip({
           </Link>
         </p>
       </div>
-      <Stat label={`Income in ${monthName}`} value={money(income)} />
-      <Stat label={`Spent in ${monthName}`} value={money(expense)} />
+      <Stat label={`Income in ${monthName}`} amount={income} money={money} />
+      <Stat label={`Spent in ${monthName}`} amount={expense} money={money} />
       <Stat
         label={net >= 0 ? `Saved in ${monthName}` : `Overspent in ${monthName}`}
-        value={money(Math.abs(net))}
+        amount={Math.abs(net)}
+        money={money}
         tone={net >= 0 ? (net > 0 ? 'positive' : undefined) : 'negative'}
         className="col-span-2 md:col-span-1"
       />
@@ -175,12 +177,12 @@ function BalanceStrip({
   )
 }
 
-function Stat({ label, value, tone, className = '' }: { label: string; value: string; tone?: 'positive' | 'negative'; className?: string }) {
+function Stat({ label, amount, money, tone, className = '' }: { label: string; amount: number; money: (n: number) => string; tone?: 'positive' | 'negative'; className?: string }) {
   return (
-    <div className={`md:px-6 lg:px-8 ${className}`}>
+    <div className={`min-w-0 lg:px-6 xl:px-8 ${className}`}>
       <p className="text-sm text-ink-3">{label}</p>
       <p className={`num mt-1 text-xl font-medium tracking-[-0.02em] sm:text-2xl ${tone === 'positive' ? 'text-positive' : tone === 'negative' ? 'text-negative' : 'text-ink'}`}>
-        {value}
+        <CountUp value={amount} format={(n) => money(n)} />
       </p>
     </div>
   )

@@ -25,7 +25,7 @@ export function Panel({
   return (
     <section
       aria-labelledby={headingId}
-      className={`${plain ? '' : 'rounded-lg border border-line bg-surface px-4 py-4 md:px-5 md:py-5'} min-w-0 ${className}`}
+      className={`${plain ? '' : 'ft-card rounded-lg border border-line bg-surface px-4 py-4 md:px-5 md:py-5'} min-w-0 ${className}`}
     >
       <div className="mb-4 flex items-start justify-between gap-3">
         <div className="min-w-0">

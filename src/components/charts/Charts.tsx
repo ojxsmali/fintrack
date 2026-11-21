@@ -5,6 +5,9 @@ import { formatCurrency, formatPercent } from '../../lib/format'
 import { fmt } from '../../lib/dates'
 import type { BalancePoint, MonthPoint, PacePoint } from '../../lib/finance'
 
+/** Series draw in once on mount; skipped for reduced motion (and in test environments without matchMedia). */
+const animate = typeof window !== 'undefined' && typeof window.matchMedia === 'function' && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
 const axisProps = { tickLine: false, axisLine: false, stroke: CHART.axis, fontSize: 11 } as const
 
 /**
@@ -58,8 +61,8 @@ export function SpendingPaceChart({
               ) : null
             }
           />
-          <Line type="monotone" dataKey="previous" stroke={CHART.previous} strokeWidth={2} strokeDasharray="4 4" dot={false} activeDot={{ r: 4, strokeWidth: 2, stroke: '#fdfcf9' }} isAnimationActive={false} connectNulls={false} />
-          <Line type="monotone" dataKey="current" stroke={CHART.current} strokeWidth={2.25} dot={false} activeDot={{ r: 5, strokeWidth: 2, stroke: '#fdfcf9' }} isAnimationActive={false} connectNulls={false} />
+          <Line type="monotone" dataKey="previous" stroke={CHART.previous} strokeWidth={2} strokeDasharray="4 4" dot={false} activeDot={{ r: 4, strokeWidth: 2, stroke: '#fdfcf9' }} isAnimationActive={animate} animationDuration={900} animationEasing="ease-out" connectNulls={false} />
+          <Line type="monotone" dataKey="current" stroke={CHART.current} strokeWidth={2.25} dot={false} activeDot={{ r: 5, strokeWidth: 2, stroke: '#fdfcf9' }} isAnimationActive={animate} animationDuration={900} animationEasing="ease-out" connectNulls={false} />
         </LineChart>
       </ResponsiveContainer>
     </ChartFrame>
@@ -102,8 +105,8 @@ export function IncomeExpenseChart({ data, currency, summary }: { data: MonthPoi
               ) : null
             }}
           />
-          <Bar dataKey="income" fill={CHART.income} radius={[4, 4, 0, 0]} maxBarSize={28} isAnimationActive={false} />
-          <Bar dataKey="expense" fill={CHART.expense} radius={[4, 4, 0, 0]} maxBarSize={28} isAnimationActive={false} />
+          <Bar dataKey="income" fill={CHART.income} radius={[4, 4, 0, 0]} maxBarSize={28} isAnimationActive={animate} animationDuration={900} animationEasing="ease-out" />
+          <Bar dataKey="expense" fill={CHART.expense} radius={[4, 4, 0, 0]} maxBarSize={28} isAnimationActive={animate} animationDuration={900} animationEasing="ease-out" />
         </BarChart>
       </ResponsiveContainer>
     </ChartFrame>
@@ -133,7 +136,7 @@ export function SavingsRateChart({ data, summary }: { data: MonthPoint[]; summar
               return active && p ? <TooltipCard title={p.label} rows={[{ label: 'Saved of income', value: formatPercent(p.rate) }]} /> : null
             }}
           />
-          <Bar dataKey="rate" fill={CHART.single} radius={[4, 4, 0, 0]} maxBarSize={32} isAnimationActive={false} />
+          <Bar dataKey="rate" fill={CHART.single} radius={[4, 4, 0, 0]} maxBarSize={32} isAnimationActive={animate} animationDuration={900} animationEasing="ease-out" />
         </BarChart>
       </ResponsiveContainer>
     </ChartFrame>
@@ -172,7 +175,7 @@ export function BalanceChart({ data, currency, summary }: { data: BalancePoint[]
               return active && p ? <TooltipCard title={`End of ${fmt.monthYear(new Date(`${p.key}-01T00:00:00`))}`} rows={[{ label: 'Balance', value: money(p.balance) }]} /> : null
             }}
           />
-          <Area type="monotone" dataKey="balance" stroke={CHART.single} strokeWidth={2.25} fill="url(#balanceFill)" dot={{ r: 3, fill: CHART.single, strokeWidth: 0 }} activeDot={{ r: 5, strokeWidth: 2, stroke: '#fdfcf9' }} isAnimationActive={false} />
+          <Area type="monotone" dataKey="balance" stroke={CHART.single} strokeWidth={2.25} fill="url(#balanceFill)" dot={{ r: 3, fill: CHART.single, strokeWidth: 0 }} activeDot={{ r: 5, strokeWidth: 2, stroke: '#fdfcf9' }} isAnimationActive={animate} animationDuration={900} animationEasing="ease-out" />
         </AreaChart>
       </ResponsiveContainer>
     </ChartFrame>
