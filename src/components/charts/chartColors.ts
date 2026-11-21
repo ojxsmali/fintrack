@@ -1,10 +1,10 @@
-/** Validated chart palette (blue / amber pair passes colour-blind separation checks). */
+/** Chart palette for the dark theme: lime = this period, sky / apricot = income / spending (CVD-separable). */
 export const CHART = {
-  current: '#17709a',
-  previous: '#b6b2a8',
-  income: '#17709a',
-  expense: '#cf8641',
-  single: '#1f5260',
-  grid: '#e3dfd6',
-  axis: '#6b6962',
+  current: '#c6f45e',
+  previous: '#5d6761',
+  income: '#7cc6ff',
+  expense: '#ffa26b',
+  single: '#c6f45e',
+  grid: '#242a27',
+  axis: '#8e988f',
 }

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { spotlight } from '../motion/effects'
 
 /**
  * A titled region. Not every section is a card: `plain` panels sit directly on
@@ -25,6 +26,7 @@ export function Panel({
   return (
     <section
       aria-labelledby={headingId}
+      onPointerMove={plain ? undefined : spotlight}
       className={`${plain ? '' : 'ft-card rounded-lg border border-line bg-surface px-4 py-4 md:px-5 md:py-5'} min-w-0 ${className}`}
     >
       <div className="mb-4 flex items-start justify-between gap-3">

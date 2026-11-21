@@ -1,28 +1,24 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
-import { ArrowRight, ChartNoAxesColumn, Keyboard, LayoutDashboard, Lightbulb, ShieldCheck, Target } from 'lucide-react'
+import { motion, useScroll, useTransform } from 'motion/react'
+import { ArrowRight, ArrowUpRight, ChartNoAxesColumn, Download, Hand, LayoutDashboard, Lightbulb, ShieldCheck, Target } from 'lucide-react'
 import { Wordmark } from '../components/ui/Logo'
 import { Button } from '../components/ui/Button'
 import { Field, Input } from '../components/ui/Field'
 import { CurrencySelect } from '../components/ui/CurrencySelect'
 import { AuthorCredit } from '../components/layout/AuthorCredit'
 import { CountUp, Reveal, SplitWords } from '../components/motion/Motion'
-import { useReducedMotion } from '../components/motion/useReducedMotion'
+import { Magnetic, PullCard, TiltCard } from '../components/motion/Interactive'
+import { spotlight } from '../components/motion/effects'
 import { useAuth, type Workspace } from '../services/authContext'
 import { buildHeroPreview, type HeroPreview } from '../lib/heroPreview'
 import { formatCurrency, formatPercent } from '../lib/format'
 import { AUTHOR } from '../lib/brand'
 
-const FEATURES = [
-  { icon: LayoutDashboard, title: 'A calm monthly overview', body: 'Balance, income, spending and savings — and how this month compares with the last, day for day.' },
-  { icon: Target, title: 'Budgets that warn early', body: 'Monthly limits per category, flagged at 80% so you can change course before the month is gone.' },
-  { icon: Lightbulb, title: 'Insights with the working shown', body: 'Every insight is calculated from your own numbers, and one tap reveals the basis behind it.' },
-  { icon: ChartNoAxesColumn, title: 'Trends across months', body: 'Income against spending, savings rate, your busiest weekday and largest expenses over any period.' },
-  { icon: Keyboard, title: 'Fast to keep up to date', body: 'Press N anywhere to add a transaction. Search, filter and sort the full history in a click.' },
-  { icon: ShieldCheck, title: 'Yours, and private', body: 'Guest workspaces never leave your browser. Synced accounts are isolated by row-level security.' },
-] as const
+const STACK = ['React 19', 'TypeScript', 'TanStack Query', 'Recharts', 'Supabase · Postgres RLS', 'motion', 'Vitest']
+const MARQUEE = ['Monthly overview', 'Spending pace', 'Budgets that warn at 80%', 'Insights with the working shown', 'Trends across months', 'CSV export', 'Every ISO currency', 'Press N to add', 'Private by default']
 
-const STACK = ['React 19', 'TypeScript', 'TanStack Query', 'Recharts', 'Supabase · Postgres RLS', 'Vitest']
+const inr = (n: number) => formatCurrency(Math.round(n), 'INR')
 
 export function WelcomePage() {
   const { status, hasBackend, startWorkspace } = useAuth()
@@ -41,179 +37,106 @@ export function WelcomePage() {
   }
 
   return (
-    <div className="relative flex min-h-dvh flex-col overflow-x-clip">
-      <div className="ft-aurora" aria-hidden="true">
-        <span />
-        <span />
-        <span />
-      </div>
-      <div className="ft-grid-bg pointer-events-none absolute inset-x-0 top-0 h-[720px]" aria-hidden="true" />
+    <div className="ft-grain relative flex min-h-dvh flex-col overflow-x-clip">
+      <Ambient />
 
-      <header className="relative mx-auto flex w-full max-w-[1200px] items-center justify-between px-5 py-5 sm:px-8">
-        <Wordmark />
-        <nav aria-label="Welcome" className="flex items-center gap-1 text-sm">
-          <a href="#features" className="hidden rounded-sm px-3 py-2 font-medium text-ink-2 hover:bg-sunken hover:text-ink sm:inline-block">
-            Features
-          </a>
-          {AUTHOR.repoUrl && (
-            <a href={AUTHOR.repoUrl} target="_blank" rel="noreferrer" className="hidden rounded-sm px-3 py-2 font-medium text-ink-2 hover:bg-sunken hover:text-ink sm:inline-block">
-              GitHub
-            </a>
-          )}
-          {hasBackend && (
-            <Link to="/login" className="rounded-sm px-3 py-2 font-medium text-ink-2 hover:bg-sunken hover:text-ink">
-              Sign in
-            </Link>
-          )}
-          <a href="#start" className="ml-1 inline-flex h-9 items-center gap-1.5 rounded-sm bg-ink px-3.5 font-medium text-paper transition-colors hover:bg-[#33322e]">
-            Get started
-          </a>
-        </nav>
+      {/* Floating glass nav */}
+      <header className="sticky top-3 z-40 mx-auto mt-3 w-[calc(100%-1.5rem)] max-w-[1200px]">
+        <div className="flex items-center justify-between rounded-full border border-white/10 bg-[#101412]/70 py-2 pl-4 pr-2 shadow-[0_20px_40px_-20px_rgb(0_0_0/0.9)] backdrop-blur-xl">
+          <Wordmark />
+          <nav aria-label="Welcome" className="flex items-center gap-1 text-sm">
+            <a href="#features" className="hidden rounded-full px-3 py-2 font-medium text-ink-2 transition-colors hover:bg-white/5 hover:text-ink sm:inline-block">Features</a>
+            <a href="#product" className="hidden rounded-full px-3 py-2 font-medium text-ink-2 transition-colors hover:bg-white/5 hover:text-ink md:inline-block">Product</a>
+            {AUTHOR.repoUrl && (
+              <a href={AUTHOR.repoUrl} target="_blank" rel="noreferrer" className="hidden rounded-full px-3 py-2 font-medium text-ink-2 transition-colors hover:bg-white/5 hover:text-ink sm:inline-block">GitHub</a>
+            )}
+            {hasBackend && <Link to="/login" className="rounded-full px-3 py-2 font-medium text-ink-2 hover:text-ink">Sign in</Link>}
+            <Magnetic strength={0.25}>
+              <a href="#start" className="ft-press inline-flex h-9 items-center gap-1.5 rounded-full bg-accent px-4 font-semibold text-on-accent transition-[transform,background-color] duration-300 ease-[var(--ease-spring)] hover:bg-accent-hover">
+                Get started <ArrowUpRight size={15} aria-hidden />
+              </a>
+            </Magnetic>
+          </nav>
+        </div>
       </header>
 
-      <main className="relative mx-auto w-full max-w-[1200px] flex-1 px-5 pb-20 sm:px-8">
+      <main className="relative mx-auto w-full max-w-[1200px] flex-1 px-5 sm:px-8">
         {/* Hero */}
-        <section className="grid items-center gap-12 pt-8 md:pt-14 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-16 lg:pt-20">
+        <section className="grid items-center gap-14 pb-16 pt-14 md:pt-20 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-10 lg:pb-24 lg:pt-24">
           <div>
-            <p className="ft-page inline-flex items-center gap-2 rounded-full border border-line bg-surface/80 px-3 py-1 text-xs font-medium text-ink-2 backdrop-blur-sm">
-              <span className="ft-live size-1.5 rounded-full bg-positive text-positive" aria-hidden="true" />
+            <p className="ft-page inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-ink-2">
+              <span className="ft-live size-1.5 rounded-full bg-accent text-accent" aria-hidden="true" />
               Live prototype · no sign-up needed
             </p>
-            <h1 className="mt-5 font-display text-[2.75rem] leading-[1.02] tracking-[-0.015em] text-ink sm:text-[4.25rem]">
-              <SplitWords text="Where your money goes, and what’s changing." />
+            <h1 className="mt-6 font-display text-[3.1rem] font-bold leading-[0.95] tracking-[-0.055em] text-ink sm:text-[5.4rem]">
+              <SplitWords text="Where your money goes," /> <span className="ft-highlight"><SplitWords text="and what’s changing." stagger={70} /></span>
             </h1>
-            <p className="ft-page mt-6 max-w-xl text-lg text-ink-2 [animation-delay:450ms]">
+            <p className="ft-page mt-7 max-w-lg text-lg leading-relaxed text-ink-2 [animation-delay:500ms]">
               FinTrack turns everyday transactions into a clear monthly picture — what you earn, what you spend, and what deserves your attention.
             </p>
-            <div className="ft-page mt-8 flex flex-col gap-3 [animation-delay:560ms] sm:flex-row sm:items-center">
-              <Button size="lg" loading={pending === 'sample'} onClick={() => open('sample')} className="group">
-                Open the prototype <ArrowRight size={16} aria-hidden className="transition-transform group-hover:translate-x-0.5" />
-              </Button>
-              <a href="#start" className="inline-flex h-11 items-center justify-center rounded-sm px-4 text-base font-medium text-ink-2 hover:bg-sunken hover:text-ink">
-                or start your own
+            <div className="ft-page mt-9 flex flex-col gap-3 [animation-delay:620ms] sm:flex-row sm:items-center">
+              <Magnetic>
+                <Button size="lg" loading={pending === 'sample'} onClick={() => open('sample')} className="group w-full !rounded-full sm:w-auto">
+                  Open the prototype <ArrowRight size={17} aria-hidden className="transition-transform duration-300 ease-[var(--ease-spring)] group-hover:translate-x-1" />
+                </Button>
+              </Magnetic>
+              <a href="#start" className="ft-press inline-flex h-12 items-center justify-center rounded-full border border-line-strong px-6 font-medium text-ink transition-colors hover:border-ink-3 hover:bg-white/5">
+                Start your own
               </a>
             </div>
-            <p className="ft-page mt-4 text-sm text-ink-3 [animation-delay:640ms]">
-              {preview.transactionCount} sample transactions across 13 months · every screen works
-            </p>
+            <dl className="ft-page mt-12 grid max-w-md grid-cols-3 gap-6 border-t border-line pt-6 [animation-delay:760ms]">
+              {[
+                [preview.transactionCount, 'sample transactions'],
+                [13, 'months of history'],
+                [6, 'screens, all working'],
+              ].map(([n, l]) => (
+                <div key={l as string}>
+                  <dt className="sr-only">{l}</dt>
+                  <dd className="num font-display text-3xl font-semibold tracking-[-0.04em] text-ink"><CountUp value={n as number} format={(v) => String(Math.round(v))} /></dd>
+                  <dd className="mt-1 text-xs text-ink-3">{l}</dd>
+                </div>
+              ))}
+            </dl>
           </div>
 
-          <HeroCard p={preview} />
+          <CardStack p={preview} />
         </section>
 
-        {/* Product preview */}
-        <TiltPreview />
-
-        {/* Features */}
-        <section id="features" aria-labelledby="features-title" className="mt-24 scroll-mt-8">
-          <Reveal>
-            <p className="text-sm font-medium text-accent">What it does</p>
-            <h2 id="features-title" className="mt-2 max-w-2xl font-display text-4xl leading-[1.08] tracking-[-0.01em] text-ink sm:text-5xl">
-              Built around the questions you actually ask about money.
-            </h2>
-          </Reveal>
-          <ul className="mt-10 grid gap-px overflow-hidden rounded-lg border border-line bg-line sm:grid-cols-2 lg:grid-cols-3">
-            {FEATURES.map((f, i) => (
-              <Reveal as="li" key={f.title} delay={(i % 3) * 80} className="group bg-surface p-6 transition-colors hover:bg-[#fffefb] sm:p-7">
-                <span className="grid size-10 place-items-center rounded-md bg-accent-soft text-accent transition-transform duration-300 group-hover:-translate-y-0.5">
-                  <f.icon size={19} aria-hidden />
-                </span>
-                <h3 className="mt-5 text-base font-semibold tracking-[-0.01em] text-ink">{f.title}</h3>
-                <p className="mt-1.5 text-sm text-ink-3">{f.body}</p>
-              </Reveal>
+        {/* Marquee */}
+        <div className="ft-marquee-wrap relative -mx-5 overflow-hidden border-y border-line py-5 sm:-mx-8 [mask-image:linear-gradient(90deg,transparent,#000_12%,#000_88%,transparent)]" aria-hidden="true">
+          <div className="ft-marquee gap-10">
+            {[...MARQUEE, ...MARQUEE].map((m, i) => (
+              <span key={i} className="flex items-center gap-10 whitespace-nowrap font-display text-2xl font-semibold tracking-[-0.03em] text-ink-3">
+                {m} <span className="size-2 rounded-full bg-accent" />
+              </span>
             ))}
-          </ul>
-        </section>
-
-        {/* Get started */}
-        <section id="start" aria-labelledby="start-title" className="mt-24 scroll-mt-8">
-          <Reveal>
-            <h2 id="start-title" className="font-display text-4xl leading-[1.08] tracking-[-0.01em] text-ink sm:text-5xl">
-              Two ways in.
-            </h2>
-            <p className="mt-3 max-w-xl text-base text-ink-2">Look around with a year of realistic data, or start a private workspace of your own. Both run entirely in your browser.</p>
-          </Reveal>
-          <div className="mt-8 grid gap-4 md:grid-cols-2">
-            <Reveal className="ft-card ft-lift flex flex-col rounded-lg border border-line bg-surface p-6 sm:p-8">
-              <p className="text-xs font-medium uppercase tracking-[0.08em] text-ink-3">Option 1</p>
-              <h3 className="mt-2 text-xl font-semibold tracking-[-0.02em]">See the prototype</h3>
-              <p className="mt-2 text-sm text-ink-2">
-                Explore every screen with a year of realistic sample data — dashboard, budgets, analytics and insights. Nothing to set up.
-              </p>
-              <ul className="mt-5 grid gap-2 text-sm text-ink-2">
-                {['13 months of income and spending', 'Five category budgets with live progress', 'Insights you can check the working of'].map((t) => (
-                  <li key={t} className="flex items-center gap-2">
-                    <span className="size-1 rounded-full bg-accent" aria-hidden />
-                    {t}
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-auto pt-7">
-                <Button size="lg" variant="secondary" className="w-full sm:w-auto" loading={pending === 'sample'} onClick={() => open('sample')}>
-                  Open the prototype <ArrowRight size={16} aria-hidden />
-                </Button>
-              </div>
-            </Reveal>
-
-            <Reveal delay={90}>
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault()
-                  open('own')
-                }}
-                className="ft-card ft-lift flex h-full flex-col rounded-lg border border-ink bg-surface p-6 sm:p-8"
-              >
-                <p className="text-xs font-medium uppercase tracking-[0.08em] text-accent">Option 2</p>
-                <h3 className="mt-2 text-xl font-semibold tracking-[-0.02em]">Build your own FinTrack</h3>
-                <p className="mt-2 text-sm text-ink-2">
-                  Start from zero and track your own income, spending and budgets. Saved privately in this browser — no sign-up needed.
-                </p>
-                <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                  <Field label="What should we call you?" optional>
-                    {(p) => <Input {...p} value={name} onChange={(e) => setName(e.target.value)} autoComplete="given-name" maxLength={60} placeholder="Your first name" />}
-                  </Field>
-                  <Field label="Currency">
-                    {(p) => <CurrencySelect {...p} value={currency} onChange={(e) => setCurrency(e.target.value)} />}
-                  </Field>
-                </div>
-                <div className="mt-auto pt-6">
-                  <Button type="submit" size="lg" className="w-full sm:w-auto" loading={pending === 'own'}>
-                    Start tracking <ArrowRight size={16} aria-hidden />
-                  </Button>
-                </div>
-              </form>
-            </Reveal>
           </div>
+        </div>
 
-          {hasBackend && (
-            <p className="mt-5 text-sm text-ink-3">
-              Want it on every device?{' '}
-              <Link to="/signup" className="font-medium text-accent underline-offset-2 hover:underline">
-                Create a free account
-              </Link>{' '}
-              or{' '}
-              <Link to="/login" className="font-medium text-accent underline-offset-2 hover:underline">
-                sign in
-              </Link>
-              .
-            </p>
-          )}
-        </section>
+        <ScrollShowcase />
+        <Bento p={preview} />
+        <Start
+          pending={pending}
+          open={open}
+          name={name}
+          setName={setName}
+          currency={currency}
+          setCurrency={setCurrency}
+          hasBackend={hasBackend}
+        />
 
-        <Reveal as="section" aria-label="Built with" className="mt-20 border-t border-line pt-8">
-          <p className="text-xs font-medium uppercase tracking-[0.08em] text-ink-3">Built with</p>
-          <ul className="mt-3 flex flex-wrap gap-2">
+        <Reveal as="section" aria-label="Built with" className="mt-24 border-t border-line pt-8">
+          <p className="text-xs font-medium uppercase tracking-[0.14em] text-ink-3">Built with</p>
+          <ul className="mt-4 flex flex-wrap gap-2">
             {STACK.map((s) => (
-              <li key={s} className="rounded-full border border-line bg-surface px-3 py-1 text-sm text-ink-2">
-                {s}
-              </li>
+              <li key={s} className="rounded-full border border-line-strong bg-surface px-3.5 py-1.5 text-sm text-ink-2 transition-colors hover:border-accent hover:text-ink">{s}</li>
             ))}
           </ul>
         </Reveal>
       </main>
 
-      <footer className="relative border-t border-line">
-        <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-2 px-5 py-6 text-xs text-ink-3 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+      <footer className="relative mt-20 border-t border-line">
+        <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-2 px-5 py-8 text-xs text-ink-3 sm:flex-row sm:items-center sm:justify-between sm:px-8">
           <AuthorCredit />
           <p>Guest workspaces stay in your browser. Accounts are protected by row-level security.</p>
         </div>
@@ -222,144 +145,303 @@ export function WelcomePage() {
   )
 }
 
-/** A working slice of the overview, computed from the prototype's own sample data. */
-function HeroCard({ p }: { p: HeroPreview }) {
-  const inr = (n: number) => formatCurrency(Math.round(n), 'INR')
-  const W = 320
-  const H = 96
+/** Two slow lime/teal orbs that drift with scroll. */
+function Ambient() {
+  const { scrollY } = useScroll()
+  const y1 = useTransform(scrollY, [0, 1200], [0, 260])
+  const y2 = useTransform(scrollY, [0, 1200], [0, -180])
+  return (
+    <div className="pointer-events-none absolute inset-0 -z-0 overflow-hidden" aria-hidden="true">
+      <div className="ft-grid-bg absolute inset-x-0 top-0 h-[900px]" />
+      <motion.div style={{ y: y1 }} className="ft-orb -right-40 -top-40 size-[620px] bg-[#c6f45e]/[0.13]" />
+      <motion.div style={{ y: y2 }} className="ft-orb -left-60 top-[420px] size-[520px] bg-[#3fd6c0]/[0.08]" />
+    </div>
+  )
+}
+
+/** The hero's fanned cards — all real figures from the prototype's sample data. Grab one: it springs back. */
+function CardStack({ p }: { p: HeroPreview }) {
+  const W = 300
+  const H = 90
   const max = Math.max(1, ...p.pace.map((d) => Math.max(d.current ?? 0, d.previous ?? 0)))
   const x = (day: number) => ((day - 1) / Math.max(1, p.pace.length - 1)) * W
-  const y = (v: number) => H - (v / max) * (H - 6) - 3
-  const line = (key: 'current' | 'previous') =>
+  const y = (v: number) => H - (v / max) * (H - 8) - 4
+  const path = (key: 'current' | 'previous') =>
     p.pace
       .filter((d) => d[key] !== null)
       .map((d, i) => `${i ? 'L' : 'M'}${x(d.day).toFixed(1)},${y(d[key] as number).toFixed(1)}`)
       .join(' ')
   const curr = p.pace.filter((d) => d.current !== null)
   const last = curr[curr.length - 1]
+  const prevSame = p.pace.find((d) => d.day === last?.day)?.previous ?? null
+  const pace = last && prevSame ? ((last.current! - prevSame) / prevSame) * 100 : null
 
   return (
-    <figure className="ft-page relative [animation-delay:250ms]" aria-label={`Sample overview for ${p.monthName}`}>
-      <div className="absolute -inset-3 -z-10 rounded-[20px] bg-gradient-to-br from-accent-soft via-transparent to-positive-soft opacity-80 blur-xl" aria-hidden="true" />
-      <div className="rounded-xl border border-line bg-surface/95 p-5 shadow-[0_30px_70px_-34px_rgba(26,26,24,0.35)] backdrop-blur-sm sm:p-6">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <p className="text-xs font-medium uppercase tracking-[0.08em] text-ink-3">This month</p>
-            <p className="mt-0.5 text-sm font-semibold text-ink">{p.monthName}</p>
-          </div>
-          <span className="rounded-full bg-accent-soft px-2.5 py-1 text-2xs font-medium text-accent">Sample data</span>
+    <div className="relative mx-auto h-[540px] w-full max-w-[520px] sm:h-[560px]" role="group" aria-label={`Sample overview for ${p.monthName}`}>
+      <p className="ft-page absolute -top-2 right-2 z-40 flex items-center gap-1.5 rounded-full border border-white/10 bg-[#101412]/80 px-3 py-1.5 text-xs text-ink-2 backdrop-blur [animation-delay:1400ms]">
+        <Hand size={13} aria-hidden className="text-accent" /> Grab a card — it springs back
+      </p>
+
+      {/* Saved this month — the lime card */}
+      <PullCard rotate={-6} initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35, type: 'spring', stiffness: 140, damping: 18 }}
+        className="absolute left-0 top-6 z-20 w-[64%] sm:w-[58%]">
+        <div className="rounded-lg bg-accent p-5 text-on-accent shadow-[0_30px_60px_-24px_rgb(198_244_94/0.5)]">
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] opacity-70">Saved in {p.monthName}</p>
+          <p className="num mt-3 font-display text-[2.4rem] font-bold leading-none tracking-[-0.05em]"><CountUp value={Math.abs(p.net)} format={inr} /></p>
+          {p.savingsRate !== null && <p className="mt-3 text-sm font-medium opacity-75">{formatPercent(p.savingsRate, { digits: 0 })} of income kept</p>}
         </div>
+      </PullCard>
 
-        <dl className="mt-5 grid grid-cols-3 gap-3 border-y border-line py-4">
-          {[
-            ['Income', p.income, 'text-ink'],
-            ['Spent', p.expense, 'text-ink'],
-            [p.net >= 0 ? 'Saved' : 'Overspent', Math.abs(p.net), p.net >= 0 ? 'text-positive' : 'text-negative'],
-          ].map(([label, v, tone]) => (
-            <div key={label as string} className="min-w-0">
-              <dt className="text-xs text-ink-3">{label}</dt>
-              <dd className={`num mt-1 truncate text-lg font-medium tracking-[-0.02em] sm:text-xl ${tone}`}>
-                <CountUp value={v as number} format={inr} />
-              </dd>
-            </div>
-          ))}
-        </dl>
-
-        <div className="mt-5">
-          <div className="flex items-baseline justify-between text-xs">
-            <span className="font-medium text-ink-2">Spending pace</span>
-            <span className="flex items-center gap-3 text-ink-3">
-              <span className="inline-flex items-center gap-1.5">
-                <span className="h-0.5 w-3 rounded bg-chart-current" aria-hidden /> {p.monthName}
+      {/* Spending pace */}
+      <PullCard rotate={4} initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, type: 'spring', stiffness: 140, damping: 18 }}
+        className="absolute right-0 top-[190px] z-30 w-[86%] sm:w-[80%]">
+        <div className="rounded-lg border border-white/10 bg-[#161b18]/95 p-5 shadow-[0_40px_80px_-30px_rgb(0_0_0/0.9)] backdrop-blur">
+          <div className="flex items-baseline justify-between gap-3">
+            <p className="text-sm font-semibold text-ink">Spending pace</p>
+            {pace !== null && (
+              <span className={`num rounded-full px-2 py-0.5 text-xs font-semibold ${pace <= 0 ? 'bg-positive-soft text-positive' : 'bg-caution-soft text-caution'}`}>
+                {pace <= 0 ? '↓' : '↑'} {formatPercent(Math.abs(pace), { digits: 0 })} vs {p.prevMonthName}
               </span>
-              <span className="inline-flex items-center gap-1.5">
-                <span className="h-0 w-3 border-t-2 border-dashed border-chart-previous" aria-hidden /> {p.prevMonthName}
-              </span>
-            </span>
+            )}
           </div>
-          <svg viewBox={`0 0 ${W} ${H}`} className="mt-3 h-24 w-full overflow-visible" role="img" aria-label={`Cumulative spending by day: ${inr(last?.current ?? 0)} by day ${last?.day ?? 0} of ${p.monthName}.`}>
-            {[0.33, 0.66].map((g) => (
-              <line key={g} x1="0" x2={W} y1={H * g} y2={H * g} stroke="var(--color-line)" strokeWidth="1" />
-            ))}
-            <path d={line('previous')} fill="none" stroke="var(--color-chart-previous)" strokeWidth="1.75" strokeDasharray="4 4" />
-            <path d={line('current')} pathLength={1} className="ft-draw" fill="none" stroke="var(--color-chart-current)" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" />
-            {last && <circle cx={x(last.day)} cy={y(last.current ?? 0)} r="3.5" fill="var(--color-chart-current)" stroke="#fdfcf9" strokeWidth="2" className="ft-page [animation-delay:1500ms]" />}
+          <p className="num mt-1 text-xs text-ink-3">{inr(p.expense)} spent by day {last?.day}</p>
+          <svg viewBox={`0 0 ${W} ${H}`} className="mt-4 h-24 w-full overflow-visible" role="img" aria-label={`Cumulative spending: ${inr(last?.current ?? 0)} by day ${last?.day ?? 0}, dashed line is ${p.prevMonthName}.`}>
+            <defs>
+              <linearGradient id="ft-pace" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0" stopColor="#c6f45e" stopOpacity=".28" />
+                <stop offset="1" stopColor="#c6f45e" stopOpacity="0" />
+              </linearGradient>
+            </defs>
+            <path d={path('previous')} fill="none" stroke="#5d6761" strokeWidth="1.6" strokeDasharray="4 4" />
+            {last && <path d={`${path('current')} L${x(last.day)},${H} L0,${H} Z`} fill="url(#ft-pace)" className="ft-page [animation-delay:1200ms]" />}
+            <path d={path('current')} pathLength={1} className="ft-draw" fill="none" stroke="#c6f45e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+            {last && <circle cx={x(last.day)} cy={y(last.current ?? 0)} r="4.5" fill="#c6f45e" stroke="#161b18" strokeWidth="2.5" className="ft-page [animation-delay:1700ms]" />}
           </svg>
         </div>
+      </PullCard>
 
-        <ul className="mt-5 grid gap-2.5" aria-label="Top categories">
-          {p.topCategories.map((c, i) => (
-            <li key={c.name} className="grid grid-cols-[88px_1fr_auto] items-center gap-3 text-xs">
-              <span className="truncate text-ink-2">{c.name}</span>
-              <span className="h-1.5 overflow-hidden rounded-full bg-sunken">
-                <span className="ft-grow block h-full rounded-full bg-accent" style={{ width: `${Math.max(4, c.share)}%`, animationDelay: `${500 + i * 90}ms` }} />
-              </span>
-              <span className="num text-ink-3">{formatPercent(c.share, { digits: 0 })}</span>
-            </li>
-          ))}
-        </ul>
-        {p.savingsRate !== null && (
-          <p className="mt-5 rounded-md bg-sunken/70 px-3 py-2 text-xs text-ink-2">
-            Savings rate so far: <strong className="num font-semibold text-ink">{formatPercent(p.savingsRate, { digits: 0 })}</strong> of income kept.
-          </p>
-        )}
-      </div>
-    </figure>
+      {/* Where it went */}
+      <PullCard rotate={-3} initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.65, type: 'spring', stiffness: 140, damping: 18 }}
+        className="absolute bottom-0 left-[4%] z-20 w-[78%] sm:w-[68%]">
+        <div className="rounded-lg border border-white/10 bg-[#121614]/95 p-5 shadow-[0_40px_80px_-30px_rgb(0_0_0/0.9)] backdrop-blur">
+          <p className="text-sm font-semibold text-ink">Where it went</p>
+          <ul className="mt-4 grid gap-3">
+            {p.topCategories.map((c, i) => (
+              <li key={c.name} className="grid grid-cols-[76px_1fr_36px] items-center gap-3 text-xs">
+                <span className="truncate text-ink-2">{c.name}</span>
+                <span className="h-2 overflow-hidden rounded-full bg-white/[0.06]">
+                  <span className="ft-grow block h-full rounded-full bg-accent" style={{ width: `${Math.max(4, c.share)}%`, animationDelay: `${900 + i * 110}ms`, opacity: 1 - i * 0.18 }} />
+                </span>
+                <span className="num text-right text-ink-3">{formatPercent(c.share, { digits: 0 })}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </PullCard>
+    </div>
   )
 }
 
-/** The full overview screenshot, tilted back and flattening as it scrolls into view. */
-function TiltPreview() {
+/** The real overview, rising from a tilt and scaling to full size as you scroll (container-scroll effect). */
+function ScrollShowcase() {
   const ref = useRef<HTMLDivElement>(null)
-  const reduced = useReducedMotion()
-  useEffect(() => {
-    const el = ref.current
-    if (!el || reduced) return
-    let raf = 0
-    const update = () => {
-      raf = 0
-      const r = el.getBoundingClientRect()
-      const vh = window.innerHeight
-      const t = Math.min(1, Math.max(0, (r.top - vh * 0.15) / (vh * 0.7)))
-      el.style.setProperty('--tilt', t.toFixed(3))
-    }
-    const onScroll = () => {
-      if (!raf) raf = requestAnimationFrame(update)
-    }
-    update()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('resize', onScroll)
-    return () => {
-      window.removeEventListener('scroll', onScroll)
-      window.removeEventListener('resize', onScroll)
-      cancelAnimationFrame(raf)
-    }
-  }, [reduced])
-
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'center center'] })
+  const rotateX = useTransform(scrollYProgress, [0, 1], [24, 0])
+  const scale = useTransform(scrollYProgress, [0, 1], [0.86, 1])
+  const y = useTransform(scrollYProgress, [0, 1], [60, 0])
   return (
-    <figure className="mt-20 lg:mt-28">
-      <div ref={ref} className="ft-tilt overflow-hidden rounded-xl border border-line bg-surface shadow-[0_40px_90px_-40px_rgba(26,26,24,0.4)]">
-        <div className="flex items-center gap-1.5 border-b border-line bg-sunken px-3 py-2" aria-hidden="true">
-          <span className="size-2.5 rounded-full bg-line-strong" />
-          <span className="size-2.5 rounded-full bg-line-strong" />
-          <span className="size-2.5 rounded-full bg-line-strong" />
-          <span className="ml-3 hidden rounded-sm bg-surface px-2 py-0.5 text-2xs text-ink-3 sm:inline">fintrack-ojasmali.vercel.app/dashboard</span>
-        </div>
-        <img
-          src="/preview/overview-1600.webp"
-          srcSet="/preview/overview-960.webp 960w, /preview/overview-1600.webp 1600w"
-          sizes="(min-width: 1200px) 1136px, 100vw"
-          width={1600}
-          height={1000}
-          loading="lazy"
-          decoding="async"
-          className="block h-auto w-full"
-          alt="The FinTrack overview: total balance, this month's income, spending and savings, a spending-pace chart against last month, and insights worth your attention."
-        />
+    <section id="product" aria-labelledby="product-title" className="scroll-mt-24 pt-24 lg:pt-32">
+      <Reveal className="mx-auto max-w-3xl text-center">
+        <p className="text-sm font-semibold text-accent">The product</p>
+        <h2 id="product-title" className="mt-3 font-display text-4xl font-bold leading-[1] tracking-[-0.045em] text-ink sm:text-6xl">
+          One calm screen for the whole month.
+        </h2>
+      </Reveal>
+      <div ref={ref} className="mt-14 [perspective:1400px]">
+        <motion.figure style={{ rotateX, scale, y }} className="origin-top">
+          <div className="overflow-hidden rounded-[22px] border border-white/10 bg-surface p-1.5 shadow-[0_60px_120px_-40px_rgb(0_0_0/0.95),0_0_0_1px_rgb(198_244_94/0.06)]">
+            <img
+              src="/preview/overview-1600.webp"
+              srcSet="/preview/overview-960.webp 960w, /preview/overview-1600.webp 1600w"
+              sizes="(min-width: 1200px) 1136px, 100vw"
+              width={1600}
+              height={1000}
+              loading="lazy"
+              decoding="async"
+              className="block h-auto w-full rounded-[16px]"
+              alt="The FinTrack overview: total balance, this month's income, spending and savings, a spending-pace chart against last month, and insights worth your attention."
+            />
+          </div>
+        </motion.figure>
       </div>
-      <figcaption className="mt-4 text-sm text-ink-3">
-        The prototype’s overview — balance, this month at a glance, spending pace and the insights worth a look.
-      </figcaption>
-    </figure>
+    </section>
+  )
+}
+
+const KEYS = ['N']
+
+/** Feature bento: each tile shows the feature doing its job, with a cursor spotlight. */
+function Bento({ p }: { p: HeroPreview }) {
+  const budget = 84
+  return (
+    <section id="features" aria-labelledby="features-title" className="scroll-mt-24 pt-28 lg:pt-36">
+      <Reveal>
+        <p className="text-sm font-semibold text-accent">What it does</p>
+        <h2 id="features-title" className="mt-3 max-w-2xl font-display text-4xl font-bold leading-[1] tracking-[-0.045em] text-ink sm:text-6xl">
+          Built around the questions you actually ask.
+        </h2>
+      </Reveal>
+      <ul className="mt-12 grid auto-rows-[minmax(220px,auto)] gap-3 md:grid-cols-6">
+        <Tile className="md:col-span-4" icon={LayoutDashboard} title="A calm monthly overview" body="Balance, income, spending and savings — and how this month compares with the last, day for day.">
+          <div className="mt-6 grid grid-cols-3 gap-2">
+            {[['Income', p.income], ['Spent', p.expense], ['Saved', p.net]].map(([l, v]) => (
+              <div key={l as string} className="rounded-md border border-line bg-paper/60 p-3">
+                <p className="text-2xs text-ink-3">{l}</p>
+                <p className={`num mt-1 font-display text-lg font-semibold tracking-[-0.03em] ${l === 'Saved' ? 'text-positive' : 'text-ink'}`}>{inr(v as number)}</p>
+              </div>
+            ))}
+          </div>
+        </Tile>
+        <Tile className="md:col-span-2" icon={Target} title="Budgets that warn early" body="Flagged at 80%, before the month is gone.">
+          <div className="mt-6">
+            <div className="flex justify-between text-xs"><span className="text-ink-2">Transport</span><span className="num text-caution">{budget}% used</span></div>
+            <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-white/[0.06]">
+              <motion.div className="h-full rounded-full bg-caution" initial={{ width: 0 }} whileInView={{ width: `${budget}%` }} viewport={{ once: true }} transition={{ type: 'spring', stiffness: 60, damping: 14, delay: 0.2 }} />
+            </div>
+            <p className="mt-2 text-2xs text-ink-3">Example budget, close to its limit</p>
+          </div>
+        </Tile>
+        <Tile className="md:col-span-2" icon={Lightbulb} title="Insights with the working shown" body="Every insight is calculated from your own numbers. Tap to see the formula.">
+          <details className="group mt-5 rounded-md border border-line bg-paper/60 p-3 text-xs">
+            <summary className="cursor-pointer list-none font-medium text-ink">Spending pace ↓ — show basis</summary>
+            <p className="mt-2 text-ink-3">(Spent 1st→today − same days last month) ÷ same days last month × 100</p>
+          </details>
+        </Tile>
+        <Tile className="md:col-span-2" icon={ChartNoAxesColumn} title="Trends across months" body="Income against spending, savings rate, busiest weekday and largest expenses.">
+          <div className="mt-6 flex h-16 items-end gap-1.5">
+            {[42, 64, 51, 78, 58, 88, 70].map((h, i) => (
+              <motion.span key={i} className="flex-1 rounded-t-[4px] bg-accent/80" initial={{ height: 0 }} whileInView={{ height: `${h}%` }} viewport={{ once: true }} transition={{ type: 'spring', stiffness: 120, damping: 12, delay: i * 0.06 }} />
+            ))}
+          </div>
+          <p className="mt-2 text-2xs text-ink-3">Illustrative shape</p>
+        </Tile>
+        <Tile className="md:col-span-2" icon={Download} title="Fast, and yours to export" body="Press N anywhere to add a transaction. Export everything to CSV.">
+          <div className="mt-6 flex items-center gap-2">
+            {KEYS.map((k) => (
+              <motion.kbd key={k} whileHover={{ y: 3, boxShadow: '0 1px 0 #3a423e' }} whileTap={{ y: 4, boxShadow: '0 0 0 #3a423e' }}
+                className="grid size-12 cursor-pointer place-items-center rounded-md border border-line-strong bg-sunken font-mono text-lg font-semibold text-ink shadow-[0_4px_0_#3a423e]">
+                {k}
+              </motion.kbd>
+            ))}
+            <span className="text-xs text-ink-3">→ add transaction</span>
+          </div>
+        </Tile>
+        <Tile className="md:col-span-6" icon={ShieldCheck} title="Private by default" body="Guest workspaces never leave your browser. Synced accounts are isolated by Postgres row-level security, checked by 20 automated database tests.">
+          <ul className="mt-6 flex flex-wrap gap-2 text-xs">
+            {['Guest data stays in this browser', 'Row-level security on every table', '20 automated RLS checks', 'No tracking, no ads'].map((c) => (
+              <li key={c} className="rounded-full border border-line-strong bg-paper/60 px-3 py-1.5 text-ink-2">{c}</li>
+            ))}
+          </ul>
+        </Tile>
+      </ul>
+    </section>
+  )
+}
+
+function Tile({ className = '', icon: Icon, title, body, children }: { className?: string; icon: typeof Target; title: string; body: string; children?: React.ReactNode }) {
+  return (
+    <Reveal as="li" className={className}>
+      <TiltCard className="h-full" max={4}>
+        <div onPointerMove={spotlight} className="ft-card group flex h-full flex-col rounded-lg border border-line bg-surface p-6">
+          <span className="grid size-10 place-items-center rounded-md bg-accent-soft text-accent transition-transform duration-500 ease-[var(--ease-spring)] group-hover:-rotate-6 group-hover:scale-110">
+            <Icon size={19} aria-hidden />
+          </span>
+          <h3 className="mt-5 font-display text-xl font-semibold tracking-[-0.03em] text-ink">{title}</h3>
+          <p className="mt-1.5 text-sm text-ink-3">{body}</p>
+          {children}
+        </div>
+      </TiltCard>
+    </Reveal>
+  )
+}
+
+function Start({
+  pending,
+  open,
+  name,
+  setName,
+  currency,
+  setCurrency,
+  hasBackend,
+}: {
+  pending: Workspace | null
+  open: (k: Workspace) => void
+  name: string
+  setName: (s: string) => void
+  currency: string
+  setCurrency: (s: string) => void
+  hasBackend: boolean
+}) {
+  return (
+    <section id="start" aria-labelledby="start-title" className="scroll-mt-24 pt-28 lg:pt-36">
+      <Reveal className="text-center">
+        <h2 id="start-title" className="font-display text-5xl font-bold tracking-[-0.05em] text-ink sm:text-7xl">Two ways in.</h2>
+        <p className="mx-auto mt-4 max-w-xl text-base text-ink-2">Look around with a year of realistic data, or start a private workspace of your own. Both run entirely in your browser.</p>
+      </Reveal>
+      <div className="mt-12 grid gap-3 md:grid-cols-2">
+        <Reveal>
+          <div onPointerMove={spotlight} className="ft-card ft-lift flex h-full flex-col rounded-lg border border-line bg-surface p-7 sm:p-9">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-3">Option 1</p>
+            <h3 className="mt-3 font-display text-3xl font-semibold tracking-[-0.04em]">See the prototype</h3>
+            <p className="mt-3 text-sm text-ink-2">Every screen with a year of realistic sample data — dashboard, budgets, analytics and insights. Nothing to set up.</p>
+            <ul className="mt-6 grid gap-2.5 text-sm text-ink-2">
+              {['13 months of income and spending', 'Five category budgets with live progress', 'Insights you can check the working of'].map((t) => (
+                <li key={t} className="flex items-center gap-2.5">
+                  <span className="grid size-4 place-items-center rounded-full bg-accent text-[10px] font-bold text-on-accent" aria-hidden>✓</span>
+                  {t}
+                </li>
+              ))}
+            </ul>
+            <div className="mt-auto pt-8">
+              <Button size="lg" variant="secondary" className="w-full !rounded-full sm:w-auto" loading={pending === 'sample'} onClick={() => open('sample')}>
+                Open the prototype <ArrowRight size={16} aria-hidden />
+              </Button>
+            </div>
+          </div>
+        </Reveal>
+        <Reveal delay={90}>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              open('own')
+            }}
+            onPointerMove={spotlight}
+            className="ft-card ft-lift relative flex h-full flex-col overflow-hidden rounded-lg border border-accent/40 bg-[linear-gradient(160deg,#1a2214,#131715_55%)] p-7 sm:p-9"
+          >
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-accent">Option 2</p>
+            <h3 className="mt-3 font-display text-3xl font-semibold tracking-[-0.04em]">Build your own FinTrack</h3>
+            <p className="mt-3 text-sm text-ink-2">Start from zero and track your own income, spending and budgets. Saved privately in this browser — no sign-up.</p>
+            <div className="mt-6 grid gap-4 sm:grid-cols-2">
+              <Field label="What should we call you?" optional>
+                {(p) => <Input {...p} value={name} onChange={(e) => setName(e.target.value)} autoComplete="given-name" maxLength={60} placeholder="Your first name" />}
+              </Field>
+              <Field label="Currency">{(p) => <CurrencySelect {...p} value={currency} onChange={(e) => setCurrency(e.target.value)} />}</Field>
+            </div>
+            <div className="mt-auto pt-8">
+              <Button type="submit" size="lg" className="w-full !rounded-full sm:w-auto" loading={pending === 'own'}>
+                Start tracking <ArrowRight size={16} aria-hidden />
+              </Button>
+            </div>
+          </form>
+        </Reveal>
+      </div>
+      {hasBackend && (
+        <p className="mt-5 text-center text-sm text-ink-3">
+          Want it on every device?{' '}
+          <Link to="/signup" className="font-medium text-accent underline-offset-2 hover:underline">Create a free account</Link> or{' '}
+          <Link to="/login" className="font-medium text-accent underline-offset-2 hover:underline">sign in</Link>.
+        </p>
+      )}
+    </section>
   )
 }

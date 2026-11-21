@@ -54,7 +54,7 @@ export function Dialog({
         if (e.target === ref.current) onClose() // backdrop click
       }}
       aria-labelledby={titleId}
-      className={`bg-surface text-ink border-line p-0 shadow-[var(--shadow-overlay)] backdrop:bg-ink/30 ${frame}`}
+      className={`bg-surface text-ink border-line p-0 shadow-[var(--shadow-overlay)] backdrop:bg-black/60 backdrop:backdrop-blur-sm ${frame}`}
     >
       {open && (
         <div className={`flex flex-col ${variant === 'drawer' ? 'h-full' : 'max-h-[85dvh]'}`}>

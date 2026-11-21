@@ -1,6 +1,7 @@
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { ArrowLeftRight, ChartNoAxesColumn, House, Plus, Settings, Target } from 'lucide-react'
 import { useEffect, useRef, type ReactNode } from 'react'
+import { motion } from 'motion/react'
 import { Wordmark, LogoMark } from '../ui/Logo'
 import { ErrorBoundary } from './ErrorBoundary'
 import { Button, IconButton } from '../ui/Button'
@@ -37,12 +38,12 @@ export function AppShell() {
 
   return (
     <div className="min-h-dvh md:grid md:grid-cols-[72px_1fr] lg:grid-cols-[232px_1fr]">
-      <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-sm focus:bg-ink focus:px-3 focus:py-2 focus:text-paper">
+      <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-sm focus:bg-accent focus:px-3 focus:py-2 focus:text-on-accent">
         Skip to content
       </a>
 
       {/* Sidebar / rail */}
-      <aside className="hidden md:flex sticky top-0 h-dvh flex-col border-r border-line bg-paper px-3 py-5 lg:px-4">
+      <aside className="hidden md:flex sticky top-0 h-dvh flex-col border-r border-line bg-[#0e110f] px-3 py-5 lg:px-4">
         <div className="mb-8 px-2 lg:px-2">
           <span className="lg:hidden">
             <LogoMark size={28} />
@@ -52,7 +53,7 @@ export function AppShell() {
         <Button onClick={() => editor.create()} icon={<Plus size={16} />} className="mb-6 max-lg:hidden" title="Add transaction (N)" aria-keyshortcuts="N">
           Add transaction
         </Button>
-        <IconButton label="Add transaction" onClick={() => editor.create()} className="mb-6 bg-ink text-paper hover:bg-[#33322e] hover:text-paper lg:hidden mx-auto">
+        <IconButton label="Add transaction" onClick={() => editor.create()} className="mb-6 bg-accent text-on-accent hover:bg-accent-hover hover:text-on-accent lg:hidden mx-auto">
           <Plus size={18} />
         </IconButton>
         <nav aria-label="Main" className="flex flex-col gap-0.5">
@@ -71,7 +72,7 @@ export function AppShell() {
         <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-line bg-paper/95 px-4 backdrop-blur-sm md:hidden">
           <Wordmark />
           <div className="flex items-center gap-1">
-            <IconButton label="Add transaction" onClick={() => editor.create()} className="bg-ink text-paper hover:bg-[#33322e] hover:text-paper size-9">
+            <IconButton label="Add transaction" onClick={() => editor.create()} className="bg-accent text-on-accent hover:bg-accent-hover hover:text-on-accent size-9">
               <Plus size={18} />
             </IconButton>
           </div>
@@ -113,7 +114,7 @@ export function AppShell() {
         )}
 
         <main id="main" ref={mainRef} tabIndex={-1} className="flex-1 outline-none">
-          <div className="mx-auto w-full max-w-[1180px] px-4 pb-28 pt-6 sm:px-6 md:pb-16 md:pt-8 lg:px-10 lg:pt-10">
+          <div className="mx-auto w-full max-w-[1180px] px-4 pb-32 pt-6 sm:px-6 md:pb-16 md:pt-8 lg:px-10 lg:pt-10">
             <ErrorBoundary resetKey={location.pathname}>
               <div key={location.pathname} className="ft-page">
                 <Outlet />
@@ -123,22 +124,22 @@ export function AppShell() {
         </main>
       </div>
 
-      {/* Phone tab bar */}
-      <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-paper/95 backdrop-blur-sm pb-safe md:hidden">
-        <ul className="grid grid-cols-5">
+      {/* Phone tab bar: floating pill, active tab marked by a sliding lime blob */}
+      <nav aria-label="Main" className="fixed inset-x-3 bottom-3 z-30 rounded-[22px] border border-line-strong bg-[#151a17]/90 shadow-[0_20px_40px_-12px_rgb(0_0_0/0.8)] backdrop-blur-xl pb-safe md:hidden">
+        <ul className="grid grid-cols-5 p-1.5">
           {[...NAV, { to: '/settings', label: 'Settings', icon: Settings }].map(({ to, label, icon: Icon }) => (
             <li key={to}>
               <NavLink
                 to={to}
                 className={({ isActive }) =>
-                  `relative flex h-14 flex-col items-center justify-center gap-0.5 text-[10.5px] font-medium transition-colors ${isActive ? 'text-ink' : 'text-ink-3'}`
+                  `ft-press relative isolate flex h-13 flex-col items-center justify-center gap-0.5 rounded-[16px] text-[10.5px] font-medium transition-colors duration-200 ${isActive ? 'text-on-accent' : 'text-ink-3'}`
                 }
               >
                 {({ isActive }) => (
                   <>
-                    <span aria-hidden className={`absolute top-0 h-0.5 w-8 rounded-b-full bg-accent transition-opacity duration-300 ${isActive ? 'opacity-100' : 'opacity-0'}`} />
-                    <Icon size={20} strokeWidth={isActive ? 2.1 : 1.7} aria-hidden />
-                    <span>{label === 'Transactions' ? 'Activity' : label}</span>
+                    {isActive && <motion.span layoutId="tab-blob" aria-hidden className="absolute inset-0 -z-10 rounded-[16px] bg-accent" transition={{ type: 'spring', stiffness: 500, damping: 34 }} />}
+                    <Icon size={19} strokeWidth={isActive ? 2.3 : 1.7} aria-hidden className="relative" />
+                    <span className="relative">{label === 'Transactions' ? 'Activity' : label}</span>
                   </>
                 )}
               </NavLink>
@@ -156,30 +157,30 @@ function SideLink({ to, label, icon: Icon }: { to: string; label: string; icon: 
       to={to}
       title={label}
       className={({ isActive }) =>
-        `group relative flex h-10 items-center justify-center gap-3 rounded-sm px-2.5 text-sm font-medium transition-colors duration-[var(--duration-fast)] lg:justify-start ${
-          isActive ? 'bg-sunken text-ink' : 'text-ink-3 hover:bg-sunken/60 hover:text-ink'
+        `ft-press group relative isolate flex h-10 items-center justify-center gap-3 rounded-sm px-2.5 text-sm font-medium transition-colors duration-[var(--duration-fast)] lg:justify-start ${
+          isActive ? 'text-ink' : 'text-ink-3 hover:text-ink'
         }`
       }
     >
       {({ isActive }) => (
         <>
-          <span
-            aria-hidden
-            className={`absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-accent transition-[opacity,transform] duration-300 ease-[var(--ease-out)] max-lg:hidden ${isActive ? 'scale-y-100 opacity-100' : 'scale-y-0 opacity-0'}`}
-          />
-          <Icon size={18} strokeWidth={isActive ? 2.1 : 1.7} aria-hidden className="transition-transform duration-200 group-hover:scale-105" />
-          <span className="sr-only lg:not-sr-only">{label}</span>
+          {isActive && (
+            <motion.span layoutId="side-pill" aria-hidden className="absolute inset-0 -z-10 rounded-sm border border-line-strong bg-sunken" transition={{ type: 'spring', stiffness: 520, damping: 38 }}>
+              <span className="absolute left-0 top-1/2 h-4 w-[3px] -translate-y-1/2 rounded-r-full bg-accent shadow-[0_0_12px_rgb(198_244_94/0.8)] max-lg:hidden" />
+            </motion.span>
+          )}
+          <Icon size={18} strokeWidth={isActive ? 2.2 : 1.7} aria-hidden className={`relative transition-transform duration-300 ease-[var(--ease-spring)] group-hover:scale-110 ${isActive ? 'text-accent' : ''}`} />
+          <span className="relative sr-only lg:not-sr-only">{label}</span>
         </>
       )}
     </NavLink>
   )
 }
-
 export function PageHeader({ title, description, actions }: { title: string; description?: string; actions?: ReactNode }) {
   return (
     <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <h1 className="text-2xl font-semibold tracking-[-0.025em] text-ink">{title}</h1>
+        <h1 className="font-display text-3xl font-semibold tracking-[-0.035em] text-ink sm:text-[2.6rem] sm:leading-[1.05]">{title}</h1>
         {description && <p className="mt-1 text-sm text-ink-3">{description}</p>}
       </div>
       {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}

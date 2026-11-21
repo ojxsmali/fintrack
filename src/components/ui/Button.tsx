@@ -1,22 +1,26 @@
 import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from 'react'
+import { ripple } from '../motion/effects'
 
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger'
 type Size = 'sm' | 'md' | 'lg'
 
+// Press feels physical: a quick squash on pointer-down, a spring back on release, and an ink ripple from the touch point.
 const base =
-  'inline-flex items-center justify-center gap-2 font-medium whitespace-nowrap select-none rounded-sm transition-[background-color,border-color,color,transform] duration-[var(--duration-fast)] ease-[var(--ease-out)] active:translate-y-px disabled:opacity-50 disabled:pointer-events-none'
+  'ft-press relative isolate inline-flex items-center justify-center gap-2 overflow-hidden font-medium whitespace-nowrap select-none rounded-sm ' +
+  'transition-[background-color,border-color,color,box-shadow,transform] duration-[var(--duration-base)] ease-[var(--ease-spring)] ' +
+  'disabled:opacity-50 disabled:pointer-events-none'
 
 const variants: Record<Variant, string> = {
-  primary: 'bg-ink text-paper hover:bg-[#33322e]',
-  secondary: 'bg-surface text-ink border border-line-strong hover:bg-sunken',
+  primary: 'bg-accent text-on-accent hover:bg-accent-hover hover:shadow-[0_0_0_4px_rgb(198_244_94_/_0.14),0_10px_30px_-8px_rgb(198_244_94_/_0.45)]',
+  secondary: 'bg-surface text-ink border border-line-strong hover:border-ink-3 hover:bg-sunken',
   ghost: 'text-ink-2 hover:bg-sunken hover:text-ink',
-  danger: 'bg-negative text-white hover:bg-[#8a3b26]',
+  danger: 'bg-negative text-on-accent hover:brightness-110',
 }
 
 const sizes: Record<Size, string> = {
   sm: 'h-8 px-3 text-sm',
   md: 'h-10 px-4 text-sm',
-  lg: 'h-11 px-5 text-base',
+  lg: 'h-12 px-6 text-base',
 }
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -27,7 +31,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
-  { variant = 'primary', size = 'md', icon, loading, className = '', children, disabled, type = 'button', ...rest },
+  { variant = 'primary', size = 'md', icon, loading, className = '', children, disabled, type = 'button', onPointerDown, ...rest },
   ref,
 ) {
   return (
@@ -37,6 +41,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       className={`${base} ${variants[variant]} ${sizes[size]} ${className}`}
       disabled={disabled || loading}
       aria-busy={loading || undefined}
+      onPointerDown={(e) => {
+        ripple(e)
+        onPointerDown?.(e)
+      }}
       {...rest}
     >
       {loading ? <span className="size-3.5 rounded-full border-2 border-current border-r-transparent animate-spin" aria-hidden /> : icon}
@@ -49,6 +57,7 @@ export function IconButton({
   label,
   className = '',
   children,
+  onPointerDown,
   ...rest
 }: ButtonHTMLAttributes<HTMLButtonElement> & { label: string }) {
   return (
@@ -56,7 +65,11 @@ export function IconButton({
       type="button"
       aria-label={label}
       title={label}
-      className={`inline-grid place-items-center size-10 rounded-sm text-ink-2 hover:bg-sunken hover:text-ink transition-colors duration-[var(--duration-fast)] ${className}`}
+      onPointerDown={(e) => {
+        ripple(e)
+        onPointerDown?.(e)
+      }}
+      className={`ft-press relative isolate inline-grid size-10 place-items-center overflow-hidden rounded-sm text-ink-2 transition-[background-color,color,transform] duration-[var(--duration-base)] ease-[var(--ease-spring)] hover:bg-sunken hover:text-ink ${className}`}
       {...rest}
     >
       {children}

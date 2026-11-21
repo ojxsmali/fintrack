@@ -1,45 +1,46 @@
 @import 'tailwindcss';
 
-/* ───────────────────────── FinTrack design tokens ─────────────────────────
-   Warm paper + ink neutrals, one petrol accent, and muted semantic colours.
-   Money is never shown in saturated red/green: positive = moss, negative = clay. */
+/* ───────────────────────── FinTrack design tokens — "Night ledger" ─────────────────────────
+   Deep green-black, bone-white ink and one electric lime accent. Lime is spent on what you
+   act on and on this month's data; everything else stays quiet. Positive = mint, negative = coral. */
 @theme {
-  --font-sans: 'Geist Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-display: 'Instrument Serif', ui-serif, Georgia, serif;
+  --font-sans: 'Onest Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Bricolage Grotesque Variable', 'Onest Variable', ui-sans-serif, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
 
   /* Neutrals */
-  --color-paper: #f6f4ef;      /* app background */
-  --color-surface: #fdfcf9;    /* raised surfaces: panels, drawers */
-  --color-sunken: #efece5;     /* wells, skeletons, hover */
-  --color-line: #e3dfd6;       /* hairlines */
-  --color-line-strong: #cfcac0;
-  --color-ink: #1a1a18;        /* primary text — 16.2:1 on paper */
-  --color-ink-2: #4a4843;      /* secondary — 8.6:1 */
-  --color-ink-3: #6b6962;      /* tertiary / meta — 5.2:1 */
-  --color-ink-4: #9a978f;      /* disabled, chart gridlines */
+  --color-paper: #0b0d0c;      /* app background */
+  --color-surface: #131715;    /* raised surfaces: panels, drawers */
+  --color-sunken: #1b201d;     /* wells, skeletons, hover */
+  --color-line: #242a27;       /* hairlines */
+  --color-line-strong: #343c38;
+  --color-ink: #f1f4ef;        /* primary text — 17.6:1 on paper */
+  --color-ink-2: #bac3bd;      /* secondary — 10.9:1 */
+  --color-ink-3: #8e988f;      /* tertiary / meta — 6.6:1 */
+  --color-ink-4: #5d6761;      /* disabled, chart gridlines */
 
-  /* Accent: petrol */
-  --color-accent: #1f5260;
-  --color-accent-hover: #173f4a;
-  --color-accent-soft: #e1eaec;
-  --color-accent-muted: #7fa6b0;
+  /* Accent: electric lime */
+  --color-accent: #c6f45e;
+  --color-accent-hover: #d7fa86;
+  --color-accent-soft: #1e2913;
+  --color-accent-muted: #7f9b3c;
+  --color-on-accent: #0b0d0c;
 
   /* Semantics */
-  --color-positive: #2e6a4c;
-  --color-positive-soft: #e3eee6;
-  --color-negative: #a3472f;
-  --color-negative-soft: #f6e5df;
-  --color-caution: #8c6412;
-  --color-caution-soft: #f5ecd8;
+  --color-positive: #5fe0a5;
+  --color-positive-soft: #10261c;
+  --color-negative: #ff7f66;
+  --color-negative-soft: #2c1510;
+  --color-caution: #f4c25a;
+  --color-caution-soft: #2a2110;
 
-  /* Charts */
-  /* Validated (OKLab CVD ΔE 20.1 protan / 27.4 tritan, chroma ≥ 0.1). Amber is
-     < 3:1 on surface, so every chart ships a legend + table view. */
-  --color-chart-current: #17709a;
-  --color-chart-previous: #b6b2a8;   /* neutral reference series, always dashed */
-  --color-chart-income: #17709a;
-  --color-chart-expense: #cf8641;
-  --color-chart-single: #1f5260;
+  /* Charts — lime for "now", sky / apricot for income / spending (CVD-separable on dark),
+     a dashed grey for the comparison series. Every chart also has a table view. */
+  --color-chart-current: #c6f45e;
+  --color-chart-previous: #5d6761;
+  --color-chart-income: #7cc6ff;
+  --color-chart-expense: #ffa26b;
+  --color-chart-single: #c6f45e;
 
   /* Type scale (1.2-ish, tuned for data) */
   --text-2xs: 0.6875rem;   /* 11 */
@@ -61,20 +62,21 @@
   --text-4xl: 3rem;        /* 48 */
   --text-4xl--line-height: 3.1rem;
 
-  /* Radius — restrained */
-  --radius-xs: 4px;
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
+  /* Radius — soft, app-like */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
 
-  /* Elevation — only overlays float */
-  --shadow-overlay: 0 1px 2px rgb(26 26 24 / 0.06), 0 12px 32px -8px rgb(26 26 24 / 0.18);
-  --shadow-raise: 0 1px 2px rgb(26 26 24 / 0.05);
+  /* Elevation */
+  --shadow-overlay: 0 0 0 1px rgb(255 255 255 / 0.06), 0 24px 60px -12px rgb(0 0 0 / 0.7);
+  --shadow-raise: 0 1px 0 rgb(255 255 255 / 0.04) inset;
 
   /* Motion */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-  --duration-fast: 120ms;
-  --duration-base: 180ms;
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --duration-fast: 140ms;
+  --duration-base: 220ms;
 
   /* Breakpoints (Tailwind defaults kept explicit for documentation) */
   --breakpoint-sm: 40rem;  /* 640 */
@@ -91,7 +93,9 @@
   }
   body {
     @apply bg-paper text-ink font-sans text-base;
-    font-feature-settings: 'ss01' on, 'cv11' on;
+    font-feature-settings: 'ss01' on;
+    background-image: radial-gradient(1200px 600px at 100% -10%, rgb(198 244 94 / 0.05), transparent 60%);
+    background-attachment: fixed;
   }
   /* Every number on screen uses tabular figures so columns line up. */
   .num {
@@ -107,7 +111,7 @@
     background: var(--color-accent-soft);
   }
   dialog::backdrop {
-    background: rgb(26 26 24 / 0.32);
+    background: rgb(0 0 0 / 0.6);
   }
   input[type='date']::-webkit-calendar-picker-indicator {
     opacity: 0.55;
@@ -130,10 +134,12 @@
   50% { opacity: 0.55; }
 }
 .skeleton {
-  background: var(--color-sunken);
+  background: linear-gradient(100deg, var(--color-sunken) 30%, #252c28 50%, var(--color-sunken) 70%);
+  background-size: 300% 100%;
   border-radius: var(--radius-xs);
-  animation: ft-pulse 1.6s ease-in-out infinite;
+  animation: ft-shimmer 1.6s linear infinite;
 }
+@keyframes ft-shimmer { from { background-position: 100% 0; } to { background-position: -50% 0; } }
 
 /* Overlay motion */
 @keyframes ft-drawer-in {
@@ -154,145 +160,114 @@
 }
 
 /* ───────────────────────── Motion system ─────────────────────────
-   One easing curve, three durations. Things rise 10–14px and fade; nothing
-   bounces, spins or loops except the hero's slow ambient light. */
+   Spring for anything you touch (press, drag, toggle), expo-out for anything
+   that arrives (reveal, page, chart). Interactive motion is driven by `motion`
+   (components/motion); these classes cover the CSS-only parts. */
 
-/* Scroll reveal (components/motion/Motion.tsx → Reveal) */
+/* Press + ripple (Button / IconButton) */
+.ft-press:active:not(:disabled) { transform: scale(0.96); transition-duration: 90ms; }
+.ft-ripple {
+  position: absolute;
+  z-index: -1;
+  border-radius: 9999px;
+  background: currentColor;
+  opacity: 0.22;
+  transform: scale(0);
+  pointer-events: none;
+  animation: ft-ripple 650ms var(--ease-out) forwards;
+}
+@keyframes ft-ripple { to { transform: scale(1); opacity: 0; } }
+
+/* Scroll reveal (Reveal) */
 [data-reveal] {
   transition:
-    opacity 700ms var(--ease-out) var(--reveal-delay, 0ms),
-    transform 700ms var(--ease-out) var(--reveal-delay, 0ms);
+    opacity 800ms var(--ease-out) var(--reveal-delay, 0ms),
+    transform 800ms var(--ease-out) var(--reveal-delay, 0ms),
+    filter 800ms var(--ease-out) var(--reveal-delay, 0ms);
 }
-[data-reveal='out'] {
-  opacity: 0;
-  transform: translateY(14px);
-}
+[data-reveal='out'] { opacity: 0; transform: translateY(24px) scale(0.985); filter: blur(6px); }
 
-/* Word-by-word headline (SplitWords) */
-.ft-word-mask {
-  display: inline-block;
-  overflow: hidden;
-  vertical-align: top;
-  padding-bottom: 0.08em;
-  margin-bottom: -0.08em;
-}
-.ft-word {
-  display: inline-block;
-  animation: ft-word-rise 900ms var(--ease-out) both;
-}
-@keyframes ft-word-rise {
-  from { transform: translateY(105%); opacity: 0; }
-  to { transform: none; opacity: 1; }
-}
+/* Word-by-word headline (SplitWords): rise + un-blur */
+.ft-word-mask { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: 0.1em; margin-bottom: -0.1em; }
+.ft-word { display: inline-block; animation: ft-word-rise 1000ms var(--ease-out) both; }
+@keyframes ft-word-rise { from { transform: translateY(110%) rotate(4deg); opacity: 0; filter: blur(8px); } to { transform: none; opacity: 1; filter: none; } }
 
-/* Route change: the new page settles in */
-.ft-page {
-  animation: ft-page-in 420ms var(--ease-out) both;
-}
-@keyframes ft-page-in {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: none; }
-}
+/* Page settle + section stagger */
+.ft-page { animation: ft-page-in 520ms var(--ease-out) both; }
+@keyframes ft-page-in { from { opacity: 0; transform: translateY(14px); filter: blur(4px); } to { opacity: 1; transform: none; filter: none; } }
+.ft-stagger > * { animation: ft-page-in 640ms var(--ease-out) both; }
+.ft-stagger > *:nth-child(2) { animation-delay: 70ms; }
+.ft-stagger > *:nth-child(3) { animation-delay: 140ms; }
+.ft-stagger > *:nth-child(4) { animation-delay: 210ms; }
+.ft-stagger > *:nth-child(5) { animation-delay: 280ms; }
+.ft-stagger > *:nth-child(n + 6) { animation-delay: 340ms; }
 
-/* Staggered entrance for a page's top-level sections */
-.ft-stagger > * {
-  animation: ft-page-in 560ms var(--ease-out) both;
-}
-.ft-stagger > *:nth-child(2) { animation-delay: 60ms; }
-.ft-stagger > *:nth-child(3) { animation-delay: 120ms; }
-.ft-stagger > *:nth-child(4) { animation-delay: 180ms; }
-.ft-stagger > *:nth-child(5) { animation-delay: 240ms; }
-.ft-stagger > *:nth-child(n + 6) { animation-delay: 300ms; }
-
-/* Panels: a hairline that warms on hover, no jumping */
+/* Cards: cursor-following spotlight + border glow (set --mx/--my via useSpotlight) */
 .ft-card {
-  transition: border-color var(--duration-base) var(--ease-out), box-shadow var(--duration-base) var(--ease-out), transform var(--duration-base) var(--ease-out);
-}
-.ft-card:hover {
-  border-color: var(--color-line-strong);
-  box-shadow: 0 1px 2px rgb(26 26 24 / 0.04), 0 14px 34px -22px rgb(26 26 24 / 0.22);
-}
-.ft-lift:hover {
-  transform: translateY(-2px);
-}
-
-/* Hero ambient light: three soft washes drifting very slowly */
-.ft-aurora {
-  position: absolute;
-  inset: -10% -10% auto -10%;
-  height: 780px;
-  pointer-events: none;
-  overflow: hidden;
-  -webkit-mask-image: linear-gradient(to bottom, #000 40%, transparent);
-  mask-image: linear-gradient(to bottom, #000 40%, transparent);
-}
-.ft-aurora span {
-  position: absolute;
-  border-radius: 9999px;
-  filter: blur(80px);
-  opacity: 0.55;
-  will-change: transform;
-}
-.ft-aurora span:nth-child(1) { width: 46vw; height: 46vw; max-width: 640px; max-height: 640px; left: 52%; top: -12%; background: #c9dde1; animation: ft-drift-a 22s ease-in-out infinite alternate; }
-.ft-aurora span:nth-child(2) { width: 34vw; height: 34vw; max-width: 480px; max-height: 480px; left: 70%; top: 22%; background: #dfe9df; animation: ft-drift-b 26s ease-in-out infinite alternate; }
-.ft-aurora span:nth-child(3) { width: 30vw; height: 30vw; max-width: 420px; max-height: 420px; left: 8%; top: -18%; background: #efe3cf; animation: ft-drift-a 30s ease-in-out infinite alternate-reverse; }
-@keyframes ft-drift-a { to { transform: translate3d(-6%, 8%, 0) scale(1.08); } }
-@keyframes ft-drift-b { to { transform: translate3d(8%, -6%, 0) scale(0.94); } }
-
-/* Faint ledger grid behind the hero */
-.ft-grid-bg {
-  background-image:
-    linear-gradient(to right, rgb(26 26 24 / 0.045) 1px, transparent 1px),
-    linear-gradient(to bottom, rgb(26 26 24 / 0.045) 1px, transparent 1px);
-  background-size: 56px 56px;
-  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, #000 30%, transparent 75%);
-  mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, #000 30%, transparent 75%);
-}
-
-/* Sparkline draw-in */
-.ft-draw {
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  animation: ft-draw 1600ms var(--ease-out) 350ms forwards;
-}
-@keyframes ft-draw { to { stroke-dashoffset: 0; } }
-
-/* Horizontal bar grow (hero preview + category bars) */
-.ft-grow {
-  transform-origin: left center;
-  animation: ft-grow 1000ms var(--ease-out) both;
-}
-@keyframes ft-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-
-/* Product preview: tilted back, flattens as it scrolls into view */
-.ft-tilt {
-  transform: perspective(1600px) rotateX(calc(var(--tilt, 1) * 14deg)) scale(calc(1 - var(--tilt, 1) * 0.06));
-  transform-origin: 50% 0%;
-  transition: transform 120ms linear;
-}
-
-/* Live dot */
-.ft-live {
   position: relative;
+  transition: border-color var(--duration-base) var(--ease-out), transform 400ms var(--ease-spring), box-shadow var(--duration-base) var(--ease-out);
 }
-.ft-live::after {
+.ft-card::before {
   content: '';
   position: absolute;
-  inset: -3px;
-  border-radius: 9999px;
-  border: 1.5px solid currentColor;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
   opacity: 0;
-  animation: ft-ping 2.4s var(--ease-out) infinite;
+  transition: opacity 300ms var(--ease-out);
+  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 0%), rgb(198 244 94 / 0.09), transparent 45%);
 }
-@keyframes ft-ping {
-  0% { transform: scale(0.6); opacity: 0.6; }
-  100% { transform: scale(1.8); opacity: 0; }
+.ft-card:hover::before { opacity: 1; }
+.ft-card:hover { border-color: #3d4641; box-shadow: 0 24px 50px -30px rgb(0 0 0 / 0.9); }
+.ft-lift:hover { transform: translateY(-4px); }
+
+/* Data draw-ins */
+.ft-draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: ft-draw 1800ms var(--ease-out) 300ms forwards; }
+@keyframes ft-draw { to { stroke-dashoffset: 0; } }
+.ft-grow { transform-origin: left center; animation: ft-grow 1100ms var(--ease-spring) both; }
+@keyframes ft-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+/* Live dot */
+.ft-live { position: relative; }
+.ft-live::after {
+  content: ''; position: absolute; inset: -4px; border-radius: 9999px; border: 1.5px solid currentColor; opacity: 0;
+  animation: ft-ping 2.2s var(--ease-out) infinite;
 }
+@keyframes ft-ping { 0% { transform: scale(0.5); opacity: 0.7; } 100% { transform: scale(2); opacity: 0; } }
+
+/* Landing: ambient orbs, grain, grid, marquee */
+.ft-orb { position: absolute; border-radius: 9999px; filter: blur(90px); pointer-events: none; will-change: transform; }
+.ft-grain::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0.05; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.ft-grid-bg {
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.04) 1px, transparent 1px);
+  background-size: 64px 64px;
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, #000 25%, transparent 75%);
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, #000 25%, transparent 75%);
+}
+.ft-marquee { display: flex; width: max-content; animation: ft-marquee 38s linear infinite; }
+.ft-marquee-wrap:hover .ft-marquee { animation-play-state: paused; }
+@keyframes ft-marquee { to { transform: translateX(-50%); } }
+.ft-highlight {
+  padding: 0 0.1em;
+  border-radius: 0.14em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  background: linear-gradient(var(--color-accent), var(--color-accent)) no-repeat 0 60% / 0% 86%;
+  color: var(--color-ink);
+  animation: ft-mark 900ms var(--ease-out) 800ms forwards, ft-ink-flip 300ms ease 1150ms forwards;
+}
+@keyframes ft-mark { to { background-size: 100% 86%; } }
+@keyframes ft-ink-flip { to { color: var(--color-on-accent); } }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-reveal='out'] { opacity: 1; transform: none; }
-  .ft-tilt { transform: none; }
-  .ft-aurora span, .ft-live::after { animation: none; }
+  [data-reveal='out'] { opacity: 1; transform: none; filter: none; }
+  .ft-marquee, .ft-live::after, .skeleton { animation: none; }
+  .ft-press:active:not(:disabled) { transform: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {

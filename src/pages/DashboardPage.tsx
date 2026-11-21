@@ -15,6 +15,8 @@ import { TransactionList } from '../components/transactions/TransactionList'
 import { useTransactionEditor } from '../components/transactions/editorContext'
 import { InsightList } from '../components/dashboard/InsightList'
 import { CountUp } from '../components/motion/Motion'
+import { PullCard, TiltCard } from '../components/motion/Interactive'
+import { spotlight } from '../components/motion/effects'
 import { friendlyError } from '../services/repository'
 import { useAuth } from '../services/authContext'
 
@@ -43,7 +45,7 @@ export function DashboardPage() {
   return (
     <div className="ft-stagger flex flex-col gap-10">
       <header>
-        <h1 className="font-display text-[2.15rem] leading-[1.1] tracking-[-0.01em] text-ink sm:text-4xl">
+        <h1 className="font-display text-[2.4rem] font-semibold leading-[1.02] tracking-[-0.045em] text-ink sm:text-[3.4rem]">
           {greeting()}
           {firstName ? `, ${firstName}.` : '.'}
         </h1>
@@ -153,17 +155,25 @@ function BalanceStrip({
   accounts: number
 }) {
   return (
-    <section aria-label="Balance overview" className="grid grid-cols-2 gap-x-6 gap-y-6 border-y border-line py-6 md:grid-cols-3 lg:grid-cols-[minmax(0,1.5fr)_repeat(3,minmax(0,1fr))] lg:gap-0 lg:divide-x lg:divide-line">
-      <div className="col-span-2 min-w-0 md:col-span-3 lg:col-span-1 lg:pr-8">
-        <p className="text-sm text-ink-3">Total balance</p>
-        <p className={`num mt-1 text-4xl font-medium tracking-[-0.035em] ${balance < 0 ? 'text-negative' : 'text-ink'}`}><CountUp value={balance} format={(n) => money(n)} /></p>
-        <p className="mt-1 text-xs text-ink-3">
-          Across {accounts} {accounts === 1 ? 'account' : 'accounts'} ·{' '}
-          <Link to="/settings#accounts" className="underline-offset-2 hover:underline">
-            starting balances
-          </Link>
-        </p>
-      </div>
+    <section aria-label="Balance overview" className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-[minmax(0,1.45fr)_repeat(3,minmax(0,1fr))]">
+      <TiltCard className="col-span-2 min-w-0 md:col-span-3 lg:col-span-1" max={5}>
+        <div className="relative h-full overflow-hidden rounded-lg bg-accent p-5 text-on-accent shadow-[0_30px_60px_-30px_rgb(198_244_94/0.55)] sm:p-6">
+          <div className="pointer-events-none absolute -right-10 -top-16 size-48 rounded-full bg-white/25 blur-2xl" aria-hidden />
+          <svg className="pointer-events-none absolute bottom-0 right-0 h-24 w-48 opacity-25" viewBox="0 0 200 100" aria-hidden>
+            <path d="M0 90 C 40 80, 60 40, 100 50 S 160 20, 200 8" fill="none" stroke="currentColor" strokeWidth="3" />
+          </svg>
+          <p className="relative text-sm font-medium opacity-75">Total balance</p>
+          <p className={`num relative mt-2 font-display text-[2.6rem] font-bold leading-none tracking-[-0.05em] sm:text-5xl ${balance < 0 ? 'text-[#7a1d0c]' : ''}`}>
+            <CountUp value={balance} format={(n) => money(n)} />
+          </p>
+          <p className="relative mt-3 text-xs font-medium opacity-70">
+            Across {accounts} {accounts === 1 ? 'account' : 'accounts'} ·{' '}
+            <Link to="/settings#accounts" className="underline underline-offset-2 hover:opacity-100">
+              starting balances
+            </Link>
+          </p>
+        </div>
+      </TiltCard>
       <Stat label={`Income in ${monthName}`} amount={income} money={money} />
       <Stat label={`Spent in ${monthName}`} amount={expense} money={money} />
       <Stat
@@ -177,17 +187,19 @@ function BalanceStrip({
   )
 }
 
+/** A stat tile you can grab and pull; it springs back when released. */
 function Stat({ label, amount, money, tone, className = '' }: { label: string; amount: number; money: (n: number) => string; tone?: 'positive' | 'negative'; className?: string }) {
   return (
-    <div className={`min-w-0 lg:px-6 xl:px-8 ${className}`}>
-      <p className="text-sm text-ink-3">{label}</p>
-      <p className={`num mt-1 text-xl font-medium tracking-[-0.02em] sm:text-2xl ${tone === 'positive' ? 'text-positive' : tone === 'negative' ? 'text-negative' : 'text-ink'}`}>
-        <CountUp value={amount} format={(n) => money(n)} />
-      </p>
-    </div>
+    <PullCard className={`min-w-0 ${className}`}>
+      <div onPointerMove={spotlight} className="ft-card flex h-full flex-col justify-between rounded-lg border border-line bg-surface p-5">
+        <p className="text-sm text-ink-3">{label}</p>
+        <p className={`num mt-6 font-display text-2xl font-semibold tracking-[-0.04em] sm:text-[1.9rem] ${tone === 'positive' ? 'text-positive' : tone === 'negative' ? 'text-negative' : 'text-ink'}`}>
+          <CountUp value={amount} format={(n) => money(n)} />
+        </p>
+      </div>
+    </PullCard>
   )
 }
-
 function HealthRow({ savingsRate, budgetUsage, pace, prevMonthName }: { savingsRate: number | null; budgetUsage: number | null; pace: number | null; prevMonthName: string }) {
   const [open, setOpen] = useState(false)
   const items = [

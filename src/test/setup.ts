@@ -27,3 +27,22 @@ if (!('ResizeObserver' in globalThis)) {
     disconnect() {}
   }
 }
+
+// jsdom has no IntersectionObserver; motion's whileInView and our reveals need one.
+// This stub reports every element as visible straight away.
+if (!('IntersectionObserver' in globalThis)) {
+  ;(globalThis as Record<string, unknown>).IntersectionObserver = class {
+    private cb: (e: { isIntersecting: boolean; target: Element }[]) => void
+    constructor(cb: (e: { isIntersecting: boolean; target: Element }[]) => void) {
+      this.cb = cb
+    }
+    observe(target: Element) {
+      this.cb([{ isIntersecting: true, target }])
+    }
+    unobserve() {}
+    disconnect() {}
+    takeRecords() {
+      return []
+    }
+  }
+}

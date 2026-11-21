@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, type ReactNode } from 'react'
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { MotionConfig } from 'motion/react'
 import { AuthProvider } from './services/auth'
 import { useAuth } from './services/authContext'
 import { ToastProvider } from './components/ui/Toast'
@@ -73,6 +74,7 @@ function PageFallback() {
 
 export default function App() {
   return (
+    <MotionConfig reducedMotion="user">
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <ToastProvider>
@@ -111,5 +113,6 @@ export default function App() {
         </ToastProvider>
       </BrowserRouter>
     </QueryClientProvider>
+    </MotionConfig>
   )
 }
