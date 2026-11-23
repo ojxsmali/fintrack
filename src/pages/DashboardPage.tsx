@@ -45,11 +45,11 @@ export function DashboardPage() {
   return (
     <div className="ft-stagger flex flex-col gap-10">
       <header>
-        <h1 className="font-display text-[2.4rem] font-semibold leading-[1.02] tracking-[-0.045em] text-ink sm:text-[3.4rem]">
+        <h1 className="ft-display text-[2.6rem] text-ink sm:text-[4rem]">
           {greeting()}
           {firstName ? `, ${firstName}.` : '.'}
         </h1>
-        <p className="mt-2 max-w-2xl text-base text-ink-2">{contextLine}</p>
+        <p className="mt-4 max-w-2xl text-base text-ink-2 sm:text-lg">{contextLine}</p>
       </header>
 
       {!data.hasAnyData ? (
@@ -157,13 +157,12 @@ function BalanceStrip({
   return (
     <section aria-label="Balance overview" className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-[minmax(0,1.45fr)_repeat(3,minmax(0,1fr))]">
       <TiltCard className="col-span-2 min-w-0 md:col-span-3 lg:col-span-1" max={5}>
-        <div className="relative h-full overflow-hidden rounded-lg bg-accent p-5 text-on-accent shadow-[0_30px_60px_-30px_rgb(198_244_94/0.55)] sm:p-6">
-          <div className="pointer-events-none absolute -right-10 -top-16 size-48 rounded-full bg-white/25 blur-2xl" aria-hidden />
+        <div className="relative h-full overflow-hidden rounded-lg bg-accent p-5 text-on-accent sm:p-6">
           <svg className="pointer-events-none absolute bottom-0 right-0 h-24 w-48 opacity-25" viewBox="0 0 200 100" aria-hidden>
             <path d="M0 90 C 40 80, 60 40, 100 50 S 160 20, 200 8" fill="none" stroke="currentColor" strokeWidth="3" />
           </svg>
           <p className="relative text-sm font-medium opacity-75">Total balance</p>
-          <p className={`num relative mt-2 font-display text-[2.6rem] font-bold leading-none tracking-[-0.05em] sm:text-5xl ${balance < 0 ? 'text-[#7a1d0c]' : ''}`}>
+          <p className={`num relative mt-2 font-display text-[2.6rem] font-bold leading-none tracking-[-0.05em] sm:text-5xl ${balance < 0 ? 'text-[#6b1a0b]' : ''}`}>
             <CountUp value={balance} format={(n) => money(n)} />
           </p>
           <p className="relative mt-3 text-xs font-medium opacity-70">

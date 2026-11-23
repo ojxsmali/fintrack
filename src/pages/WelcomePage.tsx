@@ -1,24 +1,26 @@
-import { useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState, type ReactNode } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { motion, useScroll, useTransform } from 'motion/react'
-import { ArrowRight, ArrowUpRight, ChartNoAxesColumn, Download, Hand, LayoutDashboard, Lightbulb, ShieldCheck, Target } from 'lucide-react'
+import { ArrowRight, ArrowUpRight } from 'lucide-react'
 import { Wordmark } from '../components/ui/Logo'
 import { Button } from '../components/ui/Button'
 import { Field, Input } from '../components/ui/Field'
 import { CurrencySelect } from '../components/ui/CurrencySelect'
 import { AuthorCredit } from '../components/layout/AuthorCredit'
-import { CountUp, Reveal, SplitWords } from '../components/motion/Motion'
-import { Magnetic, PullCard, TiltCard } from '../components/motion/Interactive'
-import { spotlight } from '../components/motion/effects'
+import { Reveal, SplitWords } from '../components/motion/Motion'
+import { Magnetic } from '../components/motion/Interactive'
+import { MoneyFlow } from '../components/landing/MoneyFlow'
 import { useAuth, type Workspace } from '../services/authContext'
 import { buildHeroPreview, type HeroPreview } from '../lib/heroPreview'
-import { formatCurrency, formatPercent } from '../lib/format'
+import { formatCurrency } from '../lib/format'
 import { AUTHOR } from '../lib/brand'
 
 const STACK = ['React 19', 'TypeScript', 'TanStack Query', 'Recharts', 'Supabase · Postgres RLS', 'motion', 'Vitest']
-const MARQUEE = ['Monthly overview', 'Spending pace', 'Budgets that warn at 80%', 'Insights with the working shown', 'Trends across months', 'CSV export', 'Every ISO currency', 'Press N to add', 'Private by default']
 
 const inr = (n: number) => formatCurrency(Math.round(n), 'INR')
+
+/** Page frame shared by every landing section: wide measure, fluid gutter. */
+const FRAME = 'mx-auto w-full max-w-[1360px] px-[clamp(16px,3vw,40px)]'
 
 export function WelcomePage() {
   const { status, hasBackend, startWorkspace } = useAuth()
@@ -37,22 +39,32 @@ export function WelcomePage() {
   }
 
   return (
-    <div className="ft-grain relative flex min-h-dvh flex-col overflow-x-clip">
-      <Ambient />
+    <div className="relative flex min-h-dvh flex-col overflow-x-clip">
+      <a href="#hero" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-xs focus:bg-accent focus:px-3 focus:py-2 focus:text-on-accent">
+        Skip to content
+      </a>
 
-      {/* Floating glass nav */}
-      <header className="sticky top-3 z-40 mx-auto mt-3 w-[calc(100%-1.5rem)] max-w-[1200px]">
-        <div className="flex items-center justify-between rounded-full border border-white/10 bg-[#101412]/70 py-2 pl-4 pr-2 shadow-[0_20px_40px_-20px_rgb(0_0_0/0.9)] backdrop-blur-xl">
-          <Wordmark />
+      <header className="sticky top-0 z-40 border-b border-line bg-paper">
+        <div className={`${FRAME} flex h-16 items-center justify-between gap-4`}>
+          <Link to="/" aria-label="FinTrack home" className="rounded-xs">
+            <Wordmark />
+          </Link>
           <nav aria-label="Welcome" className="flex items-center gap-1 text-sm">
-            <a href="#features" className="hidden rounded-full px-3 py-2 font-medium text-ink-2 transition-colors hover:bg-white/5 hover:text-ink sm:inline-block">Features</a>
-            <a href="#product" className="hidden rounded-full px-3 py-2 font-medium text-ink-2 transition-colors hover:bg-white/5 hover:text-ink md:inline-block">Product</a>
+            <NavA href="#product" className="hidden md:inline-flex">Product</NavA>
+            <NavA href="#features" className="hidden md:inline-flex">Features</NavA>
+            <NavA href="#privacy" className="hidden lg:inline-flex">Privacy</NavA>
             {AUTHOR.repoUrl && (
-              <a href={AUTHOR.repoUrl} target="_blank" rel="noreferrer" className="hidden rounded-full px-3 py-2 font-medium text-ink-2 transition-colors hover:bg-white/5 hover:text-ink sm:inline-block">GitHub</a>
+              <NavA href={AUTHOR.repoUrl} external className="hidden sm:inline-flex">
+                GitHub
+              </NavA>
             )}
-            {hasBackend && <Link to="/login" className="rounded-full px-3 py-2 font-medium text-ink-2 hover:text-ink">Sign in</Link>}
+            {hasBackend && (
+              <Link to="/login" className="inline-flex h-9 items-center rounded-xs px-3 font-medium text-ink-2 hover:text-ink">
+                Sign in
+              </Link>
+            )}
             <Magnetic strength={0.25}>
-              <a href="#start" className="ft-press inline-flex h-9 items-center gap-1.5 rounded-full bg-accent px-4 font-semibold text-on-accent transition-[transform,background-color] duration-300 ease-[var(--ease-spring)] hover:bg-accent-hover">
+              <a href="#start" className="ft-press ml-1 inline-flex h-9 items-center gap-1.5 rounded-full bg-accent px-4 font-semibold text-on-accent transition-[transform,background-color] duration-300 ease-[var(--ease-spring)] hover:bg-accent-hover">
                 Get started <ArrowUpRight size={15} aria-hidden />
               </a>
             </Magnetic>
@@ -60,308 +72,301 @@ export function WelcomePage() {
         </div>
       </header>
 
-      <main className="relative mx-auto w-full max-w-[1200px] flex-1 px-5 sm:px-8">
-        {/* Hero */}
-        <section className="grid items-center gap-14 pb-16 pt-14 md:pt-20 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-10 lg:pb-24 lg:pt-24">
-          <div>
-            <p className="ft-page inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-ink-2">
+      <main className="flex-1">
+        {/* ── Hero ─────────────────────────────────────────── */}
+        <section id="hero" aria-labelledby="hero-title" className={`${FRAME} pb-24 pt-10 sm:pt-14 lg:pb-32 lg:pt-16`}>
+          <div className="ft-page flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-b border-line pb-4">
+            <p className="ft-label">(FinTrack) — personal finance, made legible</p>
+            <p className="ft-label flex items-center gap-2 text-ink-2">
               <span className="ft-live size-1.5 rounded-full bg-accent text-accent" aria-hidden="true" />
-              Live prototype · no sign-up needed
+              Live prototype · no sign-up
             </p>
-            <h1 className="mt-6 font-display text-[3.1rem] font-bold leading-[0.95] tracking-[-0.055em] text-ink sm:text-[5.4rem]">
-              <SplitWords text="Where your money goes," /> <span className="ft-highlight"><SplitWords text="and what’s changing." stagger={70} /></span>
-            </h1>
-            <p className="ft-page mt-7 max-w-lg text-lg leading-relaxed text-ink-2 [animation-delay:500ms]">
-              FinTrack turns everyday transactions into a clear monthly picture — what you earn, what you spend, and what deserves your attention.
-            </p>
-            <div className="ft-page mt-9 flex flex-col gap-3 [animation-delay:620ms] sm:flex-row sm:items-center">
-              <Magnetic>
-                <Button size="lg" loading={pending === 'sample'} onClick={() => open('sample')} className="group w-full !rounded-full sm:w-auto">
-                  Open the prototype <ArrowRight size={17} aria-hidden className="transition-transform duration-300 ease-[var(--ease-spring)] group-hover:translate-x-1" />
-                </Button>
-              </Magnetic>
-              <a href="#start" className="ft-press inline-flex h-12 items-center justify-center rounded-full border border-line-strong px-6 font-medium text-ink transition-colors hover:border-ink-3 hover:bg-white/5">
-                Start your own
-              </a>
-            </div>
-            <dl className="ft-page mt-12 grid max-w-md grid-cols-3 gap-6 border-t border-line pt-6 [animation-delay:760ms]">
-              {[
-                [preview.transactionCount, 'sample transactions'],
-                [13, 'months of history'],
-                [6, 'screens, all working'],
-              ].map(([n, l]) => (
-                <div key={l as string}>
-                  <dt className="sr-only">{l}</dt>
-                  <dd className="num font-display text-3xl font-semibold tracking-[-0.04em] text-ink"><CountUp value={n as number} format={(v) => String(Math.round(v))} /></dd>
-                  <dd className="mt-1 text-xs text-ink-3">{l}</dd>
-                </div>
-              ))}
-            </dl>
           </div>
 
-          <CardStack p={preview} />
+          <h1 id="hero-title" className="ft-display mt-10 text-[clamp(2.9rem,7.9vw,8.4rem)] text-ink sm:mt-14">
+            <SplitWords text="Where your money goes," />
+            <br className="hidden sm:block" />{' '}
+            <span className="ft-serif text-accent [letter-spacing:-0.02em]">
+              <SplitWords text="and what’s changing." stagger={80} />
+            </span>
+          </h1>
+
+          <div className="mt-14 grid gap-14 lg:mt-20 lg:grid-cols-12 lg:gap-10">
+            <div className="lg:col-span-4">
+              <p className="ft-page max-w-md text-lg leading-relaxed text-ink-2 [animation-delay:450ms] sm:text-xl sm:leading-relaxed">
+                FinTrack turns everyday transactions into a clear monthly picture — what you earn, what you spend, and what deserves your attention.
+              </p>
+              <div className="ft-page mt-9 flex flex-col gap-3 [animation-delay:560ms] sm:flex-row lg:flex-col lg:items-start 2xl:flex-row">
+                <Magnetic>
+                  <Button size="lg" loading={pending === 'sample'} onClick={() => open('sample')} className="group w-full !rounded-full sm:w-auto">
+                    Open the prototype <ArrowRight size={17} aria-hidden className="transition-transform duration-300 ease-[var(--ease-spring)] group-hover:translate-x-1" />
+                  </Button>
+                </Magnetic>
+                <a href="#start" className="ft-press inline-flex h-12 items-center justify-center whitespace-nowrap rounded-full border border-line-strong px-6 font-medium text-ink transition-colors hover:border-ink hover:bg-sunken">
+                  Start your own
+                </a>
+              </div>
+              <dl className="ft-page mt-12 grid grid-cols-2 border-t border-line [animation-delay:680ms]">
+                <Fact term="Sample transactions" value={String(preview.transactionCount)} />
+                <Fact term="Months of history" value="13" />
+                <Fact term="Currencies" value="Every ISO" />
+                <Fact term="Sign-up" value="Optional" />
+              </dl>
+            </div>
+            <div className="ft-page [animation-delay:300ms] lg:col-span-8 lg:pl-6">
+              <MoneyFlow p={preview} />
+            </div>
+          </div>
         </section>
 
-        {/* Marquee */}
-        <div className="ft-marquee-wrap relative -mx-5 overflow-hidden border-y border-line py-5 sm:-mx-8 [mask-image:linear-gradient(90deg,transparent,#000_12%,#000_88%,transparent)]" aria-hidden="true">
-          <div className="ft-marquee gap-10">
-            {[...MARQUEE, ...MARQUEE].map((m, i) => (
-              <span key={i} className="flex items-center gap-10 whitespace-nowrap font-display text-2xl font-semibold tracking-[-0.03em] text-ink-3">
-                {m} <span className="size-2 rounded-full bg-accent" />
-              </span>
-            ))}
-          </div>
-        </div>
-
         <ScrollShowcase />
-        <Bento p={preview} />
-        <Start
-          pending={pending}
-          open={open}
-          name={name}
-          setName={setName}
-          currency={currency}
-          setCurrency={setCurrency}
-          hasBackend={hasBackend}
-        />
-
-        <Reveal as="section" aria-label="Built with" className="mt-24 border-t border-line pt-8">
-          <p className="text-xs font-medium uppercase tracking-[0.14em] text-ink-3">Built with</p>
-          <ul className="mt-4 flex flex-wrap gap-2">
-            {STACK.map((s) => (
-              <li key={s} className="rounded-full border border-line-strong bg-surface px-3.5 py-1.5 text-sm text-ink-2 transition-colors hover:border-accent hover:text-ink">{s}</li>
-            ))}
-          </ul>
-        </Reveal>
+        <Features p={preview} />
+        <Privacy />
+        <Start pending={pending} open={open} name={name} setName={setName} currency={currency} setCurrency={setCurrency} hasBackend={hasBackend} />
       </main>
 
-      <footer className="relative mt-20 border-t border-line">
-        <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-2 px-5 py-8 text-xs text-ink-3 sm:flex-row sm:items-center sm:justify-between sm:px-8">
-          <AuthorCredit />
-          <p>Guest workspaces stay in your browser. Accounts are protected by row-level security.</p>
+      <footer className="mt-28 border-t border-line">
+        <div className={`${FRAME} grid gap-10 py-12 md:grid-cols-12`}>
+          <div className="md:col-span-5">
+            <Wordmark />
+            <p className="mt-4 max-w-sm text-sm text-ink-3">Guest workspaces stay in your browser. Synced accounts are protected by row-level security.</p>
+            <AuthorCredit className="mt-6 text-sm text-ink-3" />
+          </div>
+          <div className="md:col-span-4">
+            <p className="ft-label">Built with</p>
+            <ul className="mt-3 grid gap-1 font-mono text-xs text-ink-2">
+              {STACK.map((s) => (
+                <li key={s}>{s}</li>
+              ))}
+            </ul>
+          </div>
+          <div className="md:col-span-3">
+            <p className="ft-label">Set in</p>
+            <ul className="mt-3 grid gap-1 text-sm text-ink-2">
+              <li>Geist</li>
+              <li className="ft-serif text-base">Instrument Serif</li>
+              <li className="font-mono text-xs">JetBrains Mono</li>
+            </ul>
+          </div>
         </div>
       </footer>
     </div>
   )
 }
 
-/** Two slow lime/teal orbs that drift with scroll. */
-function Ambient() {
-  const { scrollY } = useScroll()
-  const y1 = useTransform(scrollY, [0, 1200], [0, 260])
-  const y2 = useTransform(scrollY, [0, 1200], [0, -180])
+function NavA({ href, external, className = '', children }: { href: string; external?: boolean; className?: string; children: ReactNode }) {
   return (
-    <div className="pointer-events-none absolute inset-0 -z-0 overflow-hidden" aria-hidden="true">
-      <div className="ft-grid-bg absolute inset-x-0 top-0 h-[900px]" />
-      <motion.div style={{ y: y1 }} className="ft-orb -right-40 -top-40 size-[620px] bg-[#c6f45e]/[0.13]" />
-      <motion.div style={{ y: y2 }} className="ft-orb -left-60 top-[420px] size-[520px] bg-[#3fd6c0]/[0.08]" />
+    <a
+      href={href}
+      {...(external ? { target: '_blank', rel: 'noreferrer' } : {})}
+      className={`h-9 items-center rounded-xs px-3 font-medium text-ink-2 transition-colors hover:text-ink ${className}`}
+    >
+      {children}
+    </a>
+  )
+}
+
+function Fact({ term, value }: { term: string; value: string }) {
+  return (
+    <div className="border-b border-line py-4 odd:pr-4 even:border-l even:pl-4">
+      <dt className="ft-label">{term}</dt>
+      <dd className="num mt-1.5 text-2xl font-semibold tracking-[-0.04em] text-ink">{value}</dd>
     </div>
   )
 }
 
-/** The hero's fanned cards — all real figures from the prototype's sample data. Grab one: it springs back. */
-function CardStack({ p }: { p: HeroPreview }) {
-  const W = 300
-  const H = 90
-  const max = Math.max(1, ...p.pace.map((d) => Math.max(d.current ?? 0, d.previous ?? 0)))
-  const x = (day: number) => ((day - 1) / Math.max(1, p.pace.length - 1)) * W
-  const y = (v: number) => H - (v / max) * (H - 8) - 4
-  const path = (key: 'current' | 'previous') =>
-    p.pace
-      .filter((d) => d[key] !== null)
-      .map((d, i) => `${i ? 'L' : 'M'}${x(d.day).toFixed(1)},${y(d[key] as number).toFixed(1)}`)
-      .join(' ')
-  const curr = p.pace.filter((d) => d.current !== null)
-  const last = curr[curr.length - 1]
-  const prevSame = p.pace.find((d) => d.day === last?.day)?.previous ?? null
-  const pace = last && prevSame ? ((last.current! - prevSame) / prevSame) * 100 : null
-
+/** Monospaced section marker on a hairline: "(01) The product". */
+function SectionHead({ index, label, id, children, aside }: { index: string; label: string; id: string; children: ReactNode; aside?: ReactNode }) {
   return (
-    <div className="relative mx-auto h-[540px] w-full max-w-[520px] sm:h-[560px]" role="group" aria-label={`Sample overview for ${p.monthName}`}>
-      <p className="ft-page absolute -top-2 right-2 z-40 flex items-center gap-1.5 rounded-full border border-white/10 bg-[#101412]/80 px-3 py-1.5 text-xs text-ink-2 backdrop-blur [animation-delay:1400ms]">
-        <Hand size={13} aria-hidden className="text-accent" /> Grab a card — it springs back
-      </p>
-
-      {/* Saved this month — the lime card */}
-      <PullCard rotate={-6} initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35, type: 'spring', stiffness: 140, damping: 18 }}
-        className="absolute left-0 top-6 z-20 w-[64%] sm:w-[58%]">
-        <div className="rounded-lg bg-accent p-5 text-on-accent shadow-[0_30px_60px_-24px_rgb(198_244_94/0.5)]">
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] opacity-70">Saved in {p.monthName}</p>
-          <p className="num mt-3 font-display text-[2.4rem] font-bold leading-none tracking-[-0.05em]"><CountUp value={Math.abs(p.net)} format={inr} /></p>
-          {p.savingsRate !== null && <p className="mt-3 text-sm font-medium opacity-75">{formatPercent(p.savingsRate, { digits: 0 })} of income kept</p>}
-        </div>
-      </PullCard>
-
-      {/* Spending pace */}
-      <PullCard rotate={4} initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, type: 'spring', stiffness: 140, damping: 18 }}
-        className="absolute right-0 top-[190px] z-30 w-[86%] sm:w-[80%]">
-        <div className="rounded-lg border border-white/10 bg-[#161b18]/95 p-5 shadow-[0_40px_80px_-30px_rgb(0_0_0/0.9)] backdrop-blur">
-          <div className="flex items-baseline justify-between gap-3">
-            <p className="text-sm font-semibold text-ink">Spending pace</p>
-            {pace !== null && (
-              <span className={`num rounded-full px-2 py-0.5 text-xs font-semibold ${pace <= 0 ? 'bg-positive-soft text-positive' : 'bg-caution-soft text-caution'}`}>
-                {pace <= 0 ? '↓' : '↑'} {formatPercent(Math.abs(pace), { digits: 0 })} vs {p.prevMonthName}
-              </span>
-            )}
-          </div>
-          <p className="num mt-1 text-xs text-ink-3">{inr(p.expense)} spent by day {last?.day}</p>
-          <svg viewBox={`0 0 ${W} ${H}`} className="mt-4 h-24 w-full overflow-visible" role="img" aria-label={`Cumulative spending: ${inr(last?.current ?? 0)} by day ${last?.day ?? 0}, dashed line is ${p.prevMonthName}.`}>
-            <defs>
-              <linearGradient id="ft-pace" x1="0" x2="0" y1="0" y2="1">
-                <stop offset="0" stopColor="#c6f45e" stopOpacity=".28" />
-                <stop offset="1" stopColor="#c6f45e" stopOpacity="0" />
-              </linearGradient>
-            </defs>
-            <path d={path('previous')} fill="none" stroke="#5d6761" strokeWidth="1.6" strokeDasharray="4 4" />
-            {last && <path d={`${path('current')} L${x(last.day)},${H} L0,${H} Z`} fill="url(#ft-pace)" className="ft-page [animation-delay:1200ms]" />}
-            <path d={path('current')} pathLength={1} className="ft-draw" fill="none" stroke="#c6f45e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-            {last && <circle cx={x(last.day)} cy={y(last.current ?? 0)} r="4.5" fill="#c6f45e" stroke="#161b18" strokeWidth="2.5" className="ft-page [animation-delay:1700ms]" />}
-          </svg>
-        </div>
-      </PullCard>
-
-      {/* Where it went */}
-      <PullCard rotate={-3} initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.65, type: 'spring', stiffness: 140, damping: 18 }}
-        className="absolute bottom-0 left-[4%] z-20 w-[78%] sm:w-[68%]">
-        <div className="rounded-lg border border-white/10 bg-[#121614]/95 p-5 shadow-[0_40px_80px_-30px_rgb(0_0_0/0.9)] backdrop-blur">
-          <p className="text-sm font-semibold text-ink">Where it went</p>
-          <ul className="mt-4 grid gap-3">
-            {p.topCategories.map((c, i) => (
-              <li key={c.name} className="grid grid-cols-[76px_1fr_36px] items-center gap-3 text-xs">
-                <span className="truncate text-ink-2">{c.name}</span>
-                <span className="h-2 overflow-hidden rounded-full bg-white/[0.06]">
-                  <span className="ft-grow block h-full rounded-full bg-accent" style={{ width: `${Math.max(4, c.share)}%`, animationDelay: `${900 + i * 110}ms`, opacity: 1 - i * 0.18 }} />
-                </span>
-                <span className="num text-right text-ink-3">{formatPercent(c.share, { digits: 0 })}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </PullCard>
-    </div>
+    <Reveal>
+      <div className="flex items-baseline justify-between gap-4 border-t border-ink/80 pt-3">
+        <p className="ft-label text-ink-2">
+          ({index}) {label}
+        </p>
+        {aside}
+      </div>
+      <h2 id={id} className="ft-display mt-8 max-w-[17ch] text-[clamp(2.5rem,6vw,5.75rem)] text-ink">
+        {children}
+      </h2>
+    </Reveal>
   )
 }
 
-/** The real overview, rising from a tilt and scaling to full size as you scroll (container-scroll effect). */
+/** The real overview, rising from a tilt and settling flat as you scroll. */
 function ScrollShowcase() {
   const ref = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'center center'] })
-  const rotateX = useTransform(scrollYProgress, [0, 1], [24, 0])
-  const scale = useTransform(scrollYProgress, [0, 1], [0.86, 1])
-  const y = useTransform(scrollYProgress, [0, 1], [60, 0])
+  const rotateX = useTransform(scrollYProgress, [0, 1], [14, 0])
+  const scale = useTransform(scrollYProgress, [0, 1], [0.92, 1])
   return (
-    <section id="product" aria-labelledby="product-title" className="scroll-mt-24 pt-24 lg:pt-32">
-      <Reveal className="mx-auto max-w-3xl text-center">
-        <p className="text-sm font-semibold text-accent">The product</p>
-        <h2 id="product-title" className="mt-3 font-display text-4xl font-bold leading-[1] tracking-[-0.045em] text-ink sm:text-6xl">
-          One calm screen for the whole month.
-        </h2>
-      </Reveal>
-      <div ref={ref} className="mt-14 [perspective:1400px]">
-        <motion.figure style={{ rotateX, scale, y }} className="origin-top">
-          <div className="overflow-hidden rounded-[22px] border border-white/10 bg-surface p-1.5 shadow-[0_60px_120px_-40px_rgb(0_0_0/0.95),0_0_0_1px_rgb(198_244_94/0.06)]">
+    <section id="product" aria-labelledby="product-title" className={`${FRAME} scroll-mt-20 pt-8`}>
+      <SectionHead index="01" label="The product" id="product-title" aside={<span className="ft-label hidden sm:inline">Overview screen</span>}>
+        One calm screen <span className="ft-serif">for the whole month.</span>
+      </SectionHead>
+      <div ref={ref} className="mt-14 [perspective:1600px]">
+        <motion.figure style={{ rotateX, scale }} className="origin-top">
+          <div className="overflow-hidden rounded-lg border border-line-strong bg-surface p-1.5">
             <img
               src="/preview/overview-1600.webp"
               srcSet="/preview/overview-960.webp 960w, /preview/overview-1600.webp 1600w"
-              sizes="(min-width: 1200px) 1136px, 100vw"
+              sizes="(min-width: 1360px) 1280px, 100vw"
               width={1600}
               height={1000}
               loading="lazy"
               decoding="async"
-              className="block h-auto w-full rounded-[16px]"
+              className="block h-auto w-full rounded-[10px]"
               alt="The FinTrack overview: total balance, this month's income, spending and savings, a spending-pace chart against last month, and insights worth your attention."
             />
           </div>
+          <figcaption className="ft-label mt-3">Fig. 2 — The overview, with a year of sample data loaded</figcaption>
         </motion.figure>
       </div>
     </section>
   )
 }
 
-const KEYS = ['N']
-
-/** Feature bento: each tile shows the feature doing its job, with a cursor spotlight. */
-function Bento({ p }: { p: HeroPreview }) {
+/** Features as a numbered ledger: one row per question the app answers, each with a small live specimen. */
+function Features({ p }: { p: HeroPreview }) {
   const budget = 84
-  return (
-    <section id="features" aria-labelledby="features-title" className="scroll-mt-24 pt-28 lg:pt-36">
-      <Reveal>
-        <p className="text-sm font-semibold text-accent">What it does</p>
-        <h2 id="features-title" className="mt-3 max-w-2xl font-display text-4xl font-bold leading-[1] tracking-[-0.045em] text-ink sm:text-6xl">
-          Built around the questions you actually ask.
-        </h2>
-      </Reveal>
-      <ul className="mt-12 grid auto-rows-[minmax(220px,auto)] gap-3 md:grid-cols-6">
-        <Tile className="md:col-span-4" icon={LayoutDashboard} title="A calm monthly overview" body="Balance, income, spending and savings — and how this month compares with the last, day for day.">
-          <div className="mt-6 grid grid-cols-3 gap-2">
-            {[['Income', p.income], ['Spent', p.expense], ['Saved', p.net]].map(([l, v]) => (
-              <div key={l as string} className="rounded-md border border-line bg-paper/60 p-3">
-                <p className="text-2xs text-ink-3">{l}</p>
-                <p className={`num mt-1 font-display text-lg font-semibold tracking-[-0.03em] ${l === 'Saved' ? 'text-positive' : 'text-ink'}`}>{inr(v as number)}</p>
-              </div>
-            ))}
-          </div>
-        </Tile>
-        <Tile className="md:col-span-2" icon={Target} title="Budgets that warn early" body="Flagged at 80%, before the month is gone.">
-          <div className="mt-6">
-            <div className="flex justify-between text-xs"><span className="text-ink-2">Transport</span><span className="num text-caution">{budget}% used</span></div>
-            <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-white/[0.06]">
-              <motion.div className="h-full rounded-full bg-caution" initial={{ width: 0 }} whileInView={{ width: `${budget}%` }} viewport={{ once: true }} transition={{ type: 'spring', stiffness: 60, damping: 14, delay: 0.2 }} />
+  const rows: { title: string; body: string; specimen: ReactNode }[] = [
+    {
+      title: 'A calm monthly overview',
+      body: 'Balance, income, spending and savings — and how this month compares with the last, day for day.',
+      specimen: (
+        <dl className="grid grid-cols-3 gap-4">
+          {([['Income', p.income], ['Spent', p.expense], ['Saved', p.net]] as const).map(([l, v]) => (
+            <div key={l}>
+              <dt className="ft-label">{l}</dt>
+              <dd className={`num mt-1 text-base font-semibold tracking-[-0.03em] sm:text-lg ${l === 'Saved' && v > 0 ? 'text-accent' : 'text-ink'}`}>{inr(v)}</dd>
             </div>
-            <p className="mt-2 text-2xs text-ink-3">Example budget, close to its limit</p>
+          ))}
+        </dl>
+      ),
+    },
+    {
+      title: 'Budgets that warn early',
+      body: 'Flagged at 80% of the limit, before the month is gone.',
+      specimen: (
+        <div>
+          <div className="flex justify-between text-xs">
+            <span className="text-ink-2">Transport (example)</span>
+            <span className="num font-mono text-caution">{budget}% used</span>
           </div>
-        </Tile>
-        <Tile className="md:col-span-2" icon={Lightbulb} title="Insights with the working shown" body="Every insight is calculated from your own numbers. Tap to see the formula.">
-          <details className="group mt-5 rounded-md border border-line bg-paper/60 p-3 text-xs">
-            <summary className="cursor-pointer list-none font-medium text-ink">Spending pace ↓ — show basis</summary>
-            <p className="mt-2 text-ink-3">(Spent 1st→today − same days last month) ÷ same days last month × 100</p>
-          </details>
-        </Tile>
-        <Tile className="md:col-span-2" icon={ChartNoAxesColumn} title="Trends across months" body="Income against spending, savings rate, busiest weekday and largest expenses.">
-          <div className="mt-6 flex h-16 items-end gap-1.5">
+          <div className="relative mt-2 h-2 bg-sunken">
+            <motion.div className="h-full bg-caution" initial={{ width: 0 }} whileInView={{ width: `${budget}%` }} viewport={{ once: true }} transition={{ type: 'spring', stiffness: 60, damping: 14, delay: 0.2 }} />
+            <span className="absolute -top-1 bottom-[-4px] left-[80%] w-px bg-ink" aria-hidden />
+          </div>
+          <p className="ft-label mt-2">Warning line at 80%</p>
+        </div>
+      ),
+    },
+    {
+      title: 'Insights with the working shown',
+      body: 'Every insight is calculated from your own numbers. Open one to see its formula.',
+      specimen: (
+        <details className="group border border-line p-3 text-xs">
+          <summary className="cursor-pointer list-none font-medium text-ink marker:hidden">
+            Spending pace — <span className="text-accent underline underline-offset-2">show basis</span>
+          </summary>
+          <p className="mt-2 font-mono text-ink-3">(Spent 1st→today − same days last month) ÷ same days last month × 100</p>
+        </details>
+      ),
+    },
+    {
+      title: 'Trends across months',
+      body: 'Income against spending, savings rate, busiest weekday and largest expenses.',
+      specimen: (
+        <div>
+          <div className="flex h-14 items-end gap-1.5" aria-hidden>
             {[42, 64, 51, 78, 58, 88, 70].map((h, i) => (
-              <motion.span key={i} className="flex-1 rounded-t-[4px] bg-accent/80" initial={{ height: 0 }} whileInView={{ height: `${h}%` }} viewport={{ once: true }} transition={{ type: 'spring', stiffness: 120, damping: 12, delay: i * 0.06 }} />
+              <motion.span key={i} className={`flex-1 ${i === 6 ? 'bg-accent' : 'bg-ink/30'}`} initial={{ height: 0 }} whileInView={{ height: `${h}%` }} viewport={{ once: true }} transition={{ type: 'spring', stiffness: 120, damping: 14, delay: i * 0.05 }} />
             ))}
           </div>
-          <p className="mt-2 text-2xs text-ink-3">Illustrative shape</p>
-        </Tile>
-        <Tile className="md:col-span-2" icon={Download} title="Fast, and yours to export" body="Press N anywhere to add a transaction. Export everything to CSV.">
-          <div className="mt-6 flex items-center gap-2">
-            {KEYS.map((k) => (
-              <motion.kbd key={k} whileHover={{ y: 3, boxShadow: '0 1px 0 #3a423e' }} whileTap={{ y: 4, boxShadow: '0 0 0 #3a423e' }}
-                className="grid size-12 cursor-pointer place-items-center rounded-md border border-line-strong bg-sunken font-mono text-lg font-semibold text-ink shadow-[0_4px_0_#3a423e]">
-                {k}
-              </motion.kbd>
-            ))}
-            <span className="text-xs text-ink-3">→ add transaction</span>
-          </div>
-        </Tile>
-        <Tile className="md:col-span-6" icon={ShieldCheck} title="Private by default" body="Guest workspaces never leave your browser. Synced accounts are isolated by Postgres row-level security, checked by 20 automated database tests.">
-          <ul className="mt-6 flex flex-wrap gap-2 text-xs">
-            {['Guest data stays in this browser', 'Row-level security on every table', '20 automated RLS checks', 'No tracking, no ads'].map((c) => (
-              <li key={c} className="rounded-full border border-line-strong bg-paper/60 px-3 py-1.5 text-ink-2">{c}</li>
-            ))}
-          </ul>
-        </Tile>
-      </ul>
+          <p className="ft-label mt-2">Illustrative shape</p>
+        </div>
+      ),
+    },
+    {
+      title: 'Fast, and yours to export',
+      body: 'Press N anywhere to add a transaction. Export everything to CSV.',
+      specimen: (
+        <div className="flex items-center gap-3">
+          <motion.kbd
+            whileHover={{ y: 3, boxShadow: '0 1px 0 #383838' }}
+            whileTap={{ y: 4, boxShadow: '0 0 0 #383838' }}
+            className="grid size-12 cursor-default place-items-center rounded-xs border border-line-strong bg-sunken font-mono text-lg font-semibold text-ink shadow-[0_4px_0_#383838]"
+          >
+            N
+          </motion.kbd>
+          <span className="font-mono text-xs text-ink-3">→ add transaction</span>
+        </div>
+      ),
+    },
+    {
+      title: 'Any currency you live in',
+      body: 'Every ISO currency is supported, with digit grouping that follows each currency’s home convention.',
+      specimen: (
+        <ul className="num grid gap-1 font-mono text-sm text-ink-2">
+          {['INR', 'USD', 'EUR'].map((c) => (
+            <li key={c} className="flex justify-between gap-4 border-b border-line pb-1 last:border-0">
+              <span className="text-ink-3">{c}</span>
+              <span className={c === 'INR' ? 'text-ink' : ''}>{formatCurrency(566547, c)}</span>
+            </li>
+          ))}
+        </ul>
+      ),
+    },
+  ]
+  return (
+    <section id="features" aria-labelledby="features-title" className={`${FRAME} scroll-mt-20 pt-32 lg:pt-44`}>
+      <SectionHead index="02" label="What it does" id="features-title" aside={<span className="ft-label hidden sm:inline">{rows.length} entries</span>}>
+        Built around the questions <span className="ft-serif">you actually ask.</span>
+      </SectionHead>
+      <ol className="mt-16 border-t border-line">
+        {rows.map((r, i) => (
+          <Reveal as="li" key={r.title} delay={i * 40} className="group border-b border-line">
+            <div className="grid gap-5 py-8 transition-colors duration-300 md:grid-cols-12 md:items-center md:gap-8 md:py-10">
+              <span className="num font-mono text-sm text-ink-3 transition-colors group-hover:text-accent md:col-span-1">{String(i + 1).padStart(2, '0')}</span>
+              <div className="md:col-span-6">
+                <h3 className="text-2xl font-semibold tracking-[-0.035em] text-ink transition-transform duration-500 ease-[var(--ease-reveal)] group-hover:translate-x-1.5 sm:text-[2rem] sm:leading-tight">{r.title}</h3>
+                <p className="mt-2 max-w-md text-base text-ink-3">{r.body}</p>
+              </div>
+              <div className="md:col-span-5">{r.specimen}</div>
+            </div>
+          </Reveal>
+        ))}
+      </ol>
     </section>
   )
 }
 
-function Tile({ className = '', icon: Icon, title, body, children }: { className?: string; icon: typeof Target; title: string; body: string; children?: React.ReactNode }) {
+/** Inverted section: the one place the page flips to white paper. */
+function Privacy() {
+  const facts = ['Guest data stays in this browser', 'Row-level security on every table', '20 automated RLS checks', 'No tracking, no ads']
   return (
-    <Reveal as="li" className={className}>
-      <TiltCard className="h-full" max={4}>
-        <div onPointerMove={spotlight} className="ft-card group flex h-full flex-col rounded-lg border border-line bg-surface p-6">
-          <span className="grid size-10 place-items-center rounded-md bg-accent-soft text-accent transition-transform duration-500 ease-[var(--ease-spring)] group-hover:-rotate-6 group-hover:scale-110">
-            <Icon size={19} aria-hidden />
-          </span>
-          <h3 className="mt-5 font-display text-xl font-semibold tracking-[-0.03em] text-ink">{title}</h3>
-          <p className="mt-1.5 text-sm text-ink-3">{body}</p>
-          {children}
-        </div>
-      </TiltCard>
-    </Reveal>
+    <section id="privacy" aria-labelledby="privacy-title" className="mt-32 scroll-mt-16 bg-ink text-paper lg:mt-44">
+      <div className={`${FRAME} grid gap-12 py-20 lg:grid-cols-12 lg:py-28`}>
+        <Reveal className="lg:col-span-7">
+          <p className="font-mono text-2xs font-medium uppercase tracking-[0.08em] text-paper/70">(03) Private by default</p>
+          <h2 id="privacy-title" className="ft-display mt-8 text-[clamp(2.5rem,6vw,5.75rem)]">
+            Your numbers stay <span className="ft-serif">yours.</span>
+          </h2>
+        </Reveal>
+        <Reveal delay={120} className="lg:col-span-5 lg:self-end">
+          <p className="text-lg leading-relaxed text-paper/80">
+            Guest workspaces never leave your browser. Synced accounts are isolated by Postgres row-level security, checked by 20 automated database tests.
+          </p>
+          <ul className="mt-8 border-t border-paper/20">
+            {facts.map((f, i) => (
+              <li key={f} className="flex items-baseline gap-4 border-b border-paper/20 py-3 text-sm font-medium">
+                <span className="font-mono text-2xs text-paper/60">{String(i + 1).padStart(2, '0')}</span>
+                {f}
+              </li>
+            ))}
+          </ul>
+        </Reveal>
+      </div>
+    </section>
   )
 }
 
@@ -383,51 +388,51 @@ function Start({
   hasBackend: boolean
 }) {
   return (
-    <section id="start" aria-labelledby="start-title" className="scroll-mt-24 pt-28 lg:pt-36">
-      <Reveal className="text-center">
-        <h2 id="start-title" className="font-display text-5xl font-bold tracking-[-0.05em] text-ink sm:text-7xl">Two ways in.</h2>
-        <p className="mx-auto mt-4 max-w-xl text-base text-ink-2">Look around with a year of realistic data, or start a private workspace of your own. Both run entirely in your browser.</p>
-      </Reveal>
-      <div className="mt-12 grid gap-3 md:grid-cols-2">
-        <Reveal>
-          <div onPointerMove={spotlight} className="ft-card ft-lift flex h-full flex-col rounded-lg border border-line bg-surface p-7 sm:p-9">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-3">Option 1</p>
-            <h3 className="mt-3 font-display text-3xl font-semibold tracking-[-0.04em]">See the prototype</h3>
-            <p className="mt-3 text-sm text-ink-2">Every screen with a year of realistic sample data — dashboard, budgets, analytics and insights. Nothing to set up.</p>
-            <ul className="mt-6 grid gap-2.5 text-sm text-ink-2">
+    <section id="start" aria-labelledby="start-title" className={`${FRAME} scroll-mt-20 pt-32 lg:pt-44`}>
+      <SectionHead index="04" label="Get started" id="start-title">
+        Two ways <span className="ft-serif text-accent">in.</span>
+      </SectionHead>
+      <p className="mt-6 max-w-xl text-lg text-ink-2">Look around with a year of realistic data, or start a private workspace of your own. Both run entirely in your browser.</p>
+
+      <div className="mt-14 grid border-t border-line md:grid-cols-2">
+        <Reveal className="border-b border-line py-10 md:border-b-0 md:border-r md:pr-10">
+          <div className="flex h-full flex-col">
+            <p className="ft-label">Option A</p>
+            <h3 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-ink sm:text-4xl">See the prototype</h3>
+            <p className="mt-3 max-w-md text-base text-ink-2">Every screen with a year of realistic sample data — dashboard, budgets, analytics and insights. Nothing to set up.</p>
+            <ul className="mt-6 grid gap-2 text-sm text-ink-2">
               {['13 months of income and spending', 'Five category budgets with live progress', 'Insights you can check the working of'].map((t) => (
-                <li key={t} className="flex items-center gap-2.5">
-                  <span className="grid size-4 place-items-center rounded-full bg-accent text-[10px] font-bold text-on-accent" aria-hidden>✓</span>
+                <li key={t} className="flex items-baseline gap-3">
+                  <span className="font-mono text-2xs text-accent" aria-hidden>→</span>
                   {t}
                 </li>
               ))}
             </ul>
-            <div className="mt-auto pt-8">
+            <div className="mt-auto pt-10">
               <Button size="lg" variant="secondary" className="w-full !rounded-full sm:w-auto" loading={pending === 'sample'} onClick={() => open('sample')}>
                 Open the prototype <ArrowRight size={16} aria-hidden />
               </Button>
             </div>
           </div>
         </Reveal>
-        <Reveal delay={90}>
+        <Reveal delay={90} className="py-10 md:pl-10">
           <form
             onSubmit={(e) => {
               e.preventDefault()
               open('own')
             }}
-            onPointerMove={spotlight}
-            className="ft-card ft-lift relative flex h-full flex-col overflow-hidden rounded-lg border border-accent/40 bg-[linear-gradient(160deg,#1a2214,#131715_55%)] p-7 sm:p-9"
+            className="flex h-full flex-col"
           >
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-accent">Option 2</p>
-            <h3 className="mt-3 font-display text-3xl font-semibold tracking-[-0.04em]">Build your own FinTrack</h3>
-            <p className="mt-3 text-sm text-ink-2">Start from zero and track your own income, spending and budgets. Saved privately in this browser — no sign-up.</p>
+            <p className="ft-label text-accent">Option B</p>
+            <h3 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-ink sm:text-4xl">Build your own FinTrack</h3>
+            <p className="mt-3 max-w-md text-base text-ink-2">Start from zero and track your own income, spending and budgets. Saved privately in this browser — no sign-up.</p>
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
               <Field label="What should we call you?" optional>
-                {(p) => <Input {...p} value={name} onChange={(e) => setName(e.target.value)} autoComplete="given-name" maxLength={60} placeholder="Your first name" />}
+                {(fp) => <Input {...fp} value={name} onChange={(e) => setName(e.target.value)} autoComplete="given-name" maxLength={60} placeholder="Your first name" />}
               </Field>
-              <Field label="Currency">{(p) => <CurrencySelect {...p} value={currency} onChange={(e) => setCurrency(e.target.value)} />}</Field>
+              <Field label="Currency">{(fp) => <CurrencySelect {...fp} value={currency} onChange={(e) => setCurrency(e.target.value)} />}</Field>
             </div>
-            <div className="mt-auto pt-8">
+            <div className="mt-auto pt-10">
               <Button type="submit" size="lg" className="w-full !rounded-full sm:w-auto" loading={pending === 'own'}>
                 Start tracking <ArrowRight size={16} aria-hidden />
               </Button>
@@ -436,10 +441,16 @@ function Start({
         </Reveal>
       </div>
       {hasBackend && (
-        <p className="mt-5 text-center text-sm text-ink-3">
+        <p className="mt-6 text-sm text-ink-3">
           Want it on every device?{' '}
-          <Link to="/signup" className="font-medium text-accent underline-offset-2 hover:underline">Create a free account</Link> or{' '}
-          <Link to="/login" className="font-medium text-accent underline-offset-2 hover:underline">sign in</Link>.
+          <Link to="/signup" className="font-medium text-accent underline underline-offset-2 hover:no-underline">
+            Create a free account
+          </Link>{' '}
+          or{' '}
+          <Link to="/login" className="font-medium text-accent underline underline-offset-2 hover:no-underline">
+            sign in
+          </Link>
+          .
         </p>
       )}
     </section>

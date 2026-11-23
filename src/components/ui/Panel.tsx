@@ -31,7 +31,7 @@ export function Panel({
     >
       <div className="mb-4 flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h2 id={headingId} className="text-sm font-semibold text-ink">
+          <h2 id={headingId} className="text-base font-semibold tracking-[-0.02em] text-ink">
             {title}
           </h2>
           {description && <p className="mt-0.5 text-xs text-ink-3">{description}</p>}

@@ -11,12 +11,12 @@ import { validateEmail, validatePassword } from '../lib/validation'
 function AuthLayout({ children }: { children: ReactNode }) {
   return (
     <div className="grid min-h-dvh lg:grid-cols-[1fr_minmax(480px,560px)]">
-      <aside className="relative hidden flex-col justify-between border-r border-line bg-sunken/60 p-12 lg:flex">
+      <aside className="relative hidden flex-col justify-between border-r border-line bg-paper p-12 lg:flex">
         <Link to="/" aria-label="FinTrack home">
           <Wordmark />
         </Link>
         <div className="max-w-md">
-          <p className="font-display text-5xl leading-[1.05] tracking-[-0.01em] text-ink">Where your money goes, and what’s changing.</p>
+          <p className="ft-display text-6xl text-ink">Where your money goes, <span className="ft-serif text-accent">and what’s changing.</span></p>
           <ul className="mt-10 flex flex-col gap-4 text-sm text-ink-2">
             <li className="border-t border-line-strong pt-4">A calm monthly overview — balance, spending, savings.</li>
             <li className="border-t border-line-strong pt-4">Budgets that tell you early, without the alarm bells.</li>
