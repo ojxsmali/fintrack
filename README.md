@@ -14,7 +14,7 @@ FinTrack is a personal finance web app that turns raw transactions into a calm m
 |---|---|
 | ![Analytics: income vs spending, savings rate, highlights](docs/screenshots/analytics-desktop.png) | ![Budgets: per-category limits with on-track, close and over states](docs/screenshots/budgets-desktop.png) |
 | **Transactions** | **Welcome** |
-| ![Transactions: search, filters, period picker, CSV export](docs/screenshots/transactions-desktop.png) | ![Welcome page: a live slice of the overview next to the headline, then two ways in](docs/screenshots/welcome-desktop.png) |
+| ![Transactions: search, filters, period picker, CSV export](docs/screenshots/transactions-desktop.png) | ![Welcome page: oversized headline above a money-flow figure of a sample month, income fanning out into where it went](docs/screenshots/welcome-desktop.png) |
 
 <p align="center">
   <img src="docs/screenshots/overview-mobile.png" alt="FinTrack overview on a phone" width="260" />
