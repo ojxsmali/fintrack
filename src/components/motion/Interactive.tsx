@@ -3,9 +3,23 @@
  * the OS reduced-motion setting through <MotionConfig reducedMotion="user"> in App.
  */
 import { motion, useMotionValue, useSpring, useTransform, type HTMLMotionProps } from 'motion/react'
-import { useRef, type ReactNode } from 'react'
+import { useRef, useSyncExternalStore, type ReactNode } from 'react'
 
 const SPRING = { stiffness: 380, damping: 26, mass: 0.6 }
+
+// Drag-to-throw only makes sense with a mouse. On touch screens it hijacks scrolling,
+// so phones and tablets get a plain card with a press squash instead.
+const FINE = '(hover: hover) and (pointer: fine)'
+const subscribeFine = (cb: () => void) => {
+  if (typeof window === 'undefined' || !window.matchMedia) return () => {}
+  const mq = window.matchMedia(FINE)
+  mq.addEventListener?.('change', cb)
+  return () => mq.removeEventListener?.('change', cb)
+}
+const readFine = () => (typeof window !== 'undefined' && window.matchMedia ? window.matchMedia(FINE).matches : true)
+function useFinePointer() {
+  return useSyncExternalStore(subscribeFine, readFine, () => true)
+}
 
 /**
  * A card you can grab and pull; let go and it springs back to its place.
@@ -14,6 +28,13 @@ const SPRING = { stiffness: 380, damping: 26, mass: 0.6 }
 export function PullCard({ children, className = '', rotate = 0, ...rest }: HTMLMotionProps<'div'> & { rotate?: number; children: ReactNode }) {
   const x = useMotionValue(0)
   const tilt = useTransform(x, [-160, 160], [rotate - 10, rotate + 10])
+  const fine = useFinePointer()
+  if (!fine)
+    return (
+      <motion.div whileTap={{ scale: 0.98 }} style={{ rotate }} className={className} {...rest}>
+        {children}
+      </motion.div>
+    )
   return (
     <motion.div
       drag

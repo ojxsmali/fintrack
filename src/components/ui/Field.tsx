@@ -2,7 +2,7 @@ import { forwardRef, useId, useState, type InputHTMLAttributes, type ReactNode, 
 import { ChevronDown } from 'lucide-react'
 
 const control =
-  'w-full h-10 rounded-sm border bg-surface px-3 text-base sm:text-sm text-ink placeholder:text-ink-4 transition-colors duration-[var(--duration-fast)] hover:border-ink-4 focus:outline-none focus-visible:outline-none focus:border-accent focus:ring-2 focus:ring-accent-soft disabled:bg-sunken disabled:text-ink-3'
+  'w-full h-11 rounded-sm border-2 bg-surface px-3 text-base sm:text-sm font-medium text-ink placeholder:text-ink-4 transition-[box-shadow,border-color] duration-[var(--duration-fast)] focus:outline-none focus-visible:outline-none focus:border-ink focus:shadow-[3px_3px_0_var(--color-cobalt)] disabled:bg-sunken disabled:text-ink-3'
 
 interface FieldProps {
   label: string
@@ -93,9 +93,9 @@ export function Toggle({ checked, onChange, label, description, disabled }: { ch
         aria-checked={checked}
         disabled={disabled}
         onClick={() => onChange(!checked)}
-        className={`relative mt-0.5 h-6 w-10 shrink-0 rounded-full transition-colors duration-[var(--duration-base)] disabled:opacity-50 ${checked ? 'bg-accent' : 'bg-line-strong'}`}
+        className={`relative mt-0.5 h-7 w-12 shrink-0 rounded-full border-2 border-ink transition-colors duration-[var(--duration-base)] disabled:opacity-50 ${checked ? 'bg-accent' : 'bg-sunken'}`}
       >
-        <span className={`absolute top-0.5 left-0.5 size-5 rounded-full bg-white shadow-sm transition-transform duration-[var(--duration-base)] ease-[var(--ease-out)] ${checked ? 'translate-x-4' : ''}`} />
+        <span className={`absolute top-0.5 left-0.5 size-5 rounded-full border-2 border-ink bg-surface transition-transform duration-300 ease-[var(--ease-spring)] ${checked ? 'translate-x-5' : ''}`} />
       </button>
     </div>
   )

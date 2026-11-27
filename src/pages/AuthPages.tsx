@@ -11,19 +11,21 @@ import { validateEmail, validatePassword } from '../lib/validation'
 function AuthLayout({ children }: { children: ReactNode }) {
   return (
     <div className="grid min-h-dvh lg:grid-cols-[1fr_minmax(480px,560px)]">
-      <aside className="relative hidden flex-col justify-between border-r border-line bg-paper p-12 lg:flex">
+      <aside className="relative hidden flex-col justify-between overflow-hidden border-r-2 border-ink bg-accent p-12 lg:flex">
         <Link to="/" aria-label="FinTrack home">
           <Wordmark />
         </Link>
         <div className="max-w-md">
-          <p className="ft-display text-6xl text-ink">Where your money goes, <span className="ft-serif text-accent">and what’s changing.</span></p>
+          <p className="ft-display text-6xl text-ink">Your money,<br />stacked up.</p>
           <ul className="mt-10 flex flex-col gap-4 text-sm text-ink-2">
-            <li className="border-t border-line-strong pt-4">A calm monthly overview — balance, spending, savings.</li>
-            <li className="border-t border-line-strong pt-4">Budgets that tell you early, without the alarm bells.</li>
-            <li className="border-t border-line-strong pt-4">Insights calculated from your own numbers, with the working shown.</li>
+            {['A loud monthly overview: balance, spending, savings.', 'Budgets that warn you early, at 80% of the limit.', 'Insights calculated from your own numbers, with the working shown.'].map((t) => (
+              <li key={t} className="rounded-[14px] border-2 border-ink bg-surface px-4 py-3 font-semibold text-ink shadow-[3px_3px_0_#16140f]">
+                {t}
+              </li>
+            ))}
           </ul>
         </div>
-        <div className="flex flex-col gap-1 text-xs text-ink-3">
+        <div className="flex flex-col gap-1 text-xs text-ink-2">
           <p>Your data is private to your account and protected by row-level security.</p>
           <AuthorCredit />
         </div>
@@ -48,7 +50,7 @@ function GuestDemoButton() {
   return (
     <p className="mt-8 border-t border-line pt-6 text-sm text-ink-3">
       Just looking?{' '}
-      <Link to="/" className="font-medium text-accent underline-offset-2 hover:underline">
+      <Link to="/" className="font-medium text-accent-ink underline-offset-2 hover:underline">
         Try the prototype or build your own — no sign-up
       </Link>
     </p>
@@ -87,7 +89,7 @@ export function LoginPage() {
 
   return (
     <AuthLayout>
-      <h1 className="text-2xl font-semibold tracking-[-0.025em]">Sign in</h1>
+      <h1 className="font-display text-3xl font-extrabold tracking-[-0.04em]">Sign in</h1>
       <p className="mt-1 mb-8 text-sm text-ink-3">Welcome back.</p>
       {notice && (
         <p role="alert" className="mb-5 rounded-sm bg-caution-soft px-3 py-2 text-sm text-caution">
@@ -118,7 +120,7 @@ export function LoginPage() {
           </Button>
           <p className="mt-2 text-sm text-ink-3">
             New to FinTrack?{' '}
-            <Link to="/signup" className="font-medium text-accent underline-offset-2 hover:underline">
+            <Link to="/signup" className="font-medium text-accent-ink underline-offset-2 hover:underline">
               Create an account
             </Link>
           </p>
@@ -169,7 +171,7 @@ export function SignupPage() {
     <AuthLayout>
       {sentTo ? (
         <div>
-          <h1 className="text-2xl font-semibold tracking-[-0.025em]">Check your inbox</h1>
+          <h1 className="font-display text-3xl font-extrabold tracking-[-0.04em]">Check your inbox</h1>
           <p className="mt-2 text-sm text-ink-2">
             We sent a confirmation link to <span className="font-medium text-ink">{sentTo}</span>. Open it on this device to finish creating your account.
           </p>
@@ -182,14 +184,14 @@ export function SignupPage() {
             <button type="button" onClick={() => setSentTo(null)} className="font-medium text-ink-3 underline-offset-2 hover:text-ink hover:underline">
               Use a different email
             </button>
-            <Link to="/login" className="font-medium text-accent underline-offset-2 hover:underline">
+            <Link to="/login" className="font-medium text-accent-ink underline-offset-2 hover:underline">
               Back to sign in
             </Link>
           </div>
         </div>
       ) : (
         <>
-          <h1 className="text-2xl font-semibold tracking-[-0.025em]">Create your account</h1>
+          <h1 className="font-display text-3xl font-extrabold tracking-[-0.04em]">Create your account</h1>
           <p className="mt-1 mb-8 text-sm text-ink-3">Free, private, and yours to export any time.</p>
           {!hasBackend ? (
             <DemoEntry />
@@ -217,7 +219,7 @@ export function SignupPage() {
               </Button>
               <p className="mt-2 text-sm text-ink-3">
                 Already have an account?{' '}
-                <Link to="/login" className="font-medium text-accent underline-offset-2 hover:underline">
+                <Link to="/login" className="font-medium text-accent-ink underline-offset-2 hover:underline">
                   Sign in
                 </Link>
               </p>
@@ -261,7 +263,7 @@ function ResendLink({ email }: { email: string }) {
         type="button"
         onClick={send}
         disabled={state === 'sending' || cooldown > 0}
-        className="font-medium text-accent underline-offset-2 hover:underline disabled:text-ink-4 disabled:no-underline"
+        className="font-medium text-accent-ink underline-offset-2 hover:underline disabled:text-ink-4 disabled:no-underline"
       >
         {state === 'sending' ? 'Sending…' : cooldown > 0 ? `Resend in ${cooldown}s` : 'Resend confirmation email'}
       </button>

@@ -54,13 +54,13 @@ export function Dialog({
         if (e.target === ref.current) onClose() // backdrop click
       }}
       aria-labelledby={titleId}
-      className={`bg-surface text-ink border-line p-0 shadow-[var(--shadow-overlay)] backdrop:bg-black/60 backdrop:backdrop-blur-sm ${frame}`}
+      className={`bg-surface text-ink border-2 border-ink p-0 shadow-[var(--shadow-overlay)] backdrop:bg-ink/40 backdrop:backdrop-blur-sm ${frame}`}
     >
       {open && (
         <div className={`flex flex-col ${variant === 'drawer' ? 'h-full' : 'max-h-[85dvh]'}`}>
           <header className="flex items-start justify-between gap-4 px-5 pt-5 pb-3 md:px-6">
             <div className="min-w-0">
-              <h2 id={titleId} className="text-lg font-semibold tracking-[-0.01em]">
+              <h2 id={titleId} className="font-display text-xl font-extrabold tracking-[-0.03em]">
                 {title}
               </h2>
               {description && <div className="mt-1 text-sm text-ink-3">{description}</div>}

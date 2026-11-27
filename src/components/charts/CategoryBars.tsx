@@ -42,9 +42,9 @@ export function CategoryBars({
                 <span className="num w-10 text-right text-xs text-ink-3">{formatPercent(c.share, { digits: 0 })}</span>
               </span>
             </div>
-            <div className="h-1.5 rounded-full bg-sunken" aria-hidden>
+            <div className="h-3.5 overflow-hidden rounded-full border-2 border-ink bg-sunken" aria-hidden>
               <div
-                className={`h-full rounded-full ${c.categoryId === 'rest' ? 'bg-ink-4' : 'bg-accent'}`}
+                className={`h-full rounded-r-full ${c.categoryId === 'rest' ? 'bg-ink-4' : 'bg-accent'}`}
                 style={{ width: `${Math.max((c.amount / max) * 100, 1.5)}%` }}
               />
             </div>

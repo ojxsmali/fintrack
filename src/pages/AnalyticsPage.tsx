@@ -100,7 +100,7 @@ export function AnalyticsPage() {
         <EmptyState title="No transactions in this period." body="Choose a wider period, or add transactions to see how your money moves." />
       ) : (
         <div className={`flex flex-col gap-8 transition-opacity ${txs.isFetching ? 'opacity-70' : ''}`}>
-          <section aria-label="Period summary" className="grid grid-cols-2 gap-x-6 gap-y-6 border-y border-line py-5 md:grid-cols-5">
+          <section aria-label="Period summary" className="grid grid-cols-2 gap-3 md:grid-cols-5">
             <Kpi label="Income" value={money(a.t.income)} change={percentChange(a.t.income, a.p.income)} goodWhenUp hasPrev={a.hasPrev} />
             <Kpi label="Spending" value={money(a.t.expense)} change={percentChange(a.t.expense, a.p.expense)} hasPrev={a.hasPrev} />
             <Kpi label={a.t.net >= 0 ? 'Saved' : 'Overspent'} value={money(Math.abs(a.t.net))} tone={a.t.net < 0 ? 'text-negative' : undefined} />
@@ -115,7 +115,7 @@ export function AnalyticsPage() {
             {a.hasPrev ? <>Changes compare {periodLabel} with the {fmt.day(prev.from)} – {fmt.day(prev.to)} period before it. </> : <>Your history doesn’t reach back far enough to compare with the {fmt.day(prev.from)} – {fmt.day(prev.to)} period before this one. </>}Average daily spend counts days elapsed so far.
           </p>
 
-          <section aria-label="Highlights" className="grid gap-px overflow-hidden rounded-lg border border-line bg-line sm:grid-cols-3">
+          <section aria-label="Highlights" className="grid gap-0.5 overflow-hidden rounded-[18px] border-2 border-ink bg-ink shadow-[4px_4px_0_#16140f] sm:grid-cols-3">
             <Highlight
               label="Biggest spending day"
               value={a.peakDay.average > 0 ? `${FULL_DAY[a.peakDay.day]}s` : '—'}
@@ -295,9 +295,9 @@ function Kpi({
   const showChange = change !== undefined
   const good = change != null && (goodWhenUp ? change >= 0 : change <= 0)
   return (
-    <div className={className}>
-      <p className="text-sm text-ink-3">{label}</p>
-      <p className={`num mt-1 text-xl font-medium tracking-[-0.02em] ${tone ?? 'text-ink'}`}>{value}</p>
+    <div className={`rounded-[18px] border-2 border-ink bg-surface p-4 shadow-[4px_4px_0_#16140f] ${className}`}>
+      <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.06em] text-ink-3">{label}</p>
+      <p className={`num mt-2 font-display text-xl font-extrabold tracking-[-0.04em] sm:text-2xl ${tone ?? 'text-ink'}`}>{value}</p>
       {showChange && (
         <p className={`num mt-0.5 text-xs ${change == null || !hasPrev ? 'text-ink-4' : good ? 'text-positive' : 'text-caution'}`}>
           {!hasPrev ? 'Not enough history to compare' : change == null ? 'No baseline' : `${change >= 0 ? '↑' : '↓'} ${formatPercent(Math.abs(change), { digits: 0 })} vs previous`}
@@ -314,7 +314,7 @@ function Highlight({ label, value, note }: { label: string; value: string; note:
   return (
     <div className="bg-surface px-5 py-4">
       <p className="text-xs text-ink-3">{label}</p>
-      <p className="mt-1 text-lg font-semibold tracking-[-0.02em] text-ink">{value}</p>
+      <p className="mt-1 font-display text-lg font-extrabold tracking-[-0.03em] text-ink">{value}</p>
       <p className="num mt-0.5 text-xs text-ink-3">{note}</p>
     </div>
   )

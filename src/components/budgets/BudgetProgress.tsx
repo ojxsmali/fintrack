@@ -4,7 +4,7 @@ import { formatCurrency, formatPercent } from '../../lib/format'
 
 const STATE = {
   healthy: { label: 'On track', bar: 'bg-accent', text: 'text-ink-3', Icon: CircleCheck },
-  approaching: { label: 'Close to limit', bar: 'bg-caution', text: 'text-caution', Icon: CircleAlert },
+  approaching: { label: 'Close to limit', bar: 'bg-tangerine', text: 'text-caution', Icon: CircleAlert },
   exceeded: { label: 'Over budget', bar: 'bg-negative', text: 'text-negative', Icon: TriangleAlert },
 } as const
 
@@ -32,9 +32,9 @@ export function BudgetProgress({ status, currency, dense }: { status: BudgetStat
         aria-valuemax={100}
         aria-valuenow={Math.round(pct)}
         aria-valuetext={`${formatPercent(status.percent, { digits: 0 })} used, ${s.label}`}
-        className="relative h-1.5 overflow-hidden rounded-full bg-sunken"
+        className="relative h-3.5 overflow-hidden rounded-full border-2 border-ink bg-sunken"
       >
-        <div className={`h-full rounded-full ${s.bar} transition-[width] duration-500 ease-[var(--ease-out)]`} style={{ width: `${pct}%` }} />
+        <div className={`h-full rounded-r-full ${s.bar} transition-[width] duration-700 ease-[var(--ease-spring)]`} style={{ width: `${pct}%` }} />
       </div>
       {!dense || status.state !== 'healthy' ? (
         <p className={`mt-1.5 flex items-center gap-1 text-xs ${s.text}`}>

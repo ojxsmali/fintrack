@@ -1,36 +1,40 @@
 import { useMemo, useRef, useState, type ReactNode } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { motion, useScroll, useTransform } from 'motion/react'
-import { ArrowRight, ArrowUpRight } from 'lucide-react'
+import { ArrowRight, ArrowUpRight, Hand, MousePointerClick } from 'lucide-react'
 import { Wordmark } from '../components/ui/Logo'
 import { Button } from '../components/ui/Button'
 import { Field, Input } from '../components/ui/Field'
 import { CurrencySelect } from '../components/ui/CurrencySelect'
 import { AuthorCredit } from '../components/layout/AuthorCredit'
 import { Reveal, SplitWords } from '../components/motion/Motion'
-import { Magnetic } from '../components/motion/Interactive'
-import { MoneyFlow } from '../components/landing/MoneyFlow'
+import { Magnetic, PullCard } from '../components/motion/Interactive'
+import { useReducedMotion } from '../components/motion/useReducedMotion'
+import { MoneyStacks3D, type StackDatum } from '../components/three/Scene3D'
 import { useAuth, type Workspace } from '../services/authContext'
 import { buildHeroPreview, type HeroPreview } from '../lib/heroPreview'
-import { formatCurrency } from '../lib/format'
+import { formatCurrency, formatPercent } from '../lib/format'
 import { AUTHOR } from '../lib/brand'
 
-const STACK = ['React 19', 'TypeScript', 'TanStack Query', 'Recharts', 'Supabase · Postgres RLS', 'motion', 'Vitest']
+const STACK = ['React 19', 'TypeScript', 'three.js · react-three-fiber', 'TanStack Query', 'Recharts', 'Supabase · Postgres RLS', 'motion', 'Vitest']
 
 const inr = (n: number) => formatCurrency(Math.round(n), 'INR')
 
 /** Page frame shared by every landing section: wide measure, fluid gutter. */
 const FRAME = 'mx-auto w-full max-w-[1360px] px-[clamp(16px,3vw,40px)]'
 
+const PUSH = 'ft-press ft-push inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full font-semibold transition-[transform,box-shadow,background-color] duration-200 ease-[var(--ease-spring)]'
+
 export function WelcomePage() {
-  const { status, hasBackend, startWorkspace } = useAuth()
+  const { status, workspace, hasBackend, startWorkspace } = useAuth()
   const navigate = useNavigate()
   const [name, setName] = useState('')
   const [currency, setCurrency] = useState('INR')
   const [pending, setPending] = useState<Workspace | null>(null)
   const preview = useMemo(() => buildHeroPreview(), [])
 
-  if (status === 'signedIn') return <Navigate to="/dashboard" replace />
+  // Synced accounts go straight to their dashboard; guest workspaces can still come back here.
+  if (status === 'signedIn' && !workspace) return <Navigate to="/dashboard" replace />
 
   const open = async (kind: Workspace) => {
     setPending(kind)
@@ -44,15 +48,17 @@ export function WelcomePage() {
         Skip to content
       </a>
 
-      <header className="sticky top-0 z-40 border-b border-line bg-paper">
+      <header className="sticky top-0 z-40 border-b-2 border-ink bg-paper/90 backdrop-blur-md">
         <div className={`${FRAME} flex h-16 items-center justify-between gap-4`}>
           <Link to="/" aria-label="FinTrack home" className="rounded-xs">
             <Wordmark />
           </Link>
           <nav aria-label="Welcome" className="flex items-center gap-1 text-sm">
-            <NavA href="#product" className="hidden md:inline-flex">Product</NavA>
             <NavA href="#features" className="hidden md:inline-flex">Features</NavA>
-            <NavA href="#privacy" className="hidden lg:inline-flex">Privacy</NavA>
+            <NavA href="#privacy" className="hidden md:inline-flex">Privacy</NavA>
+            <Link to="/brand" className="hidden h-9 items-center rounded-xs px-3 font-medium text-ink-2 transition-colors hover:text-ink lg:inline-flex">
+              Brand kit
+            </Link>
             {AUTHOR.repoUrl && (
               <NavA href={AUTHOR.repoUrl} external className="hidden sm:inline-flex">
                 GitHub
@@ -64,68 +70,30 @@ export function WelcomePage() {
               </Link>
             )}
             <Magnetic strength={0.25}>
-              <a href="#start" className="ft-press ml-1 inline-flex h-9 items-center gap-1.5 rounded-full bg-accent px-4 font-semibold text-on-accent transition-[transform,background-color] duration-300 ease-[var(--ease-spring)] hover:bg-accent-hover">
-                Get started <ArrowUpRight size={15} aria-hidden />
-              </a>
+              {workspace ? (
+                <Link to="/dashboard" className={`${PUSH} ml-1 h-10 bg-accent px-4 text-on-accent hover:bg-accent-hover`}>
+                  Your dashboard <ArrowUpRight size={15} aria-hidden />
+                </Link>
+              ) : (
+                <a href="#start" className={`${PUSH} ml-1 h-10 bg-accent px-4 text-on-accent hover:bg-accent-hover`}>
+                  Get started <ArrowUpRight size={15} aria-hidden />
+                </a>
+              )}
             </Magnetic>
           </nav>
         </div>
       </header>
 
       <main className="flex-1">
-        {/* ── Hero ─────────────────────────────────────────── */}
-        <section id="hero" aria-labelledby="hero-title" className={`${FRAME} pb-24 pt-10 sm:pt-14 lg:pb-32 lg:pt-16`}>
-          <div className="ft-page flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-b border-line pb-4">
-            <p className="ft-label">(FinTrack) — personal finance, made legible</p>
-            <p className="ft-label flex items-center gap-2 text-ink-2">
-              <span className="ft-live size-1.5 rounded-full bg-accent text-accent" aria-hidden="true" />
-              Live prototype · no sign-up
-            </p>
-          </div>
-
-          <h1 id="hero-title" className="ft-display mt-10 text-[clamp(2.9rem,7.9vw,8.4rem)] text-ink sm:mt-14">
-            <SplitWords text="Where your money goes," />
-            <br className="hidden sm:block" />{' '}
-            <span className="ft-serif text-accent [letter-spacing:-0.02em]">
-              <SplitWords text="and what’s changing." stagger={80} />
-            </span>
-          </h1>
-
-          <div className="mt-14 grid gap-14 lg:mt-20 lg:grid-cols-12 lg:gap-10">
-            <div className="lg:col-span-4">
-              <p className="ft-page max-w-md text-lg leading-relaxed text-ink-2 [animation-delay:450ms] sm:text-xl sm:leading-relaxed">
-                FinTrack turns everyday transactions into a clear monthly picture — what you earn, what you spend, and what deserves your attention.
-              </p>
-              <div className="ft-page mt-9 flex flex-col gap-3 [animation-delay:560ms] sm:flex-row lg:flex-col lg:items-start 2xl:flex-row">
-                <Magnetic>
-                  <Button size="lg" loading={pending === 'sample'} onClick={() => open('sample')} className="group w-full !rounded-full sm:w-auto">
-                    Open the prototype <ArrowRight size={17} aria-hidden className="transition-transform duration-300 ease-[var(--ease-spring)] group-hover:translate-x-1" />
-                  </Button>
-                </Magnetic>
-                <a href="#start" className="ft-press inline-flex h-12 items-center justify-center whitespace-nowrap rounded-full border border-line-strong px-6 font-medium text-ink transition-colors hover:border-ink hover:bg-sunken">
-                  Start your own
-                </a>
-              </div>
-              <dl className="ft-page mt-12 grid grid-cols-2 border-t border-line [animation-delay:680ms]">
-                <Fact term="Sample transactions" value={String(preview.transactionCount)} />
-                <Fact term="Months of history" value="13" />
-                <Fact term="Currencies" value="Every ISO" />
-                <Fact term="Sign-up" value="Optional" />
-              </dl>
-            </div>
-            <div className="ft-page [animation-delay:300ms] lg:col-span-8 lg:pl-6">
-              <MoneyFlow p={preview} />
-            </div>
-          </div>
-        </section>
-
+        <Hero preview={preview} pending={pending} open={open} />
+        <Ticker p={preview} />
         <ScrollShowcase />
         <Features p={preview} />
         <Privacy />
         <Start pending={pending} open={open} name={name} setName={setName} currency={currency} setCurrency={setCurrency} hasBackend={hasBackend} />
       </main>
 
-      <footer className="mt-28 border-t border-line">
+      <footer className="mt-28 border-t-2 border-ink bg-surface">
         <div className={`${FRAME} grid gap-10 py-12 md:grid-cols-12`}>
           <div className="md:col-span-5">
             <Wordmark />
@@ -141,18 +109,191 @@ export function WelcomePage() {
             </ul>
           </div>
           <div className="md:col-span-3">
-            <p className="ft-label">Set in</p>
+            <p className="ft-label">Identity</p>
             <ul className="mt-3 grid gap-1 text-sm text-ink-2">
+              <li className="font-display font-bold">Unbounded</li>
               <li>Geist</li>
-              <li className="ft-serif text-base">Instrument Serif</li>
               <li className="font-mono text-xs">JetBrains Mono</li>
             </ul>
+            <Link to="/brand" className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-ink underline decoration-accent decoration-[3px] underline-offset-4 hover:decoration-ink">
+              Open the brand kit <ArrowRight size={14} aria-hidden />
+            </Link>
           </div>
         </div>
       </footer>
     </div>
   )
 }
+
+/* ───────────────────────── Hero ───────────────────────── */
+
+const TONES: StackDatum['tone'][] = ['cobalt', 'tangerine', 'cream', 'ink']
+const DOT: Record<StackDatum['tone'], string> = {
+  gold: 'bg-accent',
+  cobalt: 'bg-cobalt',
+  tangerine: 'bg-tangerine',
+  cream: 'bg-[#f4ead2]',
+  ink: 'bg-ink',
+}
+
+function Hero({ preview, pending, open }: { preview: HeroPreview; pending: Workspace | null; open: (k: Workspace) => void }) {
+  const reduced = useReducedMotion()
+  const stacks = useMemo<StackDatum[]>(
+    () => [
+      { name: 'Kept', amount: Math.max(preview.net, 0), label: inr(Math.max(preview.net, 0)), tone: 'gold' },
+      ...preview.topCategories.map((c, i) => ({ name: c.name, amount: c.amount, label: inr(c.amount), tone: TONES[i % TONES.length] })),
+    ],
+    [preview],
+  )
+  const [selected, setSelected] = useState(0)
+  const pick = stacks[selected]
+  const shareOfIncome = preview.income > 0 ? pick.amount / preview.income : null
+
+  return (
+    <section id="hero" aria-labelledby="hero-title" className={`${FRAME} pb-16 pt-8 sm:pt-12 lg:pb-24`}>
+      <div className="grid items-center gap-10 lg:grid-cols-12 lg:gap-8">
+        <div className="lg:col-span-6 xl:col-span-6">
+          <p className="ft-page inline-flex items-center gap-2 rounded-full border-2 border-ink bg-surface px-3 py-1.5 font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-ink shadow-[3px_3px_0_#16140f]">
+            <span className="ft-live size-2 rounded-full bg-positive text-positive" aria-hidden="true" />
+            Live prototype · no sign-up
+          </p>
+          <h1 id="hero-title" className="ft-display mt-7 text-[clamp(2.7rem,9.6vw,6.6rem)] text-ink lg:text-[clamp(3rem,4.9vw,5.4rem)]">
+            <SplitWords text="Your money," />
+            <br />
+            <span className="ft-serif">
+              <SplitWords text="stacked up." stagger={90} />
+            </span>
+          </h1>
+          <p className="ft-page mt-7 max-w-lg text-lg leading-relaxed text-ink-2 [animation-delay:450ms] sm:text-xl sm:leading-relaxed">
+            FinTrack turns every rupee in and out into something you can actually see: what you earn, where it goes, and how much you kept.
+          </p>
+          <div className="ft-page mt-9 flex flex-col gap-3 [animation-delay:560ms] sm:flex-row">
+            <Magnetic>
+              <button type="button" onClick={() => open('sample')} disabled={pending !== null} aria-busy={pending === 'sample' || undefined} className={`${PUSH} group h-14 w-full bg-accent px-7 text-base text-on-accent hover:bg-accent-hover sm:w-auto`}>
+                {pending === 'sample' && <span className="size-4 animate-spin rounded-full border-2 border-current border-r-transparent" aria-hidden />}
+                Open the prototype <ArrowRight size={18} aria-hidden className="transition-transform duration-300 ease-[var(--ease-spring)] group-hover:translate-x-1" />
+              </button>
+            </Magnetic>
+            <a href="#start" className={`${PUSH} h-14 bg-surface px-7 text-base text-ink hover:bg-sunken`}>
+              Start your own
+            </a>
+          </div>
+          <dl className="ft-page mt-10 grid grid-cols-2 gap-3 [animation-delay:680ms] sm:grid-cols-4">
+            <Fact term="Transactions" value={String(preview.transactionCount)} />
+            <Fact term="Months" value="13" />
+            <Fact term="Currencies" value="All ISO" />
+            <Fact term="Sign-up" value="Optional" />
+          </dl>
+        </div>
+
+        {/* The 3D figure */}
+        <figure className="ft-page relative [animation-delay:200ms] lg:col-span-6">
+          <div className="relative overflow-hidden rounded-[28px] border-2 border-ink bg-[radial-gradient(circle_at_50%_35%,#fff8df_0%,#efe4c6_70%)] shadow-[8px_8px_0_#16140f]">
+            <div className="flex items-center justify-between border-b-2 border-ink bg-surface px-4 py-2.5">
+              <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-ink">Fig. 1 · {preview.monthName}, in coins</span>
+              <span className="flex gap-1.5" aria-hidden>
+                <span className="size-3 rounded-full border-2 border-ink bg-tangerine" />
+                <span className="size-3 rounded-full border-2 border-ink bg-accent" />
+                <span className="size-3 rounded-full border-2 border-ink bg-cobalt" />
+              </span>
+            </div>
+            <MoneyStacks3D data={stacks} selected={selected} onPick={setSelected} calm={reduced} className="h-[380px] sm:h-[460px] lg:h-[520px]" fallback={<FlatStacks data={stacks} selected={selected} onPick={setSelected} />} />
+            <p className="pointer-events-none absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-3 whitespace-nowrap rounded-full bg-ink px-3 py-1.5 font-mono text-[10.5px] font-medium uppercase tracking-[0.08em] text-paper">
+              <span className="inline-flex items-center gap-1">
+                <Hand size={12} aria-hidden /> Drag to spin
+              </span>
+              <span className="text-accent">·</span>
+              <span className="inline-flex items-center gap-1">
+                <MousePointerClick size={12} aria-hidden /> Tap a stack
+              </span>
+            </p>
+          </div>
+
+          {/* Readout: real buttons, so the figure works without a mouse or WebGL */}
+          <figcaption className="mt-5">
+            <div className="flex flex-wrap gap-2" role="group" aria-label="Choose a stack">
+              {stacks.map((s, i) => (
+                <button
+                  key={s.name}
+                  type="button"
+                  aria-pressed={selected === i}
+                  onClick={() => setSelected(i)}
+                  className={`ft-press inline-flex items-center gap-2 rounded-full border-2 border-ink px-3 py-1.5 text-sm font-semibold transition-[background-color,color,transform,box-shadow] duration-200 ${
+                    selected === i ? 'bg-ink text-paper shadow-none' : 'bg-surface text-ink shadow-[2px_2px_0_#16140f] hover:-translate-y-0.5'
+                  }`}
+                >
+                  <span className={`size-2.5 rounded-full border border-ink ${DOT[s.tone]}`} aria-hidden />
+                  {s.name}
+                </button>
+              ))}
+            </div>
+            <div aria-live="polite" className="mt-4 flex flex-wrap items-baseline gap-x-4 gap-y-1">
+              <motion.span key={pick.name} initial={{ y: 12, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ type: 'spring', stiffness: 420, damping: 26 }} className="num font-display text-4xl font-extrabold tracking-[-0.04em] text-ink sm:text-5xl">
+                {pick.label}
+              </motion.span>
+              <span className="text-sm text-ink-3">
+                {pick.name === 'Kept' ? 'kept' : `on ${pick.name.toLowerCase()}`} in {preview.monthName}
+                {shareOfIncome !== null && ` · ${formatPercent(shareOfIncome * 100, { digits: 0 })} of ${inr(preview.income)} income`}
+              </span>
+            </div>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+  )
+}
+
+/** Flat fallback when WebGL isn't available: the same stacks as 2D coin columns. */
+function FlatStacks({ data, selected, onPick }: { data: StackDatum[]; selected: number; onPick: (i: number) => void }) {
+  const max = Math.max(...data.map((d) => d.amount), 1)
+  return (
+    <div className="flex h-[380px] items-end justify-center gap-4 px-6 pb-16 sm:h-[460px] lg:h-[520px]" aria-hidden>
+      {data.map((d, i) => {
+        const n = Math.max(2, Math.round((d.amount / max) * 14))
+        return (
+          <button key={d.name} type="button" tabIndex={-1} onClick={() => onPick(i)} className="flex flex-col-reverse items-center">
+            {Array.from({ length: n }, (_, k) => (
+              <span key={k} className={`-mt-2.5 h-5 w-14 rounded-[50%] border-2 border-ink ${DOT[d.tone]} ${selected === i ? '-translate-y-2' : ''} transition-transform`} />
+            ))}
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
+/* ───────────────────────── Ticker ───────────────────────── */
+
+function Ticker({ p }: { p: HeroPreview }) {
+  const items = [
+    `${inr(p.income)} in`,
+    `${inr(p.expense)} out`,
+    `${inr(p.net)} kept`,
+    `${formatPercent(p.savingsRate, { digits: 0 })} savings rate`,
+    ...p.topCategories.map((c) => `${c.name} ${inr(c.amount)}`),
+  ]
+  const row = (
+    <div className="flex shrink-0 items-center">
+      {items.map((t, i) => (
+        <span key={i} className="flex items-center gap-6 pr-6 font-display text-2xl font-extrabold uppercase tracking-[-0.02em] sm:text-3xl">
+          <span className={i % 3 === 2 ? 'text-accent' : 'text-paper'}>{t}</span>
+          <span className="inline-block size-4 rounded-full border-2 border-paper bg-accent" aria-hidden />
+        </span>
+      ))}
+    </div>
+  )
+  return (
+    <section aria-label={`${p.monthName} at a glance`} className="-rotate-1 border-y-2 border-ink bg-ink py-4">
+      <p className="sr-only">{items.join(', ')}</p>
+      <div className="flex w-max ft-marquee" aria-hidden>
+        {row}
+        {row}
+      </div>
+    </section>
+  )
+}
+
+/* ───────────────────────── Sections ───────────────────────── */
 
 function NavA({ href, external, className = '', children }: { href: string; external?: boolean; className?: string; children: ReactNode }) {
   return (
@@ -168,24 +309,25 @@ function NavA({ href, external, className = '', children }: { href: string; exte
 
 function Fact({ term, value }: { term: string; value: string }) {
   return (
-    <div className="border-b border-line py-4 odd:pr-4 even:border-l even:pl-4">
+    <div className="rounded-[14px] border-2 border-ink bg-surface px-3 py-2.5">
       <dt className="ft-label">{term}</dt>
-      <dd className="num mt-1.5 text-2xl font-semibold tracking-[-0.04em] text-ink">{value}</dd>
+      <dd className="num mt-1 font-display text-lg font-extrabold tracking-[-0.03em] text-ink">{value}</dd>
     </div>
   )
 }
 
-/** Monospaced section marker on a hairline: "(01) The product". */
-function SectionHead({ index, label, id, children, aside }: { index: string; label: string; id: string; children: ReactNode; aside?: ReactNode }) {
+/** Sticker section marker + oversized headline. */
+function SectionHead({ index, label, id, children, aside, invert }: { index: string; label: string; id: string; children: ReactNode; aside?: ReactNode; invert?: boolean }) {
   return (
     <Reveal>
-      <div className="flex items-baseline justify-between gap-4 border-t border-ink/80 pt-3">
-        <p className="ft-label text-ink-2">
-          ({index}) {label}
+      <div className="flex items-center justify-between gap-4">
+        <p className={`inline-flex items-center gap-2 rounded-full border-2 px-3 py-1 font-mono text-[11px] font-semibold uppercase tracking-[0.08em] ${invert ? 'border-paper text-paper' : 'border-ink bg-surface text-ink'}`}>
+          <span className={`grid size-5 place-items-center rounded-full text-[10px] ${invert ? 'bg-accent text-ink' : 'bg-ink text-accent'}`}>{index}</span>
+          {label}
         </p>
         {aside}
       </div>
-      <h2 id={id} className="ft-display mt-8 max-w-[17ch] text-[clamp(2.5rem,6vw,5.75rem)] text-ink">
+      <h2 id={id} className="ft-display mt-7 max-w-[16ch] text-[clamp(2.3rem,5.6vw,5.2rem)]">
         {children}
       </h2>
     </Reveal>
@@ -196,16 +338,17 @@ function SectionHead({ index, label, id, children, aside }: { index: string; lab
 function ScrollShowcase() {
   const ref = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'center center'] })
-  const rotateX = useTransform(scrollYProgress, [0, 1], [14, 0])
-  const scale = useTransform(scrollYProgress, [0, 1], [0.92, 1])
+  const rotateX = useTransform(scrollYProgress, [0, 1], [22, 0])
+  const rotateZ = useTransform(scrollYProgress, [0, 1], [-3, 0])
+  const scale = useTransform(scrollYProgress, [0, 1], [0.86, 1])
   return (
-    <section id="product" aria-labelledby="product-title" className={`${FRAME} scroll-mt-20 pt-8`}>
+    <section id="product" aria-labelledby="product-title" className={`${FRAME} scroll-mt-20 pt-24`}>
       <SectionHead index="01" label="The product" id="product-title" aside={<span className="ft-label hidden sm:inline">Overview screen</span>}>
-        One calm screen <span className="ft-serif">for the whole month.</span>
+        One loud screen <span className="ft-serif">for the whole month.</span>
       </SectionHead>
-      <div ref={ref} className="mt-14 [perspective:1600px]">
-        <motion.figure style={{ rotateX, scale }} className="origin-top">
-          <div className="overflow-hidden rounded-lg border border-line-strong bg-surface p-1.5">
+      <div ref={ref} className="mt-14 [perspective:1400px]">
+        <motion.figure style={{ rotateX, rotateZ, scale }} className="origin-top">
+          <div className="overflow-hidden rounded-[22px] border-2 border-ink bg-surface p-2 shadow-[10px_10px_0_#16140f]">
             <img
               src="/preview/overview-1600.webp"
               srcSet="/preview/overview-960.webp 960w, /preview/overview-1600.webp 1600w"
@@ -214,30 +357,33 @@ function ScrollShowcase() {
               height={1000}
               loading="lazy"
               decoding="async"
-              className="block h-auto w-full rounded-[10px]"
-              alt="The FinTrack overview: total balance, this month's income, spending and savings, a spending-pace chart against last month, and insights worth your attention."
+              className="block h-auto w-full rounded-[14px]"
+              alt="The FinTrack overview: total balance with a spinning gold coin, this month's income, spending and savings, a spending-pace chart against last month, and insights worth your attention."
             />
           </div>
-          <figcaption className="ft-label mt-3">Fig. 2 — The overview, with a year of sample data loaded</figcaption>
+          <figcaption className="ft-label mt-4">Fig. 2 · The overview, with a year of sample data loaded</figcaption>
         </motion.figure>
       </div>
     </section>
   )
 }
 
-/** Features as a numbered ledger: one row per question the app answers, each with a small live specimen. */
+/** Features as a bento of sticker cards you can grab and throw; each has a small live specimen. */
 function Features({ p }: { p: HeroPreview }) {
   const budget = 84
-  const rows: { title: string; body: string; specimen: ReactNode }[] = [
+  const cards: { title: string; body: string; specimen: ReactNode; className: string; bg: string; rotate: number }[] = [
     {
-      title: 'A calm monthly overview',
-      body: 'Balance, income, spending and savings — and how this month compares with the last, day for day.',
+      title: 'A loud monthly overview',
+      body: 'Balance, income, spending and savings, and how this month compares with the last, day for day.',
+      className: 'md:col-span-7',
+      bg: 'bg-accent',
+      rotate: -1,
       specimen: (
-        <dl className="grid grid-cols-3 gap-4">
-          {([['Income', p.income], ['Spent', p.expense], ['Saved', p.net]] as const).map(([l, v]) => (
-            <div key={l}>
-              <dt className="ft-label">{l}</dt>
-              <dd className={`num mt-1 text-base font-semibold tracking-[-0.03em] sm:text-lg ${l === 'Saved' && v > 0 ? 'text-accent' : 'text-ink'}`}>{inr(v)}</dd>
+        <dl className="grid grid-cols-3 gap-3">
+          {([['Income', p.income], ['Spent', p.expense], ['Kept', p.net]] as const).map(([l, v]) => (
+            <div key={l} className="rounded-[12px] border-2 border-ink bg-surface p-2.5">
+              <dt className="ft-label text-ink-2">{l}</dt>
+              <dd className="num mt-1 font-display text-sm font-extrabold tracking-[-0.03em] text-ink sm:text-lg">{inr(v)}</dd>
             </div>
           ))}
         </dl>
@@ -246,15 +392,18 @@ function Features({ p }: { p: HeroPreview }) {
     {
       title: 'Budgets that warn early',
       body: 'Flagged at 80% of the limit, before the month is gone.',
+      className: 'md:col-span-5',
+      bg: 'bg-surface',
+      rotate: 1.2,
       specimen: (
         <div>
-          <div className="flex justify-between text-xs">
+          <div className="flex justify-between text-xs font-semibold">
             <span className="text-ink-2">Transport (example)</span>
             <span className="num font-mono text-caution">{budget}% used</span>
           </div>
-          <div className="relative mt-2 h-2 bg-sunken">
-            <motion.div className="h-full bg-caution" initial={{ width: 0 }} whileInView={{ width: `${budget}%` }} viewport={{ once: true }} transition={{ type: 'spring', stiffness: 60, damping: 14, delay: 0.2 }} />
-            <span className="absolute -top-1 bottom-[-4px] left-[80%] w-px bg-ink" aria-hidden />
+          <div className="relative mt-2 h-5 overflow-hidden rounded-full border-2 border-ink bg-sunken">
+            <motion.div className="h-full rounded-full border-r-2 border-ink bg-tangerine" initial={{ width: 0 }} whileInView={{ width: `${budget}%` }} viewport={{ once: true }} transition={{ type: 'spring', stiffness: 60, damping: 11, delay: 0.2 }} />
+            <span className="absolute inset-y-0 left-[80%] w-0.5 bg-ink" aria-hidden />
           </div>
           <p className="ft-label mt-2">Warning line at 80%</p>
         </div>
@@ -263,10 +412,13 @@ function Features({ p }: { p: HeroPreview }) {
     {
       title: 'Insights with the working shown',
       body: 'Every insight is calculated from your own numbers. Open one to see its formula.',
+      className: 'md:col-span-5',
+      bg: 'bg-cobalt text-white',
+      rotate: -0.8,
       specimen: (
-        <details className="group border border-line p-3 text-xs">
-          <summary className="cursor-pointer list-none font-medium text-ink marker:hidden">
-            Spending pace — <span className="text-accent underline underline-offset-2">show basis</span>
+        <details className="group rounded-[12px] border-2 border-ink bg-surface p-3 text-xs text-ink">
+          <summary className="cursor-pointer list-none font-semibold marker:hidden">
+            Spending pace · <span className="underline decoration-cobalt decoration-2 underline-offset-2">show basis</span>
           </summary>
           <p className="mt-2 font-mono text-ink-3">(Spent 1st→today − same days last month) ÷ same days last month × 100</p>
         </details>
@@ -275,13 +427,17 @@ function Features({ p }: { p: HeroPreview }) {
     {
       title: 'Trends across months',
       body: 'Income against spending, savings rate, busiest weekday and largest expenses.',
+      className: 'md:col-span-7',
+      bg: 'bg-surface',
+      rotate: 0.8,
       specimen: (
         <div>
-          <div className="flex h-14 items-end gap-1.5" aria-hidden>
+          <div className="flex h-20 items-end gap-2" aria-hidden>
             {[42, 64, 51, 78, 58, 88, 70].map((h, i) => (
-              <motion.span key={i} className={`flex-1 ${i === 6 ? 'bg-accent' : 'bg-ink/30'}`} initial={{ height: 0 }} whileInView={{ height: `${h}%` }} viewport={{ once: true }} transition={{ type: 'spring', stiffness: 120, damping: 14, delay: i * 0.05 }} />
+              <motion.span key={i} className={`flex-1 rounded-t-[6px] border-2 border-b-0 border-ink ${i === 6 ? 'bg-accent' : i % 2 ? 'bg-cobalt' : 'bg-tangerine'}`} initial={{ height: 0 }} whileInView={{ height: `${h}%` }} viewport={{ once: true }} transition={{ type: 'spring', stiffness: 140, damping: 10, delay: i * 0.06 }} />
             ))}
           </div>
+          <div className="h-0.5 bg-ink" />
           <p className="ft-label mt-2">Illustrative shape</p>
         </div>
       ),
@@ -289,28 +445,34 @@ function Features({ p }: { p: HeroPreview }) {
     {
       title: 'Fast, and yours to export',
       body: 'Press N anywhere to add a transaction. Export everything to CSV.',
+      className: 'md:col-span-6',
+      bg: 'bg-tangerine',
+      rotate: -1.2,
       specimen: (
         <div className="flex items-center gap-3">
           <motion.kbd
-            whileHover={{ y: 3, boxShadow: '0 1px 0 #383838' }}
-            whileTap={{ y: 4, boxShadow: '0 0 0 #383838' }}
-            className="grid size-12 cursor-default place-items-center rounded-xs border border-line-strong bg-sunken font-mono text-lg font-semibold text-ink shadow-[0_4px_0_#383838]"
+            whileHover={{ y: 3, boxShadow: '0 2px 0 #16140f' }}
+            whileTap={{ y: 6, boxShadow: '0 0 0 #16140f' }}
+            className="grid size-14 cursor-pointer place-items-center rounded-[12px] border-2 border-ink bg-surface font-display text-xl font-extrabold text-ink shadow-[0_6px_0_#16140f]"
           >
             N
           </motion.kbd>
-          <span className="font-mono text-xs text-ink-3">→ add transaction</span>
+          <span className="font-mono text-xs font-semibold text-ink">→ add transaction</span>
         </div>
       ),
     },
     {
       title: 'Any currency you live in',
-      body: 'Every ISO currency is supported, with digit grouping that follows each currency’s home convention.',
+      body: 'Every ISO currency, with digit grouping that follows each currency’s home convention.',
+      className: 'md:col-span-6',
+      bg: 'bg-surface',
+      rotate: 1,
       specimen: (
         <ul className="num grid gap-1 font-mono text-sm text-ink-2">
           {['INR', 'USD', 'EUR'].map((c) => (
-            <li key={c} className="flex justify-between gap-4 border-b border-line pb-1 last:border-0">
-              <span className="text-ink-3">{c}</span>
-              <span className={c === 'INR' ? 'text-ink' : ''}>{formatCurrency(566547, c)}</span>
+            <li key={c} className="flex justify-between gap-4 border-b-2 border-dashed border-line pb-1 last:border-0">
+              <span className="font-semibold text-ink-3">{c}</span>
+              <span className={c === 'INR' ? 'font-semibold text-ink' : ''}>{formatCurrency(566547, c)}</span>
             </li>
           ))}
         </ul>
@@ -318,21 +480,23 @@ function Features({ p }: { p: HeroPreview }) {
     },
   ]
   return (
-    <section id="features" aria-labelledby="features-title" className={`${FRAME} scroll-mt-20 pt-32 lg:pt-44`}>
-      <SectionHead index="02" label="What it does" id="features-title" aside={<span className="ft-label hidden sm:inline">{rows.length} entries</span>}>
+    <section id="features" aria-labelledby="features-title" className={`${FRAME} scroll-mt-20 pt-32 lg:pt-40`}>
+      <SectionHead index="02" label="What it does" id="features-title" aside={<span className="ft-label hidden [@media(hover:hover)_and_(pointer:fine)]:sm:inline">Grab a card · throw it</span>}>
         Built around the questions <span className="ft-serif">you actually ask.</span>
       </SectionHead>
-      <ol className="mt-16 border-t border-line">
-        {rows.map((r, i) => (
-          <Reveal as="li" key={r.title} delay={i * 40} className="group border-b border-line">
-            <div className="grid gap-5 py-8 transition-colors duration-300 md:grid-cols-12 md:items-center md:gap-8 md:py-10">
-              <span className="num font-mono text-sm text-ink-3 transition-colors group-hover:text-accent md:col-span-1">{String(i + 1).padStart(2, '0')}</span>
-              <div className="md:col-span-6">
-                <h3 className="text-2xl font-semibold tracking-[-0.035em] text-ink transition-transform duration-500 ease-[var(--ease-reveal)] group-hover:translate-x-1.5 sm:text-[2rem] sm:leading-tight">{r.title}</h3>
-                <p className="mt-2 max-w-md text-base text-ink-3">{r.body}</p>
-              </div>
-              <div className="md:col-span-5">{r.specimen}</div>
-            </div>
+      <ol className="mt-14 grid gap-5 md:grid-cols-12">
+        {cards.map((c, i) => (
+          <Reveal as="li" key={c.title} delay={i * 50} className={c.className}>
+            <PullCard rotate={c.rotate} className="h-full">
+              <article className={`flex h-full flex-col justify-between gap-8 rounded-[22px] border-2 border-ink p-6 shadow-[6px_6px_0_#16140f] sm:p-7 ${c.bg}`}>
+                <div>
+                  <span className="num font-mono text-xs font-semibold opacity-70">{String(i + 1).padStart(2, '0')}</span>
+                  <h3 className="mt-2 font-display text-2xl font-extrabold leading-tight tracking-[-0.04em] sm:text-[1.75rem]">{c.title}</h3>
+                  <p className="mt-2 max-w-md text-base opacity-80">{c.body}</p>
+                </div>
+                <div>{c.specimen}</div>
+              </article>
+            </PullCard>
           </Reveal>
         ))}
       </ol>
@@ -340,26 +504,25 @@ function Features({ p }: { p: HeroPreview }) {
   )
 }
 
-/** Inverted section: the one place the page flips to white paper. */
+/** Inverted section: the one place the page flips to ink. */
 function Privacy() {
   const facts = ['Guest data stays in this browser', 'Row-level security on every table', '20 automated RLS checks', 'No tracking, no ads']
   return (
-    <section id="privacy" aria-labelledby="privacy-title" className="mt-32 scroll-mt-16 bg-ink text-paper lg:mt-44">
+    <section id="privacy" aria-labelledby="privacy-title" className="mt-32 scroll-mt-16 border-y-2 border-ink bg-ink text-paper lg:mt-40">
       <div className={`${FRAME} grid gap-12 py-20 lg:grid-cols-12 lg:py-28`}>
-        <Reveal className="lg:col-span-7">
-          <p className="font-mono text-2xs font-medium uppercase tracking-[0.08em] text-paper/70">(03) Private by default</p>
-          <h2 id="privacy-title" className="ft-display mt-8 text-[clamp(2.5rem,6vw,5.75rem)]">
-            Your numbers stay <span className="ft-serif">yours.</span>
-          </h2>
-        </Reveal>
+        <div className="lg:col-span-7">
+          <SectionHead index="03" label="Private by default" id="privacy-title" invert>
+            Your numbers stay <span className="text-accent">yours.</span>
+          </SectionHead>
+        </div>
         <Reveal delay={120} className="lg:col-span-5 lg:self-end">
           <p className="text-lg leading-relaxed text-paper/80">
             Guest workspaces never leave your browser. Synced accounts are isolated by Postgres row-level security, checked by 20 automated database tests.
           </p>
-          <ul className="mt-8 border-t border-paper/20">
+          <ul className="mt-8 grid gap-2">
             {facts.map((f, i) => (
-              <li key={f} className="flex items-baseline gap-4 border-b border-paper/20 py-3 text-sm font-medium">
-                <span className="font-mono text-2xs text-paper/60">{String(i + 1).padStart(2, '0')}</span>
+              <li key={f} className="flex items-center gap-4 rounded-[12px] border-2 border-paper/25 px-4 py-3 text-sm font-semibold transition-colors hover:border-accent">
+                <span className="grid size-6 place-items-center rounded-full bg-accent font-mono text-[10px] text-ink">{String(i + 1).padStart(2, '0')}</span>
                 {f}
               </li>
             ))}
@@ -388,22 +551,22 @@ function Start({
   hasBackend: boolean
 }) {
   return (
-    <section id="start" aria-labelledby="start-title" className={`${FRAME} scroll-mt-20 pt-32 lg:pt-44`}>
+    <section id="start" aria-labelledby="start-title" className={`${FRAME} scroll-mt-20 pt-32 lg:pt-40`}>
       <SectionHead index="04" label="Get started" id="start-title">
-        Two ways <span className="ft-serif text-accent">in.</span>
+        Two ways <span className="ft-serif">in.</span>
       </SectionHead>
       <p className="mt-6 max-w-xl text-lg text-ink-2">Look around with a year of realistic data, or start a private workspace of your own. Both run entirely in your browser.</p>
 
-      <div className="mt-14 grid border-t border-line md:grid-cols-2">
-        <Reveal className="border-b border-line py-10 md:border-b-0 md:border-r md:pr-10">
-          <div className="flex h-full flex-col">
+      <div className="mt-14 grid gap-6 md:grid-cols-2">
+        <Reveal className="h-full">
+          <div className="flex h-full flex-col rounded-[24px] border-2 border-ink bg-surface p-7 shadow-[6px_6px_0_#16140f] sm:p-9">
             <p className="ft-label">Option A</p>
-            <h3 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-ink sm:text-4xl">See the prototype</h3>
-            <p className="mt-3 max-w-md text-base text-ink-2">Every screen with a year of realistic sample data — dashboard, budgets, analytics and insights. Nothing to set up.</p>
+            <h3 className="mt-3 font-display text-3xl font-extrabold tracking-[-0.04em] text-ink sm:text-4xl">See the prototype</h3>
+            <p className="mt-3 max-w-md text-base text-ink-2">Every screen with a year of realistic sample data: dashboard, budgets, analytics and insights. Nothing to set up.</p>
             <ul className="mt-6 grid gap-2 text-sm text-ink-2">
               {['13 months of income and spending', 'Five category budgets with live progress', 'Insights you can check the working of'].map((t) => (
-                <li key={t} className="flex items-baseline gap-3">
-                  <span className="font-mono text-2xs text-accent" aria-hidden>→</span>
+                <li key={t} className="flex items-center gap-3">
+                  <span className="size-3 rounded-full border-2 border-ink bg-accent" aria-hidden />
                   {t}
                 </li>
               ))}
@@ -415,17 +578,17 @@ function Start({
             </div>
           </div>
         </Reveal>
-        <Reveal delay={90} className="py-10 md:pl-10">
+        <Reveal delay={90} className="h-full">
           <form
             onSubmit={(e) => {
               e.preventDefault()
               open('own')
             }}
-            className="flex h-full flex-col"
+            className="flex h-full flex-col rounded-[24px] border-2 border-ink bg-accent p-7 shadow-[6px_6px_0_#16140f] sm:p-9"
           >
-            <p className="ft-label text-accent">Option B</p>
-            <h3 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-ink sm:text-4xl">Build your own FinTrack</h3>
-            <p className="mt-3 max-w-md text-base text-ink-2">Start from zero and track your own income, spending and budgets. Saved privately in this browser — no sign-up.</p>
+            <p className="ft-label text-ink-2">Option B</p>
+            <h3 className="mt-3 font-display text-3xl font-extrabold tracking-[-0.04em] text-ink sm:text-4xl">Build your own FinTrack</h3>
+            <p className="mt-3 max-w-md text-base text-ink-2">Start from zero and track your own income, spending and budgets. Saved privately in this browser, no sign-up.</p>
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
               <Field label="What should we call you?" optional>
                 {(fp) => <Input {...fp} value={name} onChange={(e) => setName(e.target.value)} autoComplete="given-name" maxLength={60} placeholder="Your first name" />}
@@ -433,7 +596,7 @@ function Start({
               <Field label="Currency">{(fp) => <CurrencySelect {...fp} value={currency} onChange={(e) => setCurrency(e.target.value)} />}</Field>
             </div>
             <div className="mt-auto pt-10">
-              <Button type="submit" size="lg" className="w-full !rounded-full sm:w-auto" loading={pending === 'own'}>
+              <Button type="submit" size="lg" variant="ink" className="w-full !rounded-full sm:w-auto" loading={pending === 'own'}>
                 Start tracking <ArrowRight size={16} aria-hidden />
               </Button>
             </div>
@@ -443,11 +606,11 @@ function Start({
       {hasBackend && (
         <p className="mt-6 text-sm text-ink-3">
           Want it on every device?{' '}
-          <Link to="/signup" className="font-medium text-accent underline underline-offset-2 hover:no-underline">
+          <Link to="/signup" className="font-semibold text-ink underline decoration-accent decoration-2 underline-offset-2 hover:decoration-ink">
             Create a free account
           </Link>{' '}
           or{' '}
-          <Link to="/login" className="font-medium text-accent underline underline-offset-2 hover:no-underline">
+          <Link to="/login" className="font-semibold text-ink underline decoration-accent decoration-2 underline-offset-2 hover:decoration-ink">
             sign in
           </Link>
           .

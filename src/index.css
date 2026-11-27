@@ -1,49 +1,55 @@
 @import 'tailwindcss';
 
-/* ───────────────────────── FinTrack design tokens — "Broadsheet" ─────────────────────────
-   An editorial, near-monochrome page: near-black paper, white ink, hairlines instead of
-   shadows, and ONE electric-lime accent spent on actions and on money you kept.
-   Geist carries everything; Instrument Serif italic is the rare editorial accent;
-   JetBrains Mono sets indices, labels and code-like readouts. */
+/* ───────────────────────── FinTrack design tokens — "Gold Standard" ─────────────────────────
+   Money you can pick up. Warm cream paper, heavy ink outlines, hard offset shadows
+   instead of blur, and one gold that means "money" — the 3D coins, the balance, the
+   primary action. Unbounded shouts the headlines; Geist does the reading;
+   JetBrains Mono sets labels and figures-as-data. */
 @theme {
   --font-sans: 'Geist Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-display: 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
-  --font-serif: 'Instrument Serif', 'Iowan Old Style', Georgia, serif;
+  --font-display: 'Unbounded Variable', 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'Unbounded Variable', ui-sans-serif, sans-serif;
   --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
 
-  /* Neutrals — true greys, no tint */
-  --color-paper: #0d0d0d;      /* app background */
-  --color-surface: #141414;    /* raised surfaces: panels, drawers */
-  --color-sunken: #1c1c1c;     /* wells, skeletons, hover */
-  --color-line: #262626;       /* hairlines */
-  --color-line-strong: #383838;
-  --color-ink: #f5f5f5;        /* primary text — 18.1:1 on paper */
-  --color-ink-2: #bdbdbd;      /* secondary — 11:1 */
-  --color-ink-3: #8f8f8f;      /* tertiary / meta — 6.3:1 */
-  --color-ink-4: #5c5c5c;      /* disabled, chart gridlines */
+  /* Paper + ink (contrast measured on paper) */
+  --color-paper: #f3eee2;      /* app background, warm cream */
+  --color-surface: #fffcf4;    /* cards, drawers */
+  --color-sunken: #e8e1cf;     /* wells, skeletons, hover */
+  --color-line: #d8cfba;       /* soft rules inside cards */
+  --color-line-strong: #16140f;/* the ink outline */
+  --color-ink: #16140f;        /* 15.9:1 */
+  --color-ink-2: #45403a;      /* 8.9:1 */
+  --color-ink-3: #655e54;      /* 5.5:1 */
+  --color-ink-4: #8f877a;      /* decorative only */
 
-  /* The one accent: electric lime */
-  --color-accent: #c6f45e;
-  --color-accent-hover: #d7fa86;
-  --color-accent-soft: #1b220f;
-  --color-accent-muted: #7f9b3c;
-  --color-on-accent: #0d0d0d;
+  /* Gold — money, and the primary action */
+  --color-accent: #ffc21a;
+  --color-accent-hover: #ffd451;
+  --color-accent-soft: #fff0bf;
+  --color-accent-muted: #c9962b;
+  --color-accent-ink: #8a5a00; /* gold you can read as text: 5.1:1 */
+  --color-on-accent: #16140f;  /* 11.4:1 on gold */
+
+  /* Second voice: cobalt, for links, selection and the "now" series */
+  --color-cobalt: #2f5bff;
+  --color-cobalt-soft: #dfe6ff;
+  --color-tangerine: #ff6a2b;
 
   /* Semantics */
-  --color-positive: #5fe0a5;
-  --color-positive-soft: #10261c;
-  --color-negative: #ff7f66;
-  --color-negative-soft: #2c1510;
-  --color-caution: #f4c25a;
-  --color-caution-soft: #2a2110;
+  --color-positive: #0e7a4b;
+  --color-positive-soft: #d7f0e2;
+  --color-negative: #c42b1c;
+  --color-negative-soft: #fbe0da;
+  --color-caution: #9a5800;
+  --color-caution-soft: #fcebc8;
 
-  /* Charts — lime for "now", sky / apricot for income / spending (CVD-separable on dark),
-     a dashed grey for the comparison series. Every chart also has a table view. */
-  --color-chart-current: #c6f45e;
-  --color-chart-previous: #5c5c5c;
-  --color-chart-income: #7cc6ff;
-  --color-chart-expense: #ffa26b;
-  --color-chart-single: #c6f45e;
+  /* Charts: ink line for "now", dashed taupe for the comparison, cobalt / tangerine for
+     income / spending. Every chart also has a table view. */
+  --color-chart-current: #16140f;
+  --color-chart-previous: #a89f90;
+  --color-chart-income: #2f5bff;
+  --color-chart-expense: #ff6a2b;
+  --color-chart-single: #2f5bff;
 
   /* Type scale (1.2-ish, tuned for data) */
   --text-2xs: 0.6875rem;   /* 11 */
@@ -65,15 +71,18 @@
   --text-4xl: 3rem;        /* 48 */
   --text-4xl--line-height: 3.1rem;
 
-  /* Radius — tighter, editorial */
-  --radius-xs: 4px;
-  --radius-sm: 8px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
+  /* Radius — chunky, toy-like */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
 
-  /* Elevation */
-  --shadow-overlay: 0 0 0 1px rgb(255 255 255 / 0.08), 0 24px 60px -12px rgb(0 0 0 / 0.8);
-  --shadow-raise: 0 1px 0 rgb(255 255 255 / 0.04) inset;
+  /* Elevation: hard offset ink shadows, no blur */
+  --shadow-overlay: 6px 6px 0 #16140f;
+  --shadow-raise: 4px 4px 0 #16140f;
+  --shadow-hard-sm: 3px 3px 0 #16140f;
+  --shadow-hard: 5px 5px 0 #16140f;
+  --shadow-hard-lg: 8px 8px 0 #16140f;
 
   /* Motion */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
@@ -98,6 +107,8 @@
   body {
     @apply bg-paper text-ink font-sans text-base;
     font-feature-settings: 'ss01' on, 'cv11' on;
+    background-image: radial-gradient(rgb(22 20 15 / 0.07) 1px, transparent 1px);
+    background-size: 22px 22px;
   }
   /* Every number on screen uses tabular figures so columns line up. */
   .num {
@@ -105,16 +116,17 @@
     font-feature-settings: 'tnum' on;
   }
   :focus-visible {
-    outline: 2px solid var(--color-accent);
+    outline: 3px solid var(--color-cobalt);
     outline-offset: 2px;
     border-radius: 4px;
   }
   ::selection {
-    background: var(--color-accent);
-    color: var(--color-on-accent);
+    background: var(--color-cobalt);
+    color: #fff;
   }
   dialog::backdrop {
-    background: rgb(0 0 0 / 0.6);
+    background: rgb(22 20 15 / 0.45);
+    backdrop-filter: blur(2px);
   }
   input[type='date']::-webkit-calendar-picker-indicator {
     opacity: 0.55;
@@ -139,18 +151,29 @@
     text-transform: uppercase;
     color: var(--color-ink-3);
   }
+  /* Was the serif accent; now a highlighter swipe of gold behind the phrase. */
   .ft-serif {
-    font-family: var(--font-serif);
-    font-style: italic;
-    font-weight: 400;
-    letter-spacing: -0.01em;
+    font-family: inherit;
+    font-style: normal;
+    font-weight: inherit;
+    background: linear-gradient(transparent 58%, var(--color-accent) 58%, var(--color-accent) 92%, transparent 92%);
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+    padding: 0 0.06em;
   }
   .ft-display {
     font-family: var(--font-display);
-    font-weight: 600;
-    letter-spacing: -0.055em;
-    line-height: 0.9;
+    font-weight: 800;
+    letter-spacing: -0.045em;
+    line-height: 0.95;
   }
+  /* Sticker: ink outline + hard shadow. Lifts toward the pointer, presses flat. */
+  .ft-sticker {
+    border: 2px solid var(--color-ink);
+    box-shadow: var(--shadow-hard);
+    transition: transform 260ms var(--ease-spring), box-shadow 260ms var(--ease-spring);
+  }
+  .ft-sticker-sm { border: 2px solid var(--color-ink); box-shadow: var(--shadow-hard-sm); }
 }
 
 /* Skeleton shimmer — subtle, and disabled for reduced motion. */
@@ -159,7 +182,7 @@
   50% { opacity: 0.55; }
 }
 .skeleton {
-  background: linear-gradient(100deg, var(--color-sunken) 30%, #262626 50%, var(--color-sunken) 70%);
+  background: linear-gradient(100deg, var(--color-sunken) 30%, #f6f1e5 50%, var(--color-sunken) 70%);
   background-size: 300% 100%;
   border-radius: var(--radius-xs);
   animation: ft-shimmer 1.6s linear infinite;
@@ -191,6 +214,10 @@
 
 /* Press + ripple (Button / IconButton) */
 .ft-press:active:not(:disabled) { transform: scale(0.96); transition-duration: 90ms; }
+/* Pushable: the button sits on its own shadow and gets pressed into the page. */
+.ft-push { box-shadow: var(--shadow-hard-sm); border: 2px solid var(--color-ink); }
+.ft-push:hover:not(:disabled) { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--color-ink); }
+.ft-push:active:not(:disabled) { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--color-ink); transition-duration: 60ms; }
 .ft-ripple {
   position: absolute;
   z-index: -1;
@@ -230,10 +257,13 @@
 /* Cards: hairline that firms up under the pointer — no glows. */
 .ft-card {
   position: relative;
-  transition: border-color var(--duration-base) var(--ease-out), transform 400ms var(--ease-spring), background-color var(--duration-base) var(--ease-out);
+  border-width: 2px !important;
+  border-color: var(--color-ink) !important;
+  box-shadow: var(--shadow-hard);
+  transition: transform 380ms var(--ease-spring), box-shadow 380ms var(--ease-spring), background-color var(--duration-base) var(--ease-out);
 }
-.ft-card:hover { border-color: var(--color-line-strong); }
-.ft-lift:hover { transform: translateY(-3px); }
+.ft-card:hover { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 var(--color-ink); }
+.ft-lift:hover { transform: translate(-2px, -4px); }
 
 /* Data draw-ins */
 .ft-draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: ft-draw 1800ms var(--ease-out) 300ms forwards; }
@@ -248,14 +278,6 @@
   animation: ft-ping 2.2s var(--ease-out) infinite;
 }
 @keyframes ft-ping { 0% { transform: scale(0.5); opacity: 0.7; } 100% { transform: scale(2); opacity: 0; } }
-
-/* Landing: money-flow figure */
-.ft-flow-reveal { transform-box: fill-box; transform-origin: left center; animation: ft-flow-in 1600ms var(--ease-reveal) 250ms both; }
-@keyframes ft-flow-in { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-.ft-ribbon { transition: opacity 320ms var(--ease-out), fill 320ms var(--ease-out); cursor: pointer; }
-.ft-ribbon:focus-visible { outline: none; }
-.ft-flow-row { transition: background-color 200ms var(--ease-out), color 200ms var(--ease-out); }
-.ft-rule-grow { transform-origin: left; animation: ft-grow 1200ms var(--ease-reveal) both; }
 
 @media (prefers-reduced-motion: reduce) {
   [data-reveal='out'] { opacity: 1; transform: none; filter: none; }
@@ -273,4 +295,14 @@
 
 /* Recharts: quiet defaults */
 .recharts-cartesian-axis-tick-value { font-size: 11px; fill: var(--color-ink-3); font-variant-numeric: tabular-nums; }
+
+/* Marquee ticker (landing) */
+.ft-marquee { animation: ft-marquee 32s linear infinite; }
+@keyframes ft-marquee { to { transform: translateX(-50%); } }
+
+/* Coin spin for the 2D logo when 3D is unavailable */
+.ft-coin-spin:hover { animation: ft-coin-flip 900ms var(--ease-spring); }
+@keyframes ft-coin-flip { from { transform: rotateY(0); } to { transform: rotateY(360deg); } }
+
+@media (prefers-reduced-motion: reduce) { .ft-marquee { animation: none; } }
 .recharts-surface:focus, .recharts-wrapper:focus { outline: none; }

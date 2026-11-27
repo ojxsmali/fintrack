@@ -27,11 +27,11 @@ export function Panel({
     <section
       aria-labelledby={headingId}
       onPointerMove={plain ? undefined : spotlight}
-      className={`${plain ? '' : 'ft-card rounded-lg border border-line bg-surface px-4 py-4 md:px-5 md:py-5'} min-w-0 ${className}`}
+      className={`${plain ? '' : 'ft-card rounded-lg border bg-surface px-4 py-4 md:px-6 md:py-5'} min-w-0 ${className}`}
     >
       <div className="mb-4 flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h2 id={headingId} className="text-base font-semibold tracking-[-0.02em] text-ink">
+          <h2 id={headingId} className="font-display text-lg font-extrabold tracking-[-0.03em] text-ink">
             {title}
           </h2>
           {description && <p className="mt-0.5 text-xs text-ink-3">{description}</p>}

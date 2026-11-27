@@ -17,6 +17,8 @@ import { InsightList } from '../components/dashboard/InsightList'
 import { CountUp } from '../components/motion/Motion'
 import { PullCard, TiltCard } from '../components/motion/Interactive'
 import { spotlight } from '../components/motion/effects'
+import { BrandCoin3D } from '../components/three/Scene3D'
+import { LogoMark } from '../components/ui/Logo'
 import { friendlyError } from '../services/repository'
 import { useAuth } from '../services/authContext'
 
@@ -45,7 +47,7 @@ export function DashboardPage() {
   return (
     <div className="ft-stagger flex flex-col gap-10">
       <header>
-        <h1 className="ft-display text-[2.6rem] text-ink sm:text-[4rem]">
+        <h1 className="ft-display text-[2.3rem] text-ink sm:text-[3.6rem]">
           {greeting()}
           {firstName ? `, ${firstName}.` : '.'}
         </h1>
@@ -110,7 +112,7 @@ export function DashboardPage() {
                   title="No budgets yet."
                   body="Set a monthly limit for a category and FinTrack will track it for you."
                   action={
-                    <Link to="/budgets" className="text-sm font-medium text-accent underline-offset-2 hover:underline">
+                    <Link to="/budgets" className="text-sm font-medium text-accent-ink underline-offset-2 hover:underline">
                       Create a budget
                     </Link>
                   }
@@ -155,22 +157,22 @@ function BalanceStrip({
   accounts: number
 }) {
   return (
-    <section aria-label="Balance overview" className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-[minmax(0,1.45fr)_repeat(3,minmax(0,1fr))]">
-      <TiltCard className="col-span-2 min-w-0 md:col-span-3 lg:col-span-1" max={5}>
-        <div className="relative h-full overflow-hidden rounded-lg bg-accent p-5 text-on-accent sm:p-6">
-          <svg className="pointer-events-none absolute bottom-0 right-0 h-24 w-48 opacity-25" viewBox="0 0 200 100" aria-hidden>
-            <path d="M0 90 C 40 80, 60 40, 100 50 S 160 20, 200 8" fill="none" stroke="currentColor" strokeWidth="3" />
-          </svg>
-          <p className="relative text-sm font-medium opacity-75">Total balance</p>
-          <p className={`num relative mt-2 font-display text-[2.6rem] font-bold leading-none tracking-[-0.05em] sm:text-5xl ${balance < 0 ? 'text-[#6b1a0b]' : ''}`}>
-            <CountUp value={balance} format={(n) => money(n)} />
-          </p>
-          <p className="relative mt-3 text-xs font-medium opacity-70">
-            Across {accounts} {accounts === 1 ? 'account' : 'accounts'} ·{' '}
-            <Link to="/settings#accounts" className="underline underline-offset-2 hover:opacity-100">
-              starting balances
-            </Link>
-          </p>
+    <section aria-label="Balance overview" className="grid grid-cols-2 gap-4 md:grid-cols-3">
+      <TiltCard className="col-span-2 min-w-0 md:col-span-3" max={4}>
+        <div className="relative flex h-full items-center justify-between gap-4 overflow-hidden rounded-[24px] border-2 border-ink bg-accent p-5 text-on-accent shadow-[6px_6px_0_#16140f] sm:p-7">
+          <div className="relative z-10 min-w-0">
+            <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.08em]">Total balance</p>
+            <p className={`num mt-14 font-display text-[clamp(2.2rem,7vw,4.4rem)] sm:mt-3 font-extrabold leading-none tracking-[-0.05em] ${balance < 0 ? 'text-negative' : ''}`}>
+              <CountUp value={balance} format={(n) => money(n)} />
+            </p>
+            <p className="mt-4 text-xs font-semibold opacity-80">
+              Across {accounts} {accounts === 1 ? 'account' : 'accounts'} ·{' '}
+              <Link to="/settings#accounts" className="underline decoration-2 underline-offset-2 hover:opacity-100">
+                starting balances
+              </Link>
+            </p>
+          </div>
+          <BrandCoin3D className="absolute right-1 top-1 h-28 w-28 shrink-0 sm:static sm:-my-4 sm:h-44 sm:w-52" label="FinTrack coin: drag to spin" fallback={<span className="absolute right-4 top-4 shrink-0 sm:static"><LogoMark size={80} /></span>} />
         </div>
       </TiltCard>
       <Stat label={`Income in ${monthName}`} amount={income} money={money} />
@@ -190,9 +192,9 @@ function BalanceStrip({
 function Stat({ label, amount, money, tone, className = '' }: { label: string; amount: number; money: (n: number) => string; tone?: 'positive' | 'negative'; className?: string }) {
   return (
     <PullCard className={`min-w-0 ${className}`}>
-      <div onPointerMove={spotlight} className="ft-card flex h-full flex-col justify-between rounded-lg border border-line bg-surface p-5">
-        <p className="text-sm text-ink-3">{label}</p>
-        <p className={`num mt-6 font-display text-2xl font-semibold tracking-[-0.04em] sm:text-[1.9rem] ${tone === 'positive' ? 'text-positive' : tone === 'negative' ? 'text-negative' : 'text-ink'}`}>
+      <div onPointerMove={spotlight} className="ft-card flex h-full flex-col justify-between rounded-[20px] border bg-surface p-5">
+        <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.06em] text-ink-3">{label}</p>
+        <p className={`num mt-6 font-display text-[1.45rem] font-extrabold tracking-[-0.04em] sm:text-[1.9rem] ${tone === 'positive' ? 'text-positive' : tone === 'negative' ? 'text-negative' : 'text-ink'}`}>
           <CountUp value={amount} format={(n) => money(n)} />
         </p>
       </div>
@@ -256,7 +258,7 @@ function FirstRun({ onAdd }: { onAdd: (t: 'expense' | 'income') => void }) {
   const { workspace } = useAuth()
   const toast = useToast()
   return (
-    <section className="border-y border-line py-10">
+    <section className="flex flex-col gap-6">
       <EmptyState
         title="No transactions yet."
         body="Add your first transaction to start understanding your spending. Start with this month’s income, then a few recent expenses — the overview, budgets and insights build from there."
@@ -281,16 +283,16 @@ function FirstRun({ onAdd }: { onAdd: (t: 'expense' | 'income') => void }) {
           </>
         }
       />
-      <ol className="mt-4 grid max-w-3xl gap-4 text-sm text-ink-2 sm:grid-cols-3">
+      <ol className="grid gap-4 text-sm text-ink-2 sm:grid-cols-3">
         {[
           ['Set a starting balance', 'So your total reflects what’s in the bank today.', '/settings#accounts'],
           ['Record income and spending', 'Every transaction sharpens the picture.', null],
           ['Create a budget', 'Pick a category and a monthly limit.', '/budgets'],
         ].map(([t, d, href], i) => (
-          <li key={t} className="border-t border-line pt-3">
-            <span className="num text-xs text-ink-4">0{i + 1}</span>
-            <p className="mt-1 font-medium text-ink">{href ? <Link to={href} className="hover:underline underline-offset-2">{t}</Link> : t}</p>
-            <p className="mt-0.5 text-ink-3">{d}</p>
+          <li key={t} className={`rounded-[18px] border-2 border-ink p-5 shadow-[4px_4px_0_#16140f] ${i === 0 ? 'bg-accent' : i === 1 ? 'bg-surface' : 'bg-cobalt-soft'}`}>
+            <span className="num grid size-8 place-items-center rounded-full bg-ink font-mono text-xs font-semibold text-accent">0{i + 1}</span>
+            <p className="mt-3 font-display text-base font-extrabold tracking-[-0.02em] text-ink">{href ? <Link to={href} className="hover:underline underline-offset-2">{t}</Link> : t}</p>
+            <p className="mt-1 text-ink-2">{d}</p>
           </li>
         ))}
       </ol>

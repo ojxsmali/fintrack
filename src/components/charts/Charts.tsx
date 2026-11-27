@@ -61,8 +61,8 @@ export function SpendingPaceChart({
               ) : null
             }
           />
-          <Line type="monotone" dataKey="previous" stroke={CHART.previous} strokeWidth={2} strokeDasharray="4 4" dot={false} activeDot={{ r: 4, strokeWidth: 2, stroke: '#141414' }} isAnimationActive={animate} animationDuration={900} animationEasing="ease-out" connectNulls={false} />
-          <Line type="monotone" dataKey="current" stroke={CHART.current} strokeWidth={2.25} dot={false} activeDot={{ r: 5, strokeWidth: 2, stroke: '#141414' }} isAnimationActive={animate} animationDuration={900} animationEasing="ease-out" connectNulls={false} />
+          <Line type="monotone" dataKey="previous" stroke={CHART.previous} strokeWidth={2} strokeDasharray="4 4" dot={false} activeDot={{ r: 4, strokeWidth: 2, stroke: '#fffcf4' }} isAnimationActive={animate} animationDuration={900} animationEasing="ease-out" connectNulls={false} />
+          <Line type="monotone" dataKey="current" stroke={CHART.current} strokeWidth={2.25} dot={false} activeDot={{ r: 5, strokeWidth: 2, stroke: '#fffcf4' }} isAnimationActive={animate} animationDuration={900} animationEasing="ease-out" connectNulls={false} />
         </LineChart>
       </ResponsiveContainer>
     </ChartFrame>
@@ -175,7 +175,7 @@ export function BalanceChart({ data, currency, summary }: { data: BalancePoint[]
               return active && p ? <TooltipCard title={`End of ${fmt.monthYear(new Date(`${p.key}-01T00:00:00`))}`} rows={[{ label: 'Balance', value: money(p.balance) }]} /> : null
             }}
           />
-          <Area type="monotone" dataKey="balance" stroke={CHART.single} strokeWidth={2.25} fill="url(#balanceFill)" dot={{ r: 3, fill: CHART.single, strokeWidth: 0 }} activeDot={{ r: 5, strokeWidth: 2, stroke: '#141414' }} isAnimationActive={animate} animationDuration={900} animationEasing="ease-out" />
+          <Area type="monotone" dataKey="balance" stroke={CHART.single} strokeWidth={2.25} fill="url(#balanceFill)" dot={{ r: 3, fill: CHART.single, strokeWidth: 0 }} activeDot={{ r: 5, strokeWidth: 2, stroke: '#fffcf4' }} isAnimationActive={animate} animationDuration={900} animationEasing="ease-out" />
         </AreaChart>
       </ResponsiveContainer>
     </ChartFrame>

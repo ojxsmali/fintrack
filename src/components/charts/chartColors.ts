@@ -1,10 +1,10 @@
-/** Chart palette for the dark theme: lime = this period, sky / apricot = income / spending (CVD-separable). */
+/** Chart palette for Gold Standard: ink = this period, dashed taupe = last period, cobalt / tangerine = income / spending. */
 export const CHART = {
-  current: '#c6f45e',
-  previous: '#5c5c5c',
-  income: '#7cc6ff',
-  expense: '#ffa26b',
-  single: '#c6f45e',
-  grid: '#262626',
-  axis: '#8f8f8f',
+  current: '#16140f',
+  previous: '#a89f90',
+  income: '#2f5bff',
+  expense: '#ff6a2b',
+  single: '#2f5bff',
+  grid: '#d8cfba',
+  axis: '#655e54',
 }

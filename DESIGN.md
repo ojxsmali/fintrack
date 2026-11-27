@@ -1,48 +1,74 @@
-# FinTrack design system — "Broadsheet"
+# FinTrack design system — "Gold Standard"
 
-An editorial, near-monochrome page: near-black paper, white ink, hairlines instead of shadows, and one electric-lime accent. Lime is spent on what you act on and on money you kept; everything else stays grey. Oversized type does the heavy lifting.
+Money you can pick up. Warm cream paper, heavy ink outlines, hard offset shadows instead of blur, and one gold that means money: the 3D coins, the balance card and the primary action. Everything you can touch answers back with a spring, a push or a bounce.
+
+The live brand kit is at `/brand` (`src/pages/BrandPage.tsx`): logo variants with SVG downloads, colour swatches (tap to copy), type specimens, motion rules and voice.
+
+## Logo
+
+A gold coin with an ink rim, carrying an **F built from three stacked bars** that step down like a bar chart (or coins on their side). It always sits on its own hard ink shadow.
+
+- Geometry: `src/lib/brandMark.ts` (`LOGO_BARS`) — shared by the SVG mark (`LogoMark`), the favicon, the PWA icons and the extruded 3D coin.
+- Tones: gold (primary), cream (on gold), ink (reversed: gold F on ink).
+- Wordmark: Unbounded ExtraBold, −4% tracking, with a gold full stop. Hovering the lock-up flips the coin.
 
 ## Colour (tokens in `src/index.css`)
 
-| Role | Token | Value |
-|---|---|---|
-| App background | `paper` | `#0D0D0D` |
-| Panels, drawers | `surface` | `#141414` |
-| Wells, hover | `sunken` | `#1C1C1C` |
-| Hairlines | `line` / `line-strong` | `#262626` / `#383838` |
-| Text | `ink` → `ink-4` | `#F5F5F5` (18:1) → `#5C5C5C` |
-| Accent | `accent` (electric lime) | `#C6F45E`, text on it `#0D0D0D` |
-| Saved / income | `positive` (mint) | `#5FE0A5` |
-| Overspent | `negative` (coral) | `#FF7F66` |
-| Near a limit | `caution` | `#F4C25A` |
-| Charts | current / previous / income / spending | lime / dashed grey / sky `#7CC6FF` / apricot `#FFA26B` |
+| Role | Token | Value | Contrast |
+|---|---|---|---|
+| Paper (page) | `paper` | `#F3EEE2` + 22px ink dot grid | — |
+| Cards, drawers | `surface` | `#FFFCF4` | — |
+| Wells, skeletons | `sunken` | `#E8E1CF` | — |
+| Soft rules | `line` | `#D8CFBA` | decorative |
+| Outline / text | `ink` (= `line-strong`) | `#16140F` | 15.9:1 on paper |
+| Secondary text | `ink-2` / `ink-3` | `#45403A` / `#655E54` | 8.9:1 / 5.5:1 |
+| Money, primary action | `accent` (gold) | `#FFC21A`, ink text on it | 11.4:1 |
+| Gold as text | `accent-ink` | `#8A5A00` | 5.1:1 |
+| Income, links, focus | `cobalt` | `#2F5BFF` | white on it 5.2:1 |
+| Spending, warnings | `tangerine` | `#FF6A2B` | ink on it 6.4:1 |
+| Saved / overspent / near limit | `positive` / `negative` / `caution` | `#0E7A4B` / `#C42B1C` / `#9A5800` | ≥ 4.6:1 |
+| Charts | current / previous / income / spending | ink / dashed taupe `#A89F90` / cobalt / tangerine | every chart also has a table view |
 
-The landing page has one inverted section (Privacy) that flips to `ink` paper with `paper` text.
+One inverted section per page at most (landing: Privacy, ink with gold).
 
 ## Type
 
-- **Geist** — everything: display headlines (`.ft-display`: 600, −0.055em, 0.9 line-height), interface, figures (tabular via `.num`).
-- **Instrument Serif italic** (`.ft-serif`) — the editorial accent, one phrase per headline at most.
-- **JetBrains Mono** — section markers like `(02) What it does`, figure captions, indices and code-like readouts (`.ft-label`).
+- **Unbounded** (`font-display`, `.ft-display` 800, −0.045em) — headlines, big figures, card titles, the wordmark.
+- **Geist** — interface and body, tabular figures via `.num`.
+- **JetBrains Mono** (`.ft-label`) — section markers, captions, stat labels, chart readouts.
+- **Highlight** (`.ft-serif`, kept for compatibility) — a gold marker swipe behind one phrase per headline.
 
-## Signature visual
+## Surfaces
 
-`src/components/landing/MoneyFlow.tsx` — "Fig. 1": this month's income fanning out into where it went, ribbon widths proportional to the real sample figures (`src/lib/heroPreview.ts`). The kept ribbon is lime. The numbered legend is made of real buttons (hover, focus or tap to read any ribbon); the SVG is decorative.
+- `.ft-card` / `.ft-sticker`: 2px ink border + 5px hard shadow. Cards lift toward the pointer (shadow grows to 7px).
+- `.ft-push`: buttons sit on a 3px shadow and are pressed flat (translate 3px, 60ms) on click. Every filled `Button` variant uses it; ink ripple on top.
+- Radius is chunky: 6 / 10 / 14 / 20px, pills for buttons, chips and the segmented control.
+
+## 3D layer (`src/components/three`)
+
+three.js + react-three-fiber + drei, **lazy-loaded** (`Scene3D.tsx`) so the app shell never downloads it, and only when WebGL is available (`webgl.ts`). If WebGL is missing or the context dies, a flat SVG fallback renders instead.
+
+| Scene | Where | Interaction |
+|---|---|---|
+| `MoneyStacksScene` | landing hero, "Fig. 1" | This month's money as coin stacks (kept = gold, top four categories = cobalt / tangerine / cream / ink), heights proportional to real sample figures. Coins drop in with gravity and a 0.38 bounce. Drag to spin the turntable (momentum decays to an idle turn); tap a stack to make it jump and read it out. DOM stickers are projected onto stack tops each frame. |
+| `BrandCoinScene` | dashboard balance card, brand kit cover | The extruded logo coin; flick to spin, floats and wobbles at rest. |
+
+Performance: render pauses when the canvas is off screen; local `Lightformer` studio environment (no HDR download); phones (< 768px) get fewer coins (11 vs 16), DPR ≤ 1.5, no pointer parallax, no antialias on the hero and only the selected sticker. Reduced motion: no idle turn and no drop-in; drag still works because it's user-driven.
 
 ## Interaction
 
 | Pattern | Where |
 |---|---|
-| Ribbon / legend focus readout with spring swap | landing hero |
-| Magnetic primary buttons | landing CTAs |
-| Drag-and-release stat tiles (`PullCard`), tilt (`TiltCard`) | dashboard |
-| Press squash + ink ripple | every button |
-| Sliding nav pill / tab blob (`layoutId`) | sidebar, phone tab bar |
-| Scroll-linked product reveal (tilt → flat) | landing |
-| Word rise, blur-rise reveals, page settle, chart draw-in, count-ups | everywhere |
+| Drag-to-spin 3D turntable, tap-to-jump stacks | landing hero |
+| Flick-to-spin coin | dashboard, brand kit |
+| Throwable feature cards (`PullCard`, spring back) | landing features, brand kit |
+| Push buttons + ink ripple | every button |
+| Sliding nav pill / tab blob / segmented pill (`layoutId`) | sidebar, phone tab bar, filters |
+| Scroll-tilted product shot, marquee ticker of real figures | landing |
+| Word rise, reveals, count-ups, spring bar fills | everywhere |
 
-`<MotionConfig reducedMotion="user">` and CSS media queries turn all of it off for reduced motion.
+`<MotionConfig reducedMotion="user">` and CSS media queries turn the decorative motion off for reduced motion.
 
 ## Layout
 
-Landing: 1360px frame, fluid `clamp(16px, 3vw, 40px)` gutter, 12-column hero. App — phone (< 768): top bar + floating tab bar; tablet (768–1023): icon rail; desktop (≥ 1024): labelled sidebar. Checked at 1440, 1280, 375 and 320 px with no horizontal overflow. Dark theme only.
+Landing: 1360px frame, fluid `clamp(16px, 3vw, 40px)` gutter. App — phone (< 768): sticky top bar + floating sticker tab bar; tablet (768–1023): icon rail; desktop (≥ 1024): labelled sidebar. Balance card spans the full row (fixes the old truncated balance at tablet widths). Guest workspaces can return to the landing page (logo link); synced accounts still go straight to the dashboard. Light theme only.

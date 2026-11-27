@@ -1,4 +1,5 @@
-import { useRef, type KeyboardEvent } from 'react'
+import { useId, useRef, type KeyboardEvent } from 'react'
+import { motion } from 'motion/react'
 
 interface Option<T extends string> {
   value: T
@@ -22,6 +23,7 @@ export function Segmented<T extends string>({
   className?: string
 }) {
   const refs = useRef<(HTMLButtonElement | null)[]>([])
+  const pill = useId()
   const onKey = (e: KeyboardEvent, i: number) => {
     const dir = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0
     if (!dir) return
@@ -31,7 +33,7 @@ export function Segmented<T extends string>({
     refs.current[next]?.focus()
   }
   return (
-    <div role="radiogroup" aria-label={label} className={`inline-flex rounded-sm bg-sunken p-0.5 ${className}`}>
+    <div role="radiogroup" aria-label={label} className={`inline-flex rounded-full border-2 border-ink bg-surface p-0.5 ${className}`}>
       {options.map((o, i) => {
         const active = o.value === value
         return (
@@ -46,10 +48,11 @@ export function Segmented<T extends string>({
             tabIndex={active ? 0 : -1}
             onClick={() => onChange(o.value)}
             onKeyDown={(e) => onKey(e, i)}
-            className={`flex-1 rounded-[5px] font-medium transition-colors duration-[var(--duration-fast)] ${size === 'sm' ? 'h-7 px-2.5 text-xs' : 'h-9 px-4 text-sm'} ${
-              active ? 'bg-surface text-ink shadow-[var(--shadow-raise)]' : 'text-ink-3 hover:text-ink'
+            className={`ft-press relative isolate flex-1 rounded-full font-semibold transition-colors duration-[var(--duration-fast)] ${size === 'sm' ? 'h-7 px-3 text-xs' : 'h-9 px-4 text-sm'} ${
+              active ? 'text-accent' : 'text-ink-3 hover:text-ink'
             }`}
           >
+            {active && <motion.span layoutId={pill} aria-hidden className="absolute inset-0 -z-10 rounded-full bg-ink" transition={{ type: 'spring', stiffness: 520, damping: 34 }} />}
             {o.label}
           </button>
         )

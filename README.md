@@ -4,22 +4,26 @@
 
 **Live demo → [fintrack-ojasmali.vercel.app](https://fintrack-ojasmali.vercel.app)** — open the prototype, or build your own; no sign-up needed.
 
-**Where your money goes, what's changing, and what deserves attention.**
+**Your money, stacked up.** A personal finance app where this month's money becomes 3D coin stacks you can spin, tap and read.
 
-FinTrack is a personal finance web app that turns raw transactions into a calm monthly picture: your balance, what came in, what went out, how you're pacing against last month, which budgets need attention, and short insights. Each insight shows the calculation it comes from.
+![FinTrack welcome page: the headline "Your money, stacked up." next to a 3D turntable of gold, blue, orange, cream and black coin stacks](docs/screenshots/welcome-desktop.png)
+
+FinTrack is a personal finance web app that turns raw transactions into a clear monthly picture: your balance, what came in, what went out, how you're pacing against last month, which budgets need attention, and short insights. Each insight shows the calculation it comes from.
 
 ![FinTrack overview — balance, this month at a glance, spending pace and insights](docs/screenshots/overview-desktop.png)
 
 | Analytics | Budgets |
 |---|---|
 | ![Analytics: income vs spending, savings rate, highlights](docs/screenshots/analytics-desktop.png) | ![Budgets: per-category limits with on-track, close and over states](docs/screenshots/budgets-desktop.png) |
-| **Transactions** | **Welcome** |
-| ![Transactions: search, filters, period picker, CSV export](docs/screenshots/transactions-desktop.png) | ![Welcome page: oversized headline above a money-flow figure of a sample month, income fanning out into where it went](docs/screenshots/welcome-desktop.png) |
+| **Transactions** | **Brand kit** |
+| ![Transactions: search, filters, period picker, CSV export](docs/screenshots/transactions-desktop.png) | ![Brand kit page: the 3D FinTrack coin, logo variants, colour swatches and type](docs/screenshots/brand-desktop.png) |
 
 <p align="center">
   <img src="docs/screenshots/overview-mobile.png" alt="FinTrack overview on a phone" width="260" />
   &nbsp;&nbsp;
   <img src="docs/screenshots/transactions-mobile.png" alt="FinTrack transactions on a phone" width="260" />
+  &nbsp;&nbsp;
+  <img src="docs/screenshots/welcome-mobile.png" alt="FinTrack welcome page with the 3D coin stacks on a phone" width="260" />
 </p>
 
 *Screenshots show the prototype workspace (a year of clearly labelled sample data).*
@@ -40,7 +44,15 @@ FinTrack is a personal finance web app that turns raw transactions into a calm m
 
 ### Design and motion
 
-**Broadsheet.** An editorial, near-monochrome look: near-black paper, white ink, hairlines instead of shadows and one electric-lime accent spent on actions and on money you kept. Geist sets oversized headlines and every figure, Instrument Serif italic adds one editorial phrase, and JetBrains Mono sets section markers and captions. The welcome page opens on a money-flow figure built from the prototype's own sample data: this month's income fanning out into where it went, with the kept share in lime; hover, focus or tap any row to read it. Buttons squash and ripple on press, dashboard tiles can be pulled and spring back, nav pills slide on a spring, the product screenshot settles from a tilt as you scroll, and charts draw in. All of it switches off under `prefers-reduced-motion`. Tokens, type and every interaction are documented in [DESIGN.md](DESIGN.md).
+**Gold Standard.** Money you can pick up: warm cream paper, heavy ink outlines, hard offset shadows instead of blur, and one gold that means money. Unbounded ExtraBold shouts the headlines, Geist does the reading, and JetBrains Mono sets labels and figures.
+
+- **3D hero (three.js + react-three-fiber).** This month's sample money as coin stacks on a turntable. Kept money is gold, and the top four categories are cobalt, tangerine, cream and ink, each sized from the real figures. Coins drop in with gravity and bounce. Drag to spin the turntable, or tap a stack to make it jump and read it out. The extruded FinTrack coin floats above it.
+- **Flick-to-spin coin** on the dashboard balance card and the brand kit cover.
+- **Push buttons.** Every button sits on its own shadow and gets pressed flat on click, with an ink ripple. Nav pills slide on springs.
+- **Throwable feature cards** on desktop. Touch screens get a simple press instead, so scrolling is never hijacked.
+- **Marquee ticker** of the month's real figures, a scroll-tilted product shot, word-by-word headlines and spring-filled progress bars.
+
+The 3D layer is lazy-loaded and skipped when WebGL isn't available, with a flat fallback. Phones get fewer coins and a lower pixel ratio. Rendering pauses off screen, and `prefers-reduced-motion` stops the idle spin and drop-in. The logo, colours, type, motion rules and voice live on the in-app **brand kit** at [`/brand`](https://fintrack-ojasmali.vercel.app/brand). Tokens and every interaction are documented in [DESIGN.md](DESIGN.md).
 
 **Deliberately left out of v1:** dark mode, recurring transactions, goals, multiple currencies with conversion, and bank sync (see *Future improvements*). Insights are deterministic calculations, so they are called **Insights**, not "AI Insights".
 
@@ -57,10 +69,10 @@ FinTrack is a personal finance web app that turns raw transactions into a calm m
 | Charts | Recharts | Line and bar charts with custom tooltips. Category bars and sparklines are plain HTML, which is lighter and more accessible. |
 | Backend | Supabase (Postgres + Auth + Row Level Security) | Real auth and a relational schema, with security enforced in the database. |
 | Icons | Lucide | Used sparingly, mostly in navigation. |
-| Fonts | Geist (headlines, UI and numbers), Instrument Serif italic (editorial accent), JetBrains Mono (labels and keys) | Self-hosted through Fontsource, so there are no third-party font requests |
+| 3D | three.js, @react-three/fiber, @react-three/drei | Lazy-loaded chunk; local studio lighting (no HDR download) |
+| Motion | motion (Framer Motion) | Springs, drag, layout animations; respects reduced motion |
+| Fonts | Unbounded (display), Geist (UI and numbers), JetBrains Mono (labels and data) | Self-hosted through Fontsource, so there are no third-party font requests |
 | Tests | Vitest + Testing Library; PGlite for database checks | |
-
-Framer Motion was not added. The only motion is short CSS transitions (120–180 ms), which are disabled under `prefers-reduced-motion`.
 
 ---
 
@@ -71,6 +83,8 @@ src/
   components/
     ui/            Button, Field/Input/Select/Textarea/Toggle, Dialog (modal + drawer),
                    Toast, Segmented, Panel, PeriodPicker, Money, States (Skeleton/Empty/Error), Logo
+    three/         Coins (3D turntable + brand coin), Scene3D (lazy entry + fallbacks), webgl
+    motion/        Reveal, SplitWords, CountUp, PullCard, Magnetic, TiltCard
     layout/        AppShell (sidebar / icon rail / bottom tabs), ErrorBoundary
     dashboard/     InsightList
     transactions/  TransactionEditor (context + drawer: view / edit / create / delete), TransactionList
@@ -81,7 +95,7 @@ src/
                    dates.ts, periods.ts, sampleData.ts         ← pure, unit-tested
   services/        repository.ts (FinanceRepo interface + safe errors), supabaseRepo.ts,
                    demoRepo.ts, auth.tsx (AuthProvider), backend.ts (mode detection)
-  pages/           Dashboard, Transactions, Budgets, Analytics, Settings, AuthPages
+  pages/           Welcome, Dashboard, Transactions, Budgets, Analytics, Settings, AuthPages, Brand
   types/           finance.ts
 supabase/
   migrations/      20261120000000_init.sql  (schema, constraints, RLS, views, signup trigger)
@@ -228,12 +242,12 @@ Not covered by automated tests: the live `supabaseRepo` network path and the Sup
 
 ## Design decisions
 
-- **Direction.** A dark "night ledger": green-black background, bone-white text, one electric lime accent spent on actions and this month's data, mint for positive values, amber for caution, coral for over-budget. Money is never shown in saturated red/green.
-- **Type.** Geist carries oversized headlines and the interface with true tabular figures, so columns of money align; a single Instrument Serif italic phrase and JetBrains Mono labels give it an editorial voice.
+- **Direction.** "Gold Standard": cream paper, ink outlines and hard shadows, with gold reserved for money and the primary action. Cobalt marks income and tangerine marks spending in every chart; mint ink and brick red are kept for saved and overspent states. Every text colour is checked for at least 4.5:1 contrast.
+- **Type.** Unbounded carries the headlines and the big figures; Geist runs the interface with true tabular figures, so columns of money align; JetBrains Mono sets labels and readouts.
 - **Charts.** A cumulative line for "am I on pace?", because daily bars are spiky and hide the trajectory. Horizontal bars for categories, because labels sit next to exact values on a common baseline, which reads better than a donut, especially at 320 px. The two-series colours were checked with a colour-vision-deficiency validator (blue/amber, ΔE ≥ 20 under protanopia and tritanopia). Last month is a dashed neutral line, and every chart has a legend, a written summary and a table view.
 - **Navigation.** Labelled sidebar on desktop, icon rail on tablet, bottom tab bar on phones. Research (NN/g) favours visible navigation over hidden menus. On phones, "Add" lives in the top bar so it doesn't compete with the tabs.
-- **No dark mode in v1.** People check finances in short, mostly daytime sessions. A proper dark theme needs its own validated chart colours and states rather than inverted colours. The tokens are set up so it can be added later.
-- **Empty states** are text only: one sentence, one primary action, plus an optional sample-data shortcut.
+- **Light theme only.** People check finances in short, mostly daytime sessions, and the 3D coins read best on paper. The tokens are set up so a dark theme can be added later.
+- **Empty states** show a small stack of logo coins, one sentence, one primary action and an optional sample-data shortcut.
 
 ### Research references
 Linear and Stripe (table density, restrained colour), Mercury (calm, editorial money hierarchy), Ramp (attention-first rather than chart walls), Monzo and Revolut (mobile transaction lists grouped by day); NN/g on hidden vs visible navigation; Smashing Magazine on fintech typography and tabular figures.
@@ -250,7 +264,7 @@ Linear and Stripe (table density, restrained colour), Mercury (calm, editorial m
 
 ## Future improvements
 
-Recurring transactions and subscription detection; goals; transfers between accounts; CSV import; multiple currencies with FX; bank sync (Account Aggregator / Plaid); email or push budget alerts (the preference already exists); shared budgets; a carefully designed dark theme; an AI assistant that cites the same deterministic `basis` data.
+Recurring transactions and subscription detection; goals; transfers between accounts; CSV import; multiple currencies with FX; bank sync (Account Aggregator / Plaid); email or push budget alerts (the preference already exists); shared budgets; a dark theme; an AI assistant that cites the same deterministic `basis` data.
 
 ---
 

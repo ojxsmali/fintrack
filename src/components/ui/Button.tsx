@@ -1,20 +1,22 @@
 import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from 'react'
 import { ripple } from '../motion/effects'
 
-type Variant = 'primary' | 'secondary' | 'ghost' | 'danger'
+type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'ink'
 type Size = 'sm' | 'md' | 'lg'
 
 // Press feels physical: a quick squash on pointer-down, a spring back on release, and an ink ripple from the touch point.
+// Filled buttons are "pushable": outlined in ink, sitting on a hard shadow, pressed flat on click.
 const base =
-  'ft-press relative isolate inline-flex items-center justify-center gap-2 overflow-hidden font-medium whitespace-nowrap select-none rounded-sm ' +
+  'ft-press relative isolate inline-flex items-center justify-center gap-2 overflow-hidden font-semibold whitespace-nowrap select-none rounded-sm ' +
   'transition-[background-color,border-color,color,box-shadow,transform] duration-[var(--duration-base)] ease-[var(--ease-spring)] ' +
   'disabled:opacity-50 disabled:pointer-events-none'
 
 const variants: Record<Variant, string> = {
-  primary: 'bg-accent text-on-accent hover:bg-accent-hover',
-  secondary: 'bg-surface text-ink border border-line-strong hover:border-ink-3 hover:bg-sunken',
+  primary: 'ft-push bg-accent text-on-accent hover:bg-accent-hover',
+  secondary: 'ft-push bg-surface text-ink hover:bg-sunken',
+  ink: 'ft-push bg-ink text-paper hover:bg-ink-2',
   ghost: 'text-ink-2 hover:bg-sunken hover:text-ink',
-  danger: 'bg-negative text-on-accent hover:brightness-110',
+  danger: 'ft-push bg-negative text-white hover:brightness-110',
 }
 
 const sizes: Record<Size, string> = {

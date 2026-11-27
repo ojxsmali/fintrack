@@ -43,17 +43,17 @@ export function AppShell() {
       </a>
 
       {/* Sidebar / rail */}
-      <aside className="hidden md:flex sticky top-0 h-dvh flex-col border-r border-line bg-paper px-3 py-5 lg:px-4">
-        <div className="mb-8 px-2 lg:px-2">
+      <aside className="hidden md:flex sticky top-0 h-dvh flex-col border-r-2 border-ink bg-surface px-3 py-5 lg:px-4">
+        <Link to="/" aria-label="FinTrack home" className="mb-8 px-2 lg:px-2">
           <span className="lg:hidden">
-            <LogoMark size={28} />
+            <LogoMark size={32} />
           </span>
           <Wordmark className="max-lg:hidden" />
-        </div>
-        <Button onClick={() => editor.create()} icon={<Plus size={16} />} className="mb-6 max-lg:hidden" title="Add transaction (N)" aria-keyshortcuts="N">
+        </Link>
+        <Button onClick={() => editor.create()} icon={<Plus size={16} />} className="mb-6 !rounded-full max-lg:hidden" title="Add transaction (N)" aria-keyshortcuts="N">
           Add transaction
         </Button>
-        <IconButton label="Add transaction" onClick={() => editor.create()} className="mb-6 bg-accent text-on-accent hover:bg-accent-hover hover:text-on-accent lg:hidden mx-auto">
+        <IconButton label="Add transaction" onClick={() => editor.create()} className="ft-push mb-6 mx-auto rounded-full bg-accent text-on-accent hover:bg-accent-hover hover:text-on-accent lg:hidden">
           <Plus size={18} />
         </IconButton>
         <nav aria-label="Main" className="flex flex-col gap-0.5">
@@ -69,10 +69,12 @@ export function AppShell() {
 
       <div className="flex min-w-0 flex-col">
         {/* Phone top bar */}
-        <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-line bg-paper px-4 md:hidden">
-          <Wordmark />
+        <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b-2 border-ink bg-paper/90 px-4 backdrop-blur-md md:hidden">
+          <Link to="/" aria-label="FinTrack home">
+          <Wordmark size={26} />
+          </Link>
           <div className="flex items-center gap-1">
-            <IconButton label="Add transaction" onClick={() => editor.create()} className="bg-accent text-on-accent hover:bg-accent-hover hover:text-on-accent size-9">
+            <IconButton label="Add transaction" onClick={() => editor.create()} className="ft-push size-10 rounded-full bg-accent text-on-accent hover:bg-accent-hover hover:text-on-accent">
               <Plus size={18} />
             </IconButton>
           </div>
@@ -80,7 +82,7 @@ export function AppShell() {
         {workspace && (
           <div
             role="note"
-            className={`flex flex-wrap items-center justify-center gap-x-3 gap-y-1 px-4 py-2 text-center text-xs sm:text-sm ${workspace === 'sample' ? 'bg-accent-soft text-accent' : 'bg-sunken text-ink-2'}`}
+            className={`flex flex-wrap items-center justify-center gap-x-3 gap-y-1 border-b-2 border-ink px-4 py-2 text-center text-xs sm:text-sm ${workspace === 'sample' ? 'bg-accent text-ink' : 'bg-sunken text-ink-2'}`}
           >
             {workspace === 'sample' ? (
               <>
@@ -104,7 +106,7 @@ export function AppShell() {
                   <strong className="font-semibold text-ink">Your FinTrack</strong> — saved privately in this browser.
                 </span>
                 {hasBackend ? (
-                  <Link to="/signup" className="font-semibold text-accent underline underline-offset-2 hover:no-underline">
+                  <Link to="/signup" className="font-semibold text-ink underline decoration-accent decoration-2 underline-offset-2 hover:decoration-ink">
                     Prefer a synced account? Sign up
                   </Link>
                 ) : null}
@@ -125,19 +127,19 @@ export function AppShell() {
       </div>
 
       {/* Phone tab bar: floating pill, active tab marked by a sliding lime blob */}
-      <nav aria-label="Main" className="fixed inset-x-3 bottom-3 z-30 rounded-[18px] border border-line-strong bg-surface shadow-[0_20px_40px_-12px_rgb(0_0_0/0.9)] pb-safe md:hidden">
+      <nav aria-label="Main" className="fixed inset-x-3 bottom-3 z-30 rounded-[22px] border-2 border-ink bg-surface shadow-[4px_4px_0_#16140f] pb-safe md:hidden">
         <ul className="grid grid-cols-5 p-1.5">
           {[...NAV, { to: '/settings', label: 'Settings', icon: Settings }].map(({ to, label, icon: Icon }) => (
             <li key={to}>
               <NavLink
                 to={to}
                 className={({ isActive }) =>
-                  `ft-press relative isolate flex h-13 flex-col items-center justify-center gap-0.5 rounded-[12px] text-[10.5px] font-medium transition-colors duration-200 ${isActive ? 'text-on-accent' : 'text-ink-3'}`
+                  `ft-press relative isolate flex h-13 flex-col items-center justify-center gap-0.5 rounded-[12px] text-[10.5px] font-medium transition-colors duration-200 ${isActive ? 'text-accent' : 'text-ink-3'}`
                 }
               >
                 {({ isActive }) => (
                   <>
-                    {isActive && <motion.span layoutId="tab-blob" aria-hidden className="absolute inset-0 -z-10 rounded-[12px] bg-accent" transition={{ type: 'spring', stiffness: 500, damping: 34 }} />}
+                    {isActive && <motion.span layoutId="tab-blob" aria-hidden className="absolute inset-0 -z-10 rounded-[14px] bg-ink" transition={{ type: 'spring', stiffness: 500, damping: 34 }} />}
                     <Icon size={19} strokeWidth={isActive ? 2.3 : 1.7} aria-hidden className="relative" />
                     <span className="relative">{label === 'Transactions' ? 'Activity' : label}</span>
                   </>
@@ -157,7 +159,7 @@ function SideLink({ to, label, icon: Icon }: { to: string; label: string; icon: 
       to={to}
       title={label}
       className={({ isActive }) =>
-        `ft-press group relative isolate flex h-10 items-center justify-center gap-3 rounded-sm px-2.5 text-sm font-medium transition-colors duration-[var(--duration-fast)] lg:justify-start ${
+        `ft-press group relative isolate flex h-11 items-center justify-center gap-3 rounded-full px-2.5 text-sm font-semibold lg:px-3.5 transition-colors duration-[var(--duration-fast)] lg:justify-start ${
           isActive ? 'text-ink' : 'text-ink-3 hover:text-ink'
         }`
       }
@@ -165,11 +167,9 @@ function SideLink({ to, label, icon: Icon }: { to: string; label: string; icon: 
       {({ isActive }) => (
         <>
           {isActive && (
-            <motion.span layoutId="side-pill" aria-hidden className="absolute inset-0 -z-10 rounded-sm border border-line-strong bg-sunken" transition={{ type: 'spring', stiffness: 520, damping: 38 }}>
-              <span className="absolute left-0 top-1/2 h-4 w-[3px] -translate-y-1/2 rounded-r-full bg-accent max-lg:hidden" />
-            </motion.span>
+            <motion.span layoutId="side-pill" aria-hidden className="absolute inset-0 -z-10 rounded-full border-2 border-ink bg-accent shadow-[3px_3px_0_#16140f]" transition={{ type: 'spring', stiffness: 520, damping: 34 }} />
           )}
-          <Icon size={18} strokeWidth={isActive ? 2.2 : 1.7} aria-hidden className={`relative transition-transform duration-300 ease-[var(--ease-spring)] group-hover:scale-110 ${isActive ? 'text-accent' : ''}`} />
+          <Icon size={18} strokeWidth={isActive ? 2.4 : 1.8} aria-hidden className="relative shrink-0 transition-transform duration-300 ease-[var(--ease-spring)] group-hover:-rotate-12 group-hover:scale-125" />
           <span className="relative sr-only lg:not-sr-only">{label}</span>
         </>
       )}
@@ -178,9 +178,9 @@ function SideLink({ to, label, icon: Icon }: { to: string; label: string; icon: 
 }
 export function PageHeader({ title, description, actions }: { title: string; description?: string; actions?: ReactNode }) {
   return (
-    <div className="mb-10 flex flex-col gap-4 border-b border-line pb-6 sm:flex-row sm:items-end sm:justify-between">
+    <div className="mb-10 flex flex-col gap-4 border-b-2 border-ink pb-6 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <h1 className="ft-display text-[2.6rem] text-ink sm:text-[3.6rem]">{title}</h1>
+        <h1 className="ft-display text-[2.3rem] text-ink sm:text-[3.4rem]">{title}</h1>
         {description && <p className="mt-3 text-sm text-ink-3">{description}</p>}
       </div>
       {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}

@@ -102,7 +102,7 @@ export function BudgetsPage() {
         />
       ) : (
         <>
-          <section aria-label="Budget summary" className="mb-8 grid grid-cols-2 gap-6 border-y border-line py-5 sm:grid-cols-4">
+          <section aria-label="Budget summary" className="mb-10 grid grid-cols-2 gap-3 sm:grid-cols-4">
             <SummaryStat label="Budgeted" value={money(summary.limit)} />
             <SummaryStat label="Spent" value={money(summary.spent)} />
             <SummaryStat label={summary.remaining >= 0 ? 'Remaining' : 'Over'} value={money(Math.abs(summary.remaining))} tone={summary.remaining < 0 ? 'text-negative' : undefined} />
@@ -178,9 +178,9 @@ export function BudgetsPage() {
 
 function SummaryStat({ label, value, tone }: { label: string; value: string; tone?: string }) {
   return (
-    <div>
-      <p className="text-sm text-ink-3">{label}</p>
-      <p className={`num mt-1 text-xl font-medium tracking-[-0.02em] ${tone ?? 'text-ink'}`}>{value}</p>
+    <div className="rounded-[18px] border-2 border-ink bg-surface p-4 shadow-[4px_4px_0_#16140f] first:bg-accent">
+      <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.06em] text-ink-3">{label}</p>
+      <p className={`num mt-2 font-display text-xl font-extrabold tracking-[-0.04em] sm:text-2xl ${tone ?? 'text-ink'}`}>{value}</p>
     </div>
   )
 }

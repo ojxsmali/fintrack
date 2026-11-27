@@ -18,6 +18,7 @@ const DashboardPage = lazy(() => import('./pages/DashboardPage').then((m) => ({ 
 const TransactionsPage = lazy(() => import('./pages/TransactionsPage').then((m) => ({ default: m.TransactionsPage })))
 const BudgetsPage = lazy(() => import('./pages/BudgetsPage').then((m) => ({ default: m.BudgetsPage })))
 const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage').then((m) => ({ default: m.AnalyticsPage })))
+const BrandPage = lazy(() => import('./pages/BrandPage').then((m) => ({ default: m.BrandPage })))
 const SettingsPage = lazy(() => import('./pages/SettingsPage').then((m) => ({ default: m.SettingsPage })))
 
 const queryClient = new QueryClient({
@@ -31,7 +32,8 @@ const queryClient = new QueryClient({
 })
 
 const TITLES: Record<string, string> = {
-  '/': 'FinTrack — personal finance, made legible',
+  '/': 'FinTrack — your money, stacked up',
+  '/brand': 'Brand kit · FinTrack',
   '/login': 'Sign in · FinTrack',
   '/signup': 'Create account · FinTrack',
   '/dashboard': 'Overview · FinTrack',
@@ -85,6 +87,7 @@ export default function App() {
               <Route path="/" element={<WelcomePage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignupPage />} />
+              <Route path="/brand" element={<Suspense fallback={null}><BrandPage /></Suspense>} />
               <Route
                 element={
                   <RequireAuth>

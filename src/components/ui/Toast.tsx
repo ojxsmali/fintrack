@@ -26,9 +26,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         {items.map((t) => (
           <div
             key={t.id}
-            className="pointer-events-auto flex items-center gap-3 rounded-full border border-line-strong bg-sunken px-4 py-2.5 text-sm text-ink shadow-[var(--shadow-overlay)] animate-[ft-toast-in_var(--duration-base)_var(--ease-out)]"
+            className="pointer-events-auto flex items-center gap-3 rounded-full border-2 border-ink bg-ink px-4 py-2.5 text-sm font-semibold text-paper shadow-[4px_4px_0_var(--color-accent)] animate-[ft-toast-in_var(--duration-base)_var(--ease-out)]"
           >
-            {t.tone === 'success' ? <Check size={16} className="text-positive" aria-hidden /> : <CircleAlert size={16} className="text-negative" aria-hidden />}
+            {t.tone === 'success' ? <Check size={16} className="text-accent" aria-hidden /> : <CircleAlert size={16} className="text-tangerine" aria-hidden />}
             <span>{t.message}</span>
             {t.action && (
               <button className="ml-1 font-medium underline underline-offset-2" onClick={t.action.onClick}>
