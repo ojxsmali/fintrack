@@ -260,7 +260,7 @@ Linear and Stripe (table density, restrained colour), Mercury (calm, editorial m
 - One currency per workspace or account. All 150+ current ISO currencies are available, but there is no exchange-rate conversion and no mixing currencies within one account.
 - No transfers between accounts. Moving money between your own accounts would currently count as both income and spending.
 - Analytics loads the selected window's transactions and aggregates them in the browser. This is fine for personal volumes. Large histories should move to SQL aggregates through the existing `monthly_summaries` view or RPCs.
-- **The public demo runs in guest mode.** It is deployed without Supabase credentials, so visitors use the browser-only prototype or their own browser workspace and account sign-up is hidden. Connecting Supabase (see *Deployment*) switches accounts on with no code change.
+- **Real accounts are on in the public demo.** Sign-up skips email confirmation so visitors can try it instantly; turn confirmation back on (with your own SMTP) before using it for real money. The guest prototype still needs no account at all.
 
 ## Future improvements
 
