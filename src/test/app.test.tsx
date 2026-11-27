@@ -20,7 +20,8 @@ describe('app flow (no backend)', () => {
     await user.click(screen.getByRole('button', { name: 'Start tracking' }))
 
     // Empty state, no sample data offered
-    expect(await screen.findByText('No transactions yet.')).toBeInTheDocument()
+    // The dashboard route is lazy-loaded; allow for a cold module transform on the first run.
+    expect(await screen.findByText('No transactions yet.', undefined, { timeout: 5000 })).toBeInTheDocument()
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/Ojas\./)
     expect(screen.queryByRole('button', { name: 'Explore with sample data' })).not.toBeInTheDocument()
 
@@ -39,22 +40,23 @@ describe('app flow (no backend)', () => {
 
     // Persisted to *this* workspace, toast shown, dashboard updated without reload
     expect(await screen.findByText('Income added')).toBeInTheDocument()
-    expect(await screen.findByText('Total balance')).toBeInTheDocument()
+    expect(await screen.findByText('Total balance', undefined, { timeout: 5000 })).toBeInTheDocument()
     expect(screen.getAllByText('₹42,000').length).toBeGreaterThan(0)
     const own = JSON.parse(localStorage.getItem('fintrack.own.v1')!)
     expect(own.transactions).toHaveLength(1)
     expect(own.transactions[0]).toMatchObject({ amount: 42000, type: 'income', merchant: 'Northwind Labs' })
-    expect(localStorage.getItem('fintrack.demo.v1')).toBeNull()
+    expect(sessionStorage.getItem('fintrack.demo.v1')).toBeNull()
   })
 
-  it('“See the prototype” opens a labelled workspace full of sample data', async () => {
+  it('“Continue as guest” opens a labelled, unsaved workspace full of sample data', async () => {
     const user = userEvent.setup()
     window.history.pushState({}, '', '/')
     render(<App />)
-    await user.click((await screen.findAllByRole('button', { name: 'Open the prototype' }))[0])
-    expect(await screen.findByText('Total balance')).toBeInTheDocument()
-    expect(screen.getByRole('note')).toHaveTextContent(/Prototype/)
-    const sample = JSON.parse(localStorage.getItem('fintrack.demo.v1')!)
+    await user.click((await screen.findAllByRole('button', { name: /Continue as guest/ }))[0])
+    expect(await screen.findByText('Total balance', undefined, { timeout: 5000 })).toBeInTheDocument()
+    expect(screen.getByRole('note')).toHaveTextContent(/Guest mode/)
+    expect(localStorage.getItem('fintrack.demo.v1')).toBeNull()
+    const sample = JSON.parse(sessionStorage.getItem('fintrack.demo.v1')!)
     expect(sample.transactions.length).toBeGreaterThan(100)
     expect(sample.transactions.every((t: { is_sample: boolean }) => t.is_sample)).toBe(true)
   })

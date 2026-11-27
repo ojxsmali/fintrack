@@ -2,7 +2,7 @@
 
 *Designed & built by [**Ojas Mali**](https://github.com/ojxsmali)*
 
-**Live demo → [fintrack-ojasmali.vercel.app](https://fintrack-ojasmali.vercel.app)** — open the prototype, or build your own; no sign-up needed.
+**Live demo → [fintrack-ojasmali.vercel.app](https://fintrack-ojasmali.vercel.app)** — continue as a guest (nothing saved), or create a free account.
 
 **Your money, stacked up.** A personal finance app where this month's money becomes 3D coin stacks you can spin, tap and read.
 
@@ -40,7 +40,7 @@ FinTrack is a personal finance web app that turns raw transactions into a clear 
 | **Analytics** | Highlights (biggest spending day, no-spend days, largest category), balance over time, average spending by weekday, income sources, largest expenses (one per merchant), and a period picker (this month, last month, last 3 / 6 months, this year, custom). KPIs with change vs the previous equal-length period, shown only when your history actually covers it. Income vs spending by month, savings rate by month, spending by category with change, top merchants, and category trend sparklines. Every chart has a "View table" alternative. |
 | **Settings** | Display name, currency (every current ISO currency, formatted with its own symbol, digit grouping and decimal places), accounts and starting balances, budget-warning preference, CSV export, loading or removing sample data, deleting all transactions, sign out. |
 | **Auth** | Email + password sign-up and sign-in through Supabase Auth, persistent sessions and protected routes. Cached data is cleared on sign-out. |
-| **Two ways in, no sign-up** | The welcome page offers **See the prototype** (a workspace pre-filled with labelled sample data) and **Build your own FinTrack** (a workspace that starts from zero for tracking your own money). Both are stored only in that browser, kept separate, and can be erased from Settings. Real accounts are optional. |
+| **Three ways in** | The landing page offers **Continue as guest** (one click into the full app with 13 months of labelled sample data, kept in `sessionStorage` only, so nothing is saved after the tab closes), **Create account** and **Log in** (Supabase email + password). The same three options appear in the hero, in *How it works* and on the auth pages, and a guest banner links to sign-up. Without Supabase configured, a private browser-only workspace replaces accounts. |
 
 ### Design and motion
 

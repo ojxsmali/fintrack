@@ -87,18 +87,24 @@ export function AppShell() {
             {workspace === 'sample' ? (
               <>
                 <span>
-                  <strong className="font-semibold">Prototype</strong> — you’re exploring sample data.
+                  <strong className="font-semibold">Guest mode</strong> — sample data, nothing is saved. Create an account to keep your own.
                 </span>
-                <button
-                  type="button"
-                  onClick={async () => {
-                    await startWorkspace('own')
-                    navigate('/dashboard')
-                  }}
-                  className="font-semibold underline underline-offset-2 hover:no-underline"
-                >
-                  Build your own FinTrack →
-                </button>
+                {hasBackend ? (
+                  <Link to="/signup" className="rounded-full border-2 border-ink bg-surface px-3 py-0.5 font-semibold hover:bg-ink hover:text-paper">
+                    Create account →
+                  </Link>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      await startWorkspace('own')
+                      navigate('/dashboard')
+                    }}
+                    className="font-semibold underline underline-offset-2 hover:no-underline"
+                  >
+                    Build your own FinTrack →
+                  </button>
+                )}
               </>
             ) : (
               <>

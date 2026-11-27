@@ -64,15 +64,19 @@ export function WelcomePage() {
                 GitHub
               </NavA>
             )}
-            {hasBackend && (
-              <Link to="/login" className="inline-flex h-9 items-center rounded-xs px-3 font-medium text-ink-2 hover:text-ink">
-                Sign in
+            {hasBackend && !workspace && (
+              <Link to="/login" className="inline-flex h-9 items-center rounded-xs px-3 font-semibold text-ink hover:underline">
+                Log in
               </Link>
             )}
             <Magnetic strength={0.25}>
               {workspace ? (
                 <Link to="/dashboard" className={`${PUSH} ml-1 h-10 bg-accent px-4 text-on-accent hover:bg-accent-hover`}>
                   Your dashboard <ArrowUpRight size={15} aria-hidden />
+                </Link>
+              ) : hasBackend ? (
+                <Link to="/signup" className={`${PUSH} ml-1 h-10 bg-accent px-4 text-on-accent hover:bg-accent-hover`}>
+                  Create account <ArrowUpRight size={15} aria-hidden />
                 </Link>
               ) : (
                 <a href="#start" className={`${PUSH} ml-1 h-10 bg-accent px-4 text-on-accent hover:bg-accent-hover`}>
@@ -85,7 +89,7 @@ export function WelcomePage() {
       </header>
 
       <main className="flex-1">
-        <Hero preview={preview} pending={pending} open={open} />
+        <Hero preview={preview} pending={pending} open={open} hasBackend={hasBackend} />
         <Ticker p={preview} />
         <ScrollShowcase />
         <Features p={preview} />
@@ -97,7 +101,7 @@ export function WelcomePage() {
         <div className={`${FRAME} grid gap-10 py-12 md:grid-cols-12`}>
           <div className="md:col-span-5">
             <Wordmark />
-            <p className="mt-4 max-w-sm text-sm text-ink-3">Guest workspaces stay in your browser. Synced accounts are protected by row-level security.</p>
+            <p className="mt-4 max-w-sm text-sm text-ink-3">Guest mode saves nothing. Accounts are protected by Postgres row-level security.</p>
             <AuthorCredit className="mt-6 text-sm text-ink-3" />
           </div>
           <div className="md:col-span-4">
@@ -136,7 +140,7 @@ const DOT: Record<StackDatum['tone'], string> = {
   ink: 'bg-ink',
 }
 
-function Hero({ preview, pending, open }: { preview: HeroPreview; pending: Workspace | null; open: (k: Workspace) => void }) {
+function Hero({ preview, pending, open, hasBackend }: { preview: HeroPreview; pending: Workspace | null; open: (k: Workspace) => void; hasBackend: boolean }) {
   const reduced = useReducedMotion()
   const stacks = useMemo<StackDatum[]>(
     () => [
@@ -155,7 +159,7 @@ function Hero({ preview, pending, open }: { preview: HeroPreview; pending: Works
         <div className="lg:col-span-6 xl:col-span-6">
           <p className="ft-page inline-flex items-center gap-2 rounded-full border-2 border-ink bg-surface px-3 py-1.5 font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-ink shadow-[3px_3px_0_#16140f]">
             <span className="ft-live size-2 rounded-full bg-positive text-positive" aria-hidden="true" />
-            Live prototype · no sign-up
+            Try it as a guest · no sign-up
           </p>
           <h1 id="hero-title" className="ft-display mt-7 text-[clamp(2.7rem,9.6vw,6.6rem)] text-ink lg:text-[clamp(3rem,4.9vw,5.4rem)]">
             <SplitWords text="Your money," />
@@ -171,13 +175,28 @@ function Hero({ preview, pending, open }: { preview: HeroPreview; pending: Works
             <Magnetic>
               <button type="button" onClick={() => open('sample')} disabled={pending !== null} aria-busy={pending === 'sample' || undefined} className={`${PUSH} group h-14 w-full bg-accent px-7 text-base text-on-accent hover:bg-accent-hover sm:w-auto`}>
                 {pending === 'sample' && <span className="size-4 animate-spin rounded-full border-2 border-current border-r-transparent" aria-hidden />}
-                Open the prototype <ArrowRight size={18} aria-hidden className="transition-transform duration-300 ease-[var(--ease-spring)] group-hover:translate-x-1" />
+                Continue as guest <ArrowRight size={18} aria-hidden className="transition-transform duration-300 ease-[var(--ease-spring)] group-hover:translate-x-1" />
               </button>
             </Magnetic>
-            <a href="#start" className={`${PUSH} h-14 bg-surface px-7 text-base text-ink hover:bg-sunken`}>
-              Start your own
-            </a>
+            {hasBackend ? (
+              <Link to="/signup" className={`${PUSH} h-14 bg-surface px-7 text-base text-ink hover:bg-sunken`}>
+                Create account
+              </Link>
+            ) : (
+              <a href="#start" className={`${PUSH} h-14 bg-surface px-7 text-base text-ink hover:bg-sunken`}>
+                Start your own
+              </a>
+            )}
           </div>
+          {hasBackend && (
+            <p className="ft-page mt-4 text-sm text-ink-3 [animation-delay:620ms]">
+              Already have an account?{' '}
+              <Link to="/login" className="font-semibold text-ink underline decoration-accent decoration-2 underline-offset-2 hover:decoration-ink">
+                Log in
+              </Link>
+              <span className="mx-2 text-ink-4">·</span>Guest mode saves nothing.
+            </p>
+          )}
           <dl className="ft-page mt-10 grid grid-cols-2 gap-3 [animation-delay:680ms] sm:grid-cols-4">
             <Fact term="Transactions" value={String(preview.transactionCount)} />
             <Fact term="Months" value="13" />
@@ -550,72 +569,86 @@ function Start({
   setCurrency: (s: string) => void
   hasBackend: boolean
 }) {
+  const card = 'flex h-full flex-col rounded-[24px] border-2 border-ink p-7 shadow-[6px_6px_0_#16140f] sm:p-8'
   return (
     <section id="start" aria-labelledby="start-title" className={`${FRAME} scroll-mt-20 pt-32 lg:pt-40`}>
-      <SectionHead index="04" label="Get started" id="start-title">
-        Two ways <span className="ft-serif">in.</span>
+      <SectionHead index="04" label="How it works" id="start-title">
+        Three ways <span className="ft-serif">in.</span>
       </SectionHead>
-      <p className="mt-6 max-w-xl text-lg text-ink-2">Look around with a year of realistic data, or start a private workspace of your own. Both run entirely in your browser.</p>
+      <p className="mt-6 max-w-xl text-lg text-ink-2">
+        {hasBackend
+          ? 'Look around as a guest with a year of sample data, or create a free account to track your own money on every device.'
+          : 'Look around as a guest with a year of sample data, or start a private workspace of your own in this browser.'}
+      </p>
 
-      <div className="mt-14 grid gap-6 md:grid-cols-2">
-        <Reveal className="h-full">
-          <div className="flex h-full flex-col rounded-[24px] border-2 border-ink bg-surface p-7 shadow-[6px_6px_0_#16140f] sm:p-9">
-            <p className="ft-label">Option A</p>
-            <h3 className="mt-3 font-display text-3xl font-extrabold tracking-[-0.04em] text-ink sm:text-4xl">See the prototype</h3>
-            <p className="mt-3 max-w-md text-base text-ink-2">Every screen with a year of realistic sample data: dashboard, budgets, analytics and insights. Nothing to set up.</p>
-            <ul className="mt-6 grid gap-2 text-sm text-ink-2">
-              {['13 months of income and spending', 'Five category budgets with live progress', 'Insights you can check the working of'].map((t) => (
-                <li key={t} className="flex items-center gap-3">
-                  <span className="size-3 rounded-full border-2 border-ink bg-accent" aria-hidden />
-                  {t}
-                </li>
-              ))}
-            </ul>
-            <div className="mt-auto pt-10">
-              <Button size="lg" variant="secondary" className="w-full !rounded-full sm:w-auto" loading={pending === 'sample'} onClick={() => open('sample')}>
-                Open the prototype <ArrowRight size={16} aria-hidden />
+      <ol className="mt-14 grid gap-6 lg:grid-cols-3">
+        <Reveal as="li" className="h-full">
+          <div className={`${card} bg-accent`}>
+            <p className="ft-label text-ink-2">01 · Just looking</p>
+            <h3 className="mt-3 font-display text-3xl font-extrabold tracking-[-0.04em] text-ink">See the prototype</h3>
+            <p className="mt-3 text-base text-ink-2">One click, no form. Every screen with 13 months of realistic sample data. Nothing is saved: close the tab and it’s gone.</p>
+            <div className="mt-auto pt-8">
+              <Button size="lg" variant="ink" className="w-full !rounded-full" loading={pending === 'sample'} onClick={() => open('sample')}>
+                Continue as guest <ArrowRight size={16} aria-hidden />
               </Button>
             </div>
           </div>
         </Reveal>
-        <Reveal delay={90} className="h-full">
-          <form
-            onSubmit={(e) => {
-              e.preventDefault()
-              open('own')
-            }}
-            className="flex h-full flex-col rounded-[24px] border-2 border-ink bg-accent p-7 shadow-[6px_6px_0_#16140f] sm:p-9"
-          >
-            <p className="ft-label text-ink-2">Option B</p>
-            <h3 className="mt-3 font-display text-3xl font-extrabold tracking-[-0.04em] text-ink sm:text-4xl">Build your own FinTrack</h3>
-            <p className="mt-3 max-w-md text-base text-ink-2">Start from zero and track your own income, spending and budgets. Saved privately in this browser, no sign-up.</p>
-            <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              <Field label="What should we call you?" optional>
-                {(fp) => <Input {...fp} value={name} onChange={(e) => setName(e.target.value)} autoComplete="given-name" maxLength={60} placeholder="Your first name" />}
-              </Field>
-              <Field label="Currency">{(fp) => <CurrencySelect {...fp} value={currency} onChange={(e) => setCurrency(e.target.value)} />}</Field>
-            </div>
-            <div className="mt-auto pt-10">
-              <Button type="submit" size="lg" variant="ink" className="w-full !rounded-full sm:w-auto" loading={pending === 'own'}>
-                Start tracking <ArrowRight size={16} aria-hidden />
-              </Button>
-            </div>
-          </form>
-        </Reveal>
-      </div>
-      {hasBackend && (
-        <p className="mt-6 text-sm text-ink-3">
-          Want it on every device?{' '}
-          <Link to="/signup" className="font-semibold text-ink underline decoration-accent decoration-2 underline-offset-2 hover:decoration-ink">
-            Create a free account
-          </Link>{' '}
-          or{' '}
-          <Link to="/login" className="font-semibold text-ink underline decoration-accent decoration-2 underline-offset-2 hover:decoration-ink">
-            sign in
-          </Link>
-          .
-        </p>
-      )}
+
+        {hasBackend ? (
+          <>
+            <Reveal as="li" delay={80} className="h-full">
+              <div className={`${card} bg-surface`}>
+                <p className="ft-label">02 · New here</p>
+                <h3 className="mt-3 font-display text-3xl font-extrabold tracking-[-0.04em] text-ink">Create an account</h3>
+                <p className="mt-3 text-base text-ink-2">Free, with email and password. Pick your currency, and your data syncs to every device behind row-level security.</p>
+                <div className="mt-auto pt-8">
+                  <Link to="/signup" className={`${PUSH} h-12 w-full bg-accent px-6 text-base text-on-accent hover:bg-accent-hover`}>
+                    Create account <ArrowRight size={16} aria-hidden />
+                  </Link>
+                </div>
+              </div>
+            </Reveal>
+            <Reveal as="li" delay={160} className="h-full">
+              <div className={`${card} bg-cobalt-soft`}>
+                <p className="ft-label">03 · Coming back</p>
+                <h3 className="mt-3 font-display text-3xl font-extrabold tracking-[-0.04em] text-ink">Log in</h3>
+                <p className="mt-3 text-base text-ink-2">Pick up where you left off: your accounts, budgets and every transaction you’ve added.</p>
+                <div className="mt-auto pt-8">
+                  <Link to="/login" className={`${PUSH} h-12 w-full bg-surface px-6 text-base text-ink hover:bg-sunken`}>
+                    Log in <ArrowRight size={16} aria-hidden />
+                  </Link>
+                </div>
+              </div>
+            </Reveal>
+          </>
+        ) : (
+          <Reveal as="li" delay={80} className="h-full lg:col-span-2">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault()
+                open('own')
+              }}
+              className={`${card} bg-surface`}
+            >
+              <p className="ft-label">02 · Your own, in this browser</p>
+              <h3 className="mt-3 font-display text-3xl font-extrabold tracking-[-0.04em] text-ink">Build your own FinTrack</h3>
+              <p className="mt-3 max-w-md text-base text-ink-2">Start from zero and track your own income, spending and budgets. Saved privately in this browser, no sign-up.</p>
+              <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                <Field label="What should we call you?" optional>
+                  {(fp) => <Input {...fp} value={name} onChange={(e) => setName(e.target.value)} autoComplete="given-name" maxLength={60} placeholder="Your first name" />}
+                </Field>
+                <Field label="Currency">{(fp) => <CurrencySelect {...fp} value={currency} onChange={(e) => setCurrency(e.target.value)} />}</Field>
+              </div>
+              <div className="mt-auto pt-8">
+                <Button type="submit" size="lg" className="w-full !rounded-full sm:w-auto" loading={pending === 'own'}>
+                  Start tracking <ArrowRight size={16} aria-hidden />
+                </Button>
+              </div>
+            </form>
+          </Reveal>
+        )}
+      </ol>
     </section>
   )
 }

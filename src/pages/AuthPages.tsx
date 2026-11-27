@@ -46,14 +46,30 @@ function DemoEntry() {
   return <Navigate to="/" replace />
 }
 
+
+/** One click into the full app with sample data. Nothing is saved: it lives in this tab only. */
 function GuestDemoButton() {
+  const { startWorkspace } = useAuth()
+  const navigate = useNavigate()
+  const [pending, setPending] = useState(false)
   return (
-    <p className="mt-8 border-t border-line pt-6 text-sm text-ink-3">
-      Just looking?{' '}
-      <Link to="/" className="font-medium text-accent-ink underline-offset-2 hover:underline">
-        Try the prototype or build your own — no sign-up
-      </Link>
-    </p>
+    <div className="mt-8 border-t-2 border-ink pt-6">
+      <p className="mb-3 text-sm text-ink-3">Just looking? No account needed.</p>
+      <Button
+        variant="secondary"
+        size="lg"
+        className="w-full"
+        loading={pending}
+        onClick={async () => {
+          setPending(true)
+          await startWorkspace('sample')
+          navigate('/dashboard')
+        }}
+      >
+        Continue as guest
+      </Button>
+      <p className="mt-2 text-xs text-ink-3">Opens the full app with a year of sample data. Nothing is saved.</p>
+    </div>
   )
 }
 
@@ -89,7 +105,7 @@ export function LoginPage() {
 
   return (
     <AuthLayout>
-      <h1 className="font-display text-3xl font-extrabold tracking-[-0.04em]">Sign in</h1>
+      <h1 className="font-display text-3xl font-extrabold tracking-[-0.04em]">Log in</h1>
       <p className="mt-1 mb-8 text-sm text-ink-3">Welcome back.</p>
       {notice && (
         <p role="alert" className="mb-5 rounded-sm bg-caution-soft px-3 py-2 text-sm text-caution">
@@ -116,7 +132,7 @@ export function LoginPage() {
             </div>
           )}
           <Button type="submit" size="lg" loading={pending} className="mt-2">
-            Sign in
+            Log in
           </Button>
           <p className="mt-2 text-sm text-ink-3">
             New to FinTrack?{' '}
@@ -220,7 +236,7 @@ export function SignupPage() {
               <p className="mt-2 text-sm text-ink-3">
                 Already have an account?{' '}
                 <Link to="/login" className="font-medium text-accent-ink underline-offset-2 hover:underline">
-                  Sign in
+                  Log in
                 </Link>
               </p>
             </form>

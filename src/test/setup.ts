@@ -5,6 +5,7 @@ import { cleanup } from '@testing-library/react'
 afterEach(() => {
   cleanup()
   localStorage.clear()
+  sessionStorage.clear()
 })
 
 // jsdom doesn't implement <dialog> modality yet.

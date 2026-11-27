@@ -40,12 +40,16 @@ export interface DemoStorage {
   save(s: DemoState): void
 }
 
-/** One browser-only workspace per key, so the prototype and "your own" never mix. */
-export function createLocalDemoStorage(key: string): DemoStorage & { clear(): void } {
+/**
+ * One browser-only workspace per key, so the guest prototype and "your own" never mix.
+ * The guest workspace passes `sessionStorage`: nothing outlives the tab.
+ */
+export function createLocalDemoStorage(key: string, area: 'local' | 'session' = 'local'): DemoStorage & { clear(): void } {
+  const store = () => (area === 'session' ? sessionStorage : localStorage)
   return {
     load() {
       try {
-        const raw = localStorage.getItem(key)
+        const raw = store().getItem(key)
         return raw ? (JSON.parse(raw) as DemoState) : null
       } catch {
         return null
@@ -53,14 +57,14 @@ export function createLocalDemoStorage(key: string): DemoStorage & { clear(): vo
     },
     save(s) {
       try {
-        localStorage.setItem(key, JSON.stringify(s))
+        store().setItem(key, JSON.stringify(s))
       } catch {
         throw new AppError('Your browser blocked saving data. Free up storage or leave private mode.', 'storage')
       }
     },
     clear() {
       try {
-        localStorage.removeItem(key)
+        store().removeItem(key)
       } catch {
         /* ignore */
       }

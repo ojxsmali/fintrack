@@ -34,7 +34,7 @@ const queryClient = new QueryClient({
 const TITLES: Record<string, string> = {
   '/': 'FinTrack — your money, stacked up',
   '/brand': 'Brand kit · FinTrack',
-  '/login': 'Sign in · FinTrack',
+  '/login': 'Log in · FinTrack',
   '/signup': 'Create account · FinTrack',
   '/dashboard': 'Overview · FinTrack',
   '/transactions': 'Transactions · FinTrack',

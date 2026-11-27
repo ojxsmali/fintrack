@@ -9,7 +9,8 @@ const WORKSPACE_KEY = 'fintrack.workspace'
 const OWN_STORAGE_KEY = 'fintrack.own.v1'
 
 const storages = {
-  sample: createLocalDemoStorage(DEMO_STORAGE_KEY),
+  // Guest mode: sample data in sessionStorage, so nothing is saved once the tab closes.
+  sample: createLocalDemoStorage(DEMO_STORAGE_KEY, 'session'),
   own: createLocalDemoStorage(OWN_STORAGE_KEY),
 }
 
