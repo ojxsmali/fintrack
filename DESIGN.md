@@ -6,7 +6,7 @@ The live brand kit is at `/brand` (`src/pages/BrandPage.tsx`): logo variants wit
 
 ## Logo
 
-A gold coin with an ink rim, carrying an **F built from three stacked bars** that step down like a bar chart (or coins on their side). It always sits on its own hard ink shadow.
+A gold coin with an ink rim, carrying a **crisp geometric F** (one stem, two arms, softened 1.4px corners), so it reads as an F at any size. It always sits on its own hard ink shadow.
 
 - Geometry: `src/lib/brandMark.ts` (`LOGO_BARS`) — shared by the SVG mark (`LogoMark`), the favicon, the PWA icons and the extruded 3D coin.
 - Tones: gold (primary), cream (on gold), ink (reversed: gold F on ink).

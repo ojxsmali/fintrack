@@ -1,7 +1,6 @@
 /**
- * FinTrack mark: a gold coin with an ink rim, carrying an F built from three
- * stacked coin-bars. The bars rise like a column chart, so the F also reads as
- * "money going up". Geometry lives in lib/brandMark.ts so the 3D coin, favicon
+ * FinTrack mark: a gold coin with an ink rim, carrying a crisp geometric F
+ * (one stem, two arms). Geometry lives in lib/brandMark.ts so the 3D coin, favicon
  * and brand kit all share one drawing.
  */
 import { BRAND, LOGO_BARS } from '../../lib/brandMark'
@@ -16,10 +15,9 @@ export function LogoMark({ size = 28, tone = 'gold' }: { size?: number; tone?: '
       <circle cx="16" cy="16" r="15" fill={face} stroke={BRAND.ink} strokeWidth="2.2" />
       {/* milled inner rim */}
       <circle cx="16" cy="16" r="11.6" fill="none" stroke={fg} strokeOpacity="0.35" strokeWidth="1.1" strokeDasharray="1.4 1.6" />
-      {LOGO_BARS.map((b) => (
-        <rect key={b.y} x={b.x} y={b.y} width={b.w} height={b.h} rx={b.h / 2} fill={fg} />
+      {LOGO_BARS.map((b, i) => (
+        <rect key={i} x={b.x} y={b.y} width={b.w} height={b.h} rx={b.r} fill={fg} />
       ))}
-      <rect x="10" y="8.5" width="4.2" height="16" rx="2.1" fill={fg} />
     </svg>
   )
 }

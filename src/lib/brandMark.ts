@@ -7,9 +7,13 @@ export const BRAND = {
   tangerine: '#FF6A2B',
 }
 
-/** The F, in a 32×32 box: stem + three rounded bars (top longest). */
+/**
+ * The F, in a 32×32 box centred on the coin: a stem, a long top arm and a shorter
+ * middle arm. Exactly two arms, so it can never read as an E. Corners are softened
+ * (r), not pill-rounded, to keep the letterform crisp.
+ */
 export const LOGO_BARS = [
-  { x: 10, y: 8.5, w: 13, h: 4.2 },
-  { x: 10, y: 14.4, w: 10.2, h: 4.2 },
-  { x: 10, y: 20.3, w: 7.4, h: 4.2 },
+  { x: 10, y: 8, w: 4.6, h: 16, r: 1.4 }, // stem
+  { x: 10, y: 8, w: 12.6, h: 4.6, r: 1.4 }, // top arm
+  { x: 10, y: 14.3, w: 9.4, h: 4.2, r: 1.4 }, // middle arm
 ]

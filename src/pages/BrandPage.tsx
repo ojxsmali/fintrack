@@ -17,7 +17,7 @@ type Tone = 'gold' | 'ink' | 'cream'
 function logoSvg(tone: Tone, size = 512) {
   const face = tone === 'gold' ? BRAND.gold : tone === 'ink' ? BRAND.ink : BRAND.cream
   const fg = tone === 'ink' ? BRAND.gold : BRAND.ink
-  const bars = [...LOGO_BARS.map((b) => `<rect x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" rx="${b.h / 2}" fill="${fg}"/>`), `<rect x="10" y="8.5" width="4.2" height="16" rx="2.1" fill="${fg}"/>`]
+  const bars = LOGO_BARS.map((b) => `<rect x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" rx="${b.r}" fill="${fg}"/>`)
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 34 34"><circle cx="18.5" cy="18.5" r="15" fill="${BRAND.ink}"/><circle cx="16" cy="16" r="15" fill="${face}" stroke="${BRAND.ink}" stroke-width="2.2"/><circle cx="16" cy="16" r="11.6" fill="none" stroke="${fg}" stroke-opacity="0.35" stroke-width="1.1" stroke-dasharray="1.4 1.6"/>${bars.join('')}</svg>`
 }
 
@@ -72,7 +72,7 @@ export function BrandPage() {
           </div>
         </section>
 
-        <Block index="01" title="The mark" lede="A coin carrying an F made of three stacked bars. Read it as a letter, a bar chart going up, or coins stacked on their side. Always on its hard shadow.">
+        <Block index="01" title="The mark" lede="A gold coin stamped with a crisp geometric F: one stem, two arms, softened corners. Always on its hard shadow.">
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {(
               [

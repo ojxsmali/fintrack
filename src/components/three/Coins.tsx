@@ -34,9 +34,8 @@ function roundedRect(x: number, y: number, w: number, h: number, r: number) {
 function useLogoGeometry(depth: number) {
   return useMemo(() => {
     const k = 1 / 15
-    const toShape = (x: number, y: number, w: number, h: number) =>
-      roundedRect((x - 16) * k, -(y + h - 16) * k, w * k, h * k, (Math.min(w, h) / 2) * k)
-    const shapes = [...LOGO_BARS.map((b) => toShape(b.x, b.y, b.w, b.h)), toShape(10, 8.5, 4.2, 16)]
+    const toShape = (x: number, y: number, w: number, h: number, r: number) => roundedRect((x - 16) * k, -(y + h - 16) * k, w * k, h * k, r * k)
+    const shapes = LOGO_BARS.map((b) => toShape(b.x, b.y, b.w, b.h, b.r))
     const g = new THREE.ExtrudeGeometry(shapes, { depth, bevelEnabled: true, bevelThickness: depth * 0.4, bevelSize: 0.012, bevelSegments: 2, curveSegments: 10 })
     g.translate(0.02, 0, 0)
     return g
